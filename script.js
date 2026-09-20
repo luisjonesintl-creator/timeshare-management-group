@@ -1,6 +1,7 @@
 // ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://ztobjbyfbyidzzrqicjvn.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0b2pieWZieWlkenpycWljanVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzE1NTUsImV4cCI6MjEwNTUwNzU1NX0.Ap30zRwDs3z3vBjyS2ibocx5oGY3Uzft2eID26RbLKQ";
+// Enlace del servidor de datos dedicado corregido
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
 
 let supabaseClientInstance = null;
 
