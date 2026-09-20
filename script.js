@@ -1,12 +1,20 @@
 // ====== CONFIGURATION STEP ======
-// Replace these with your real strings from your Supabase Settings -> API tab!
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0b2pieWZieWlkenpycWljanVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzE1NTUsImV4cCI6MjEwNTUwNzU1NX0.Ap30zRwDs3z3vBjyS2ibocx5oGY3Uzft2eID26RbLKQ";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Global client allocation setup
+let supabaseClientInstance = null;
 
-// ====== PAGE ROUTER ROUTINE ======
+// ====== INITIALIZATION ROUTINE ======
 document.addEventListener("DOMContentLoaded", () => {
+    // Safely verify and build connection before routing
+    if (typeof supabase !== 'undefined') {
+        supabaseClientInstance = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+        console.error("Supabase engine connection block detected.");
+        return;
+    }
+
     if (document.getElementById("active-properties")) {
         loadPublicMarketplace();
         setupLeadSubmission();
@@ -18,14 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace() {
-    // 1. Pull Available Properties
-    let { data: activeList, error: err1 } = await supabase
+    let { data: activeList, error: err1 } = await supabaseClientInstance
         .from('properties')
         .select('*')
         .eq('status', 'AVAILABLE');
 
-    // 2. Pull Sold or Rented Properties
-    let { data: pastList, error: err2 } = await supabase
+    let { data: pastList, error: err2 } = await supabaseClientInstance
         .from('properties')
         .select('*')
         .in('status', ['SOLD', 'RENTED'])
@@ -67,9 +73,10 @@ async function loadPublicMarketplace() {
     }
 }
 
-// Increment system views automatically via safe RPC transaction
 async function trackPageImpression(propertyId) {
-    await supabase.rpc('increment_view_counter', { row_id: propertyId });
+    if (supabaseClientInstance) {
+        await supabaseClientInstance.rpc('increment_view_counter', { row_id: propertyId });
+    }
 }
 
 // ====== CLIENT PORTAL CORE AUTHENTICATION ENGINE ======
@@ -85,8 +92,7 @@ function setupPortalAuthentication() {
 
         if (errorMsg) errorMsg.classList.add("hidden");
 
-        // Look up the matching client profile
-        let { data: users, error } = await supabase
+        let { data: users, error } = await supabaseClientInstance
             .from('clients')
             .select('*')
             .eq('email', email)
@@ -97,16 +103,13 @@ function setupPortalAuthentication() {
             return;
         }
 
-        // Extracted verified client object
         const clientAccount = users[0]; 
         
-        // Fetch corresponding property item matching owner id link
-        let { data: properties } = await supabase
+        let { data: properties } = await supabaseClientInstance
             .from('properties')
             .select('*')
             .eq('owner_id', clientAccount.id);
 
-        // Swap visual dashboard interface layers
         document.getElementById("login-card").classList.add("hidden");
         document.getElementById("portal-dashboard").classList.remove("hidden");
         document.getElementById("owner-title").innerText = `Welcome back, ${clientAccount.client_name}`;
@@ -114,7 +117,6 @@ function setupPortalAuthentication() {
         if (properties && properties.length > 0) {
             const myProp = properties[0];
             
-            // DUAL VIEW OVERRIDE OPTICS SYSTEM
             const finalMetricViews = myProp.manual_views_override !== null 
                 ? myProp.manual_views_override 
                 : myProp.auto_views_count;
@@ -125,7 +127,6 @@ function setupPortalAuthentication() {
             document.getElementById("detail-week").innerText = `Week ${myProp.week_number}`;
             document.getElementById("detail-type").innerText = myProp.listing_type;
 
-            // Load and display active offers metrics
             loadPropertyOffers(myProp.id);
         }
     });
@@ -133,7 +134,7 @@ function setupPortalAuthentication() {
 
 // ====== OFFERS DATA RENDERING GRID UTILITIES ======
 async function loadPropertyOffers(propertyId) {
-    let { data: offersList } = await supabase
+    let { data: offersList } = await supabaseClientInstance
         .from('offers')
         .select('*')
         .eq('property_id', propertyId)
