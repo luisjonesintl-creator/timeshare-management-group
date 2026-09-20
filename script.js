@@ -1,5 +1,6 @@
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
+// ====== CONFIGURATION STEP ======
+const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -73,7 +74,6 @@ function setupPortalAuthentication() {
         const inputPassword = document.getElementById("auth-password").value.trim();
         const errorMsg = document.getElementById("login-error");
 
-        errorMsg.cloneNode(true);
         errorMsg.classList.add("hidden");
 
         let { data: users, error } = await supabase
@@ -113,7 +113,6 @@ function setupPortalAuthentication() {
             document.getElementById("detail-week").innerText = `Week ${myProp.week_number}`;
             document.getElementById("detail-type").innerText = myProp.listing_type;
 
-            // Load all corresponding manual offers tied to this property ID record
             loadPropertyOffers(myProp.id);
         }
     });
