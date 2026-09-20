@@ -1,5 +1,4 @@
 // ====== CONFIGURATION STEP ======
-// URL y Llave Anon de tu proyecto real verificadas
 const SUPABASE_URL = "https://ztobjbyfbyidzzrqicjvn.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0b2pieWZieWlkenpycWljanVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzE1NTUsImV4cCI6MjEwNTUwNzU1NX0.Ap30zRwDs3z3vBjyS2ibocx5oGY3Uzft2eID26RbLKQ";
 
