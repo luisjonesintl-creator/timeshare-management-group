@@ -1,10 +1,11 @@
 // ====== CONFIGURATION STEP ======
-// ====== CONFIGURATION STEP ======
+// Replace these with your real strings from your Supabase Settings -> API tab!
 const SUPABASE_URL = "https://supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0b2pieWZieWlkenpycWljanZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzE1NTUsImV4cCI6MjEwNTUwNzU1NX0.Ap30zRwDs3z3vBjyS2ibocx5oGY3Uzft2eID26RbLKQ";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0b2pieWZieWlkenpycWljanVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzE1NTUsImV4cCI6MjEwNTUwNzU1NX0.Ap30zRwDs3z3vBjyS2ibocx5oGY3Uzft2eID26RbLKQ";
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ====== PAGE ROUTER ROUTINE ======
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("active-properties")) {
         loadPublicMarketplace();
@@ -15,12 +16,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace() {
+    // 1. Pull Available Properties
     let { data: activeList, error: err1 } = await supabase
         .from('properties')
         .select('*')
         .eq('status', 'AVAILABLE');
 
+    // 2. Pull Sold or Rented Properties
     let { data: pastList, error: err2 } = await supabase
         .from('properties')
         .select('*')
@@ -63,40 +67,46 @@ async function loadPublicMarketplace() {
     }
 }
 
+// Increment system views automatically via safe RPC transaction
 async function trackPageImpression(propertyId) {
     await supabase.rpc('increment_view_counter', { row_id: propertyId });
 }
 
+// ====== CLIENT PORTAL CORE AUTHENTICATION ENGINE ======
 function setupPortalAuthentication() {
     const loginForm = document.getElementById("login-form");
+    if (!loginForm) return;
+
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = document.getElementById("auth-email").value.trim();
         const inputPassword = document.getElementById("auth-password").value.trim();
         const errorMsg = document.getElementById("login-error");
 
-        errorMsg.classList.add("hidden");
+        if (errorMsg) errorMsg.classList.add("hidden");
 
+        // Look up the matching client profile
         let { data: users, error } = await supabase
             .from('clients')
             .select('*')
             .eq('email', email)
-            .eq('visible_password', inputPassword)
-            .limit(1);
+            .eq('visible_password', inputPassword);
 
         if (error || !users || users.length === 0) {
-            errorMsg.classList.remove("hidden");
+            if (errorMsg) errorMsg.classList.remove("hidden");
             return;
         }
 
-        const clientAccount = users[0];
+        // Extracted verified client object
+        const clientAccount = users[0]; 
         
+        // Fetch corresponding property item matching owner id link
         let { data: properties } = await supabase
             .from('properties')
             .select('*')
-            .eq('owner_id', clientAccount.id)
-            .limit(1);
+            .eq('owner_id', clientAccount.id);
 
+        // Swap visual dashboard interface layers
         document.getElementById("login-card").classList.add("hidden");
         document.getElementById("portal-dashboard").classList.remove("hidden");
         document.getElementById("owner-title").innerText = `Welcome back, ${clientAccount.client_name}`;
@@ -104,6 +114,7 @@ function setupPortalAuthentication() {
         if (properties && properties.length > 0) {
             const myProp = properties[0];
             
+            // DUAL VIEW OVERRIDE OPTICS SYSTEM
             const finalMetricViews = myProp.manual_views_override !== null 
                 ? myProp.manual_views_override 
                 : myProp.auto_views_count;
@@ -114,11 +125,13 @@ function setupPortalAuthentication() {
             document.getElementById("detail-week").innerText = `Week ${myProp.week_number}`;
             document.getElementById("detail-type").innerText = myProp.listing_type;
 
+            // Load and display active offers metrics
             loadPropertyOffers(myProp.id);
         }
     });
 }
 
+// ====== OFFERS DATA RENDERING GRID UTILITIES ======
 async function loadPropertyOffers(propertyId) {
     let { data: offersList } = await supabase
         .from('offers')
@@ -127,6 +140,7 @@ async function loadPropertyOffers(propertyId) {
         .order('date_received', { ascending: false });
 
     const ledgerBody = document.getElementById("offers-ledger-body");
+    if (!ledgerBody) return;
     
     if (offersList && offersList.length > 0) {
         ledgerBody.innerHTML = '';
@@ -148,8 +162,11 @@ async function loadPropertyOffers(propertyId) {
     }
 }
 
+// ====== LEAD GENERATION INTAKE UTILITIES ======
 function setupLeadSubmission() {
     const leadForm = document.getElementById("general-lead-form");
+    if (!leadForm) return;
+
     leadForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         
