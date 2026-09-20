@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeshare Management Group</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- Supabase CDN Library -->
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navigation Header -->
+    <header class="bg-blue-900 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide">TIMESHARE <span class="text-blue-300">MANAGEMENT GROUP</span></h1>
+            <nav class="space-x-6 text-sm">
+                <a href="#marketplace" class="hover:text-blue-300 transition">Marketplace</a>
+                <a href="#history" class="hover:text-blue-300 transition">Recent Success</a>
+                <a href="#contact" class="hover:text-blue-300 transition">Contact Us</a>
+                <a href="portal.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold transition">Client Portal</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Top Contact Banner -->
+    <div class="bg-blue-800 text-white text-center py-3 font-semibold border-t border-blue-700">
+        📞 Call Our Sales Desk Direct: <a href="tel:18005550199" class="underline hover:text-blue-200">1-800-555-0199</a>
+    </div>
+
+    <!-- Active Catalog Section -->
+    <main class="max-w-6xl mx-auto p-6">
+        <section id="marketplace" class="mb-16">
+            <h2 class="text-3xl font-bold mb-2 text-gray-900">Current Availabilities</h2>
+            <p class="text-gray-600 mb-8">Browse verified short-term rental and resale fractional opportunities.</p>
+            
+            <div id="active-properties" class="grid md:grid-cols-3 gap-6">
+                <p class="text-gray-500 col-span-3">Loading properties...</p>
+            </div>
+        </section>
+
+        <!-- Social Proof History Section -->
+        <section id="history" class="mb-16 border-t border-gray-200 pt-12">
+            <h2 class="text-3xl font-bold mb-2 text-gray-900">Recent Transactions</h2>
+            <p class="text-gray-600 mb-8">See properties our owners successfully sold or rented through us recently.</p>
+            
+            <div id="past-properties" class="grid md:grid-cols-4 gap-4">
+                <!-- Data from Supabase will load here automatically -->
+            </div>
+        </section>
+
+        <!-- Global Catch-All Lead Form -->
+        <section id="contact" class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-100">
+            <h2 class="text-2xl font-bold mb-2 text-gray-900 text-center">General Inquiry Desk</h2>
+            <p class="text-gray-600 text-center mb-6 text-sm">Can't find a specific resort? Drop your details below and our agents will trace inventory for you.</p>
+            
+            <form id="general-lead-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Your Name</label>
+                    <input type="text" id="lead-name" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Email Address</label>
+                    <input type="email" id="lead-email" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Your Message</label>
+                    <textarea id="lead-message" rows="4" required placeholder="Tell us what resort or dates you are hunting for..." class="w-full p-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-blue-600"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-900 text-white p-3 font-semibold rounded hover:bg-blue-800 transition">Submit Request</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 text-center py-8 text-xs mt-20">
+        &copy; 2026 Timeshare Management Group. Private Client Network Model.
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
