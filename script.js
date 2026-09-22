@@ -57,8 +57,7 @@ async function loadPublicMarketplace() {
                 activeContainer.innerHTML = activeHTML.join('');
                 
                 activeContainer.querySelectorAll('.inquire-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        trackPageImpression(e.target.dataset.id);
+                    btn.addEventListener('click', () => {
                         document.getElementById("contact")?.scrollIntoView({ behavior: 'smooth' });
                     });
                 });
@@ -81,15 +80,6 @@ async function loadPublicMarketplace() {
         }
     } catch (error) {
         console.error("Error loading marketplace assets:", error.message);
-    }
-}
-
-async function trackPageImpression(propertyId) {
-    if (!supabaseClientInstance || !propertyId) return;
-    try {
-        await supabaseClientInstance.rpc('increment_view_counter', { row_id: propertyId });
-    } catch (error) {
-        console.error("Tracking impression failed:", error.message);
     }
 }
 // ====== CLIENT PORTAL CORE AUTHENTICATION ENGINE ======
@@ -155,7 +145,7 @@ function setupPortalAuthentication() {
                     : myProp.auto_views_count;
 
                 const metricViewsEl = document.getElementById("metric-views");
-                if (metricViewsEl) metricViewsEl.innerText = Number(finalMetricViews).toLocaleString();
+                if (metricViewsEl) metricViewsEl.innerText = Number(finalMetricViews || 0).toLocaleString();
 
                 // Rellenado de campos de detalles del inmueble asignado al dueño logueado
                 const resortEl = document.getElementById("detail-resort");
@@ -211,6 +201,8 @@ async function loadPropertyOffers(propertyId) {
                     </tr>
                 `;
             });
+        } else {
+            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for this property yet.</td></tr>`;
         }
     } catch (err) {
         console.error("Error fetching offers ledger:", err.message);
@@ -236,4 +228,4 @@ function setupLeadSubmission() {
     });
 }
 
-// Despliegue de actualización limpia forzada final v1.0.9
+// Despliegue de actualización limpia forzada v1.1.2 sin rpc rotos
