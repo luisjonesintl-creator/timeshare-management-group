@@ -1,94 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Portal - Timeshare Management Group</title>
-    <!-- FIX: Motor de compilación en vivo oficial de Tailwind CSS v3 -->
-    <script src="https://tailwindcss.com"></script>
-    <!-- FIX: Distribuidor global oficial de la librería Supabase JS v2 -->
-    <script src="https://unpkg.com"></script>
+    <title>Owner & Client Portal - Timeshare Management Group</title>
+    
+    <!-- Enlace oficial para activar los estilos de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
 
-    <!-- Authentication Form Screen -->
-    <div id="login-card" class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 w-full max-w-md">
-        <div class="text-center mb-6">
-            <h1 class="text-xl font-bold text-gray-900">Timeshare Management Group</h1>
-            <p class="text-xs text-gray-500 mt-1">Private Owner Dashboard Access</p>
+    <!-- CABECERA DEL PORTAL -->
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <span class="font-bold text-lg tracking-wide uppercase">Timeshare Management Group</span>
+            <a href="index.html" class="text-xs bg-blue-800 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded transition">
+                ← Back to Marketplace
+            </a>
         </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL DINÁMICO -->
+    <main class="flex-grow flex items-center justify-center p-4">
         
-        <form id="login-form" class="space-y-4">
-            <div>
-                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Account Email</label>
-                <input type="email" id="auth-email" required class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-blue-600">
+        <!-- SECCIÓN 1: Tarjeta de Acceso / Login Form -->
+        <section class="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 p-8 transition-all duration-300" id="login-card">
+            <div class="text-center mb-6">
+                <div class="inline-flex p-3 bg-blue-50 text-blue-900 rounded-full mb-3">
+                    <svg xmlns="http://w3.org" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v2m0 4h.01M19 10V6a3 3 0 00-6 0v4M4 10h16" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">Client Portal</h1>
+                <p class="text-sm text-gray-500 mt-1">Access your property performance and offers ledger</p>
             </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Access Password</label>
-                <input type="password" id="auth-password" required class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-blue-600">
-            </div>
-            <div id="login-error" class="text-red-600 text-xs font-medium hidden">Invalid email or temporary password.</div>
-            <button type="submit" class="w-full bg-blue-900 text-white p-3 font-semibold rounded hover:bg-blue-800 transition">Log In</button>
-        </form>
-    </div>
 
-    <!-- Private Logged-In Portal Screen -->
-    <div id="portal-dashboard" class="w-full max-w-4xl bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hidden">
-        <div class="bg-blue-900 p-6 text-white flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold" id="owner-title">Welcome</h1>
-                <p class="text-xs text-blue-200">Timeshare Management Group Portfolio Suite</p>
-            </div>
-            <button onclick="window.location.reload()" class="text-xs border border-blue-400 px-3 py-1 rounded hover:bg-blue-800 transition">Log Out</button>
-        </div>
-
-        <div class="p-6 space-y-6">
-            <!-- Top Row: Metrics & Details -->
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- Metric Card: View Counter -->
-                <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 flex flex-col justify-between">
-                    <span class="text-xs font-semibold tracking-wider text-blue-700 uppercase">Total Listing Views</span>
-                    <span class="text-4xl font-extrabold text-blue-900 mt-2" id="metric-views">0</span>
-                    <span class="text-[10px] text-blue-500 mt-1">Live unique impressions calculated by system.</span>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Email Address</label>
+                    <input type="email" id="auth-email" required placeholder="name@example.com" 
+                           class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" 
+                           class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:outline-none transition">
+                </div>
+                
+                <!-- Alerta de credenciales incorrectas oculta por defecto -->
+                <div id="login-error" class="p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg hidden flex items-center gap-2">
+                    <svg xmlns="http://w3.org" class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Invalid credentials. Please verify and try again.</span>
                 </div>
 
-                <!-- Property Detail Block -->
-                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 md:col-span-2">
-                    <h3 class="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide border-b pb-1">Listed Asset Information</h3>
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div><span class="text-gray-400 block text-xs">Resort:</span> <strong id="detail-resort">-</strong></div>
-                        <div><span class="text-gray-400 block text-xs">Asking Price:</span> <strong id="detail-price">-</strong></div>
-                        <div><span class="text-gray-400 block text-xs">Assigned Week:</span> <strong id="detail-week">-</strong></div>
-                        <div><span class="text-gray-400 block text-xs">Listing Mode:</span> <strong id="detail-type">-</strong></div>
+                <button type="submit" class="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 shadow-md transition-all active:scale-[0.98]">
+                    Sign In to Portal
+                </button>
+            </form>
+        </section>
+
+        <!-- SECCIÓN 2: Dashboard Privado del Propietario (Oculto inicialmente, se activa en script.js) -->
+        <section id="portal-dashboard" class="w-full max-w-4xl bg-white rounded-xl shadow-xl border border-gray-200 p-6 md:p-8 hidden transition-all duration-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-200 pb-5 mb-6 gap-4">
+                <div>
+                    <h2 id="owner-title" class="text-2xl font-extrabold text-blue-900">Welcome back</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Real-time stats for your registered inventory asset.</p>
+                </div>
+                <button onclick="window.location.reload()" class="self-start md:self-auto text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 border px-3 py-1.5 rounded-lg transition">
+                    Sign Out
+                </button>
+            </div>
+            
+            <!-- Panel de Métricas e Información de la Propiedad -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Tarjeta de Desempeño Visualizaciones -->
+                <div class="md:col-span-1 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold text-blue-800 uppercase tracking-wider">Property Performance</h3>
+                        <p class="text-4xl font-black text-blue-950 mt-3 tracking-tight" id="metric-views">0</p>
+                    </div>
+                    <p class="text-[11px] text-blue-600 font-medium mt-4 flex items-center gap-1">
+                        <span class="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Total verified marketplace views
+                    </p>
+                </div>
+
+                <!-- Detalles Técnicos de la Propiedad en Venta/Renta -->
+                <div class="md:col-span-2 p-5 bg-gray-50 border border-gray-200 rounded-xl grid grid-cols-2 gap-4">
+                    <div class="col-span-2 border-b border-gray-100 pb-1.5">
+                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Asset Information</h3>
+                        <p class="text-lg font-bold text-gray-900 mt-1" id="detail-resort">N/A</p>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase">Current Listing Price</span>
+                        <span class="text-base font-extrabold text-gray-800" id="detail-price">N/A</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase">Assigned Interval</span>
+                        <span class="text-base font-bold text-gray-700" id="detail-week">N/A</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase">Listing Type</span>
+                        <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded mt-1" id="detail-type">N/A</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Row: Offers Tracking Ledger Section -->
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide mb-4 pb-1 border-b">Active Purchase & Rental Offers</h3>
-                <div class="overflow-x-auto">
+            <!-- Panel de Ofertas Económicas Recibidas -->
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    Offers Ledger 
+                    <span class="text-xs bg-gray-100 text-gray-600 font-normal px-2 py-0.5 rounded border">Live Data</span>
+                </h3>
+                <div class="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
                     <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
-                                <th class="p-3">Date Received</th>
-                                <th class="p-3">Offer Type</th>
-                                <th class="p-3">Offered Amount</th>
-                                <th class="p-3 text-center">Status</th>
+                        <thead class="bg-gray-50 text-gray-700 uppercase text-[10px] font-bold tracking-wider border-b border-gray-200">
+                            <tr>
+                                <th class="p-3.5">Date Received</th>
+                                <th class="p-3.5">Offer Type</th>
+                                <th class="p-3.5">Proposed Amount</th>
+                                <th class="p-3.5 text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody id="offers-ledger-body" class="divide-y divide-gray-100">
-                            <!-- Offers rows from Supabase spreadsheet will inject here dynamically -->
+                            <!-- Las ofertas vinculadas a la propiedad se cargarán aquí mediante script.js -->
                             <tr>
-                                <td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for this property yet.</td>
+                                <td colspan="4" class="p-4 text-center text-gray-400 bg-gray-50/50">Awaiting portal verification hook...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <script src="script.js"></script>
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-400">
+        <p>© 2026 Timeshare Management Group. Client Dashboard Engine. All rights reserved.</p>
+    </footer>
+
+    <!-- ==================== CONTROLADORES Y LIBRERÍAS ==================== -->
+    <!-- 1. Motor oficial JavaScript de Supabase vía CDN de unpkg -->
+    <script src="https://unpkg.com"></script>
+
+    <!-- 2. Tu archivo de lógica de negocio sincronizado (Evita datos en caché mediante ?v=1.0.1) -->
+    <script src="script.js?v=1.0.1"></script>
 </body>
 </html>
