@@ -1,8 +1,7 @@
 // ====== CONFIGURATION STEP ======
-// Intenta leer desde las variables del sistema inyectadas por Vercel, si no existen, usa las cadenas por defecto.
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
-  || "https://ztojbyfbyidzzrqicjvn.supabase.co";
+  || "https://supabase.co";
 
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
@@ -11,51 +10,41 @@ const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_P
 let supabaseClientInstance = null;
 
 // ====== INITIALIZATION ROUTINE ======
-/**
- * Inicializa y retorna la instancia única del cliente de Supabase.
- * @returns {SupabaseClient} Instancia del cliente de Supabase.
- */
 function getSupabaseClient() {
   if (!supabaseClientInstance) {
-    // FIX: Usar window.supabase de forma explícita para evitar bucles infinitos en navegadores
-    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-      supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else {
-      try {
-        if (typeof createClient !== 'undefined') {
-          supabaseClientInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-      } catch (error) {
-        console.error("Error: 'createClient' no está definido. Asegúrate de que el script de unpkg en tu HTML cargue primero.");
-      }
+    const creator = window.supabase?.createClient || window.createClient || (typeof createClient !== 'undefined' ? createClient : null);
+    if (creator) {
+      supabaseClientInstance = creator(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   }
   return supabaseClientInstance;
 }
 
-// Inicialización del cliente global seguro
-const supabaseClient = getSupabaseClient();
-
-// Automatización del enrutamiento de eventos tras la carga del DOM
+// Rutina de arranque segura y controlada
 document.addEventListener("DOMContentLoaded", () => {
-    if (!supabaseClientInstance) {
-        console.error("Critical connection failure: Supabase engine not initialized.");
-        return;
-    }
-    if (document.getElementById("active-properties")) {
-        loadPublicMarketplace();
-        setupLeadSubmission();
-    }
-    if (document.getElementById("login-form")) {
-        setupPortalAuthentication();
-    }
+    setTimeout(() => {
+        const client = getSupabaseClient();
+        if (!client) {
+            console.error("Critical connection failure: Supabase engine not initialized.");
+            return;
+        }
+        
+        if (document.getElementById("active-properties")) {
+            loadPublicMarketplace(client);
+            setupLeadSubmission(client);
+        }
+        if (document.getElementById("login-form")) {
+            setupPortalAuthentication(client);
+        }
+    }, 300); // Retraso de seguridad para estabilizar la carga de scripts en la red
 });
+
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
-async function loadPublicMarketplace() {
+async function loadPublicMarketplace(client) {
     try {
         const [activeResult, pastResult] = await Promise.all([
-            supabaseClientInstance.from('properties').select('*').eq('status', 'AVAILABLE'),
-            supabaseClientInstance.from('properties').select('*').in('status', ['SOLD', 'RENTED']).order('created_at', { ascending: false })
+            client.from('properties').select('*').eq('status', 'AVAILABLE'),
+            client.from('properties').select('*').in('status', ['SOLD', 'RENTED']).order('created_at', { ascending: false })
         ]);
 
         const { data: activeList, error: err1 } = activeResult;
@@ -106,7 +95,6 @@ async function loadPublicMarketplace() {
                 });
             }
         }
-
         const pastContainer = document.getElementById("past-properties");
         if (pastContainer && pastList) {
             const pastHTML = pastList.map(prop => {
@@ -129,12 +117,9 @@ async function loadPublicMarketplace() {
         console.error("Error loading marketplace assets:", error.message);
     }
 }
-// ====== FRONTEND UTILITIES & CAPTURE FOR FORMS ======
 
-/**
- * Gestiona el envío del formulario de contacto para captación de clientes potenciales.
- */
-function setupLeadSubmission() {
+// ====== FRONTEND UTILITIES & CAPTURE FOR FORMS ======
+function setupLeadSubmission(client) {
     const leadForm = document.getElementById("general-lead-form");
     if (!leadForm) return;
 
@@ -146,7 +131,7 @@ function setupLeadSubmission() {
         const message = document.getElementById("lead-message").value;
 
         try {
-            const { error } = await supabaseClientInstance
+            const { error } = await client
                 .from('leads')
                 .insert([{ full_name: name, email_address: email, message: message }]);
 
@@ -156,15 +141,12 @@ function setupLeadSubmission() {
             leadForm.reset();
         } catch (error) {
             console.error("Error submitting lead application:", error.message);
-            alert("No se pudo procesar la solicitud en este momento. Inténtalo de nuevo.");
+            alert("No se pudo procesar la solicitud en este momento.");
         }
     });
 }
 
-/**
- * Controla el acceso del cliente a través del formulario de autenticación clásico.
- */
-function setupPortalAuthentication() {
+function setupPortalAuthentication(client) {
     const loginForm = document.getElementById("login-form");
     if (!loginForm) return;
 
@@ -177,7 +159,7 @@ function setupPortalAuthentication() {
         if (errorMsg) errorMsg.classList.add("hidden");
 
         try {
-            const { data, error } = await supabaseClientInstance.auth.signInWithPassword({
+            const { data, error } = await client.auth.signInWithPassword({
                 email: email,
                 password: password,
             });
@@ -190,9 +172,7 @@ function setupPortalAuthentication() {
                 if (dashboard) {
                     dashboard.classList.remove("hidden");
                     document.getElementById("owner-title").innerText = `Welcome back, ${data.user.email}`;
-                    
-                    // Dispara la carga dinámica de ofertas del usuario autenticado
-                    loadUserOffers(data.user.id);
+                    loadUserOffers(client, data.user.id);
                 }
             }
         } catch (error) {
@@ -202,16 +182,12 @@ function setupPortalAuthentication() {
     });
 }
 
-/**
- * Busca y renderiza las ofertas asociadas al usuario autenticado en el Offers Ledger.
- * @param {string} userId - ID del usuario de Supabase Auth.
- */
-async function loadUserOffers(userId) {
+async function loadUserOffers(client, userId) {
     const ledgerBody = document.getElementById("offers-ledger-body");
     if (!ledgerBody) return;
 
     try {
-        const { data: offers, error } = await supabaseClientInstance
+        const { data: offers, error } = await client
             .from('offers')
             .select('*')
             .eq('user_id', userId)
@@ -220,15 +196,12 @@ async function loadUserOffers(userId) {
         if (error) throw error;
 
         if (!offers || offers.length === 0) {
-            ledgerBody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for your property yet.</td>
-                </tr>`;
+            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for your property yet.</td></tr>`;
             return;
         }
 
         ledgerBody.innerHTML = offers.map(off => {
-            let statusColor = "bg-yellow-100 text-yellow-800"; // PENDING
+            let statusColor = "bg-yellow-100 text-yellow-800";
             if (off.status === 'ACCEPTED') statusColor = "bg-green-100 text-green-800";
             if (off.status === 'REJECTED') statusColor = "bg-red-100 text-red-800";
 
@@ -237,14 +210,11 @@ async function loadUserOffers(userId) {
                     <td class="p-3 text-xs text-gray-600">${new Date(off.created_at).toLocaleDateString()}</td>
                     <td class="p-3 font-medium">${off.offer_type || 'Purchase'}</td>
                     <td class="p-3 font-bold text-blue-900">$${Number(off.amount || 0).toLocaleString()}</td>
-                    <td class="p-3 text-center">
-                        <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded ${statusColor}">${off.status || 'PENDING'}</span>
-                    </td>
+                    <td class="p-3 text-center"><span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded ${statusColor}">${off.status || 'PENDING'}</span></td>
                 </tr>`;
         }).join('');
 
     } catch (error) {
         console.error("Error loading ledger offers:", error.message);
-        ledgerBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500 text-xs">Failed to load offers ledger.</td></tr>`;
     }
 }
