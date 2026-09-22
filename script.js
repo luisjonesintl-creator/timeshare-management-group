@@ -20,7 +20,7 @@ function getSupabaseClient() {
   return supabaseClientInstance;
 }
 
-// Rutina de arranque segura y controlada
+// Rutina de arranque segura con tolerancia a retrasos de red
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const client = getSupabaseClient();
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (document.getElementById("login-form")) {
             setupPortalAuthentication(client);
         }
-    }, 300); // Retraso de seguridad para estabilizar la carga de scripts en la red
+    }, 300);
 });
 
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
@@ -54,9 +54,14 @@ async function loadPublicMarketplace(client) {
         if (err2) throw err2;
 
         const activeContainer = document.getElementById("active-properties");
-        if (activeContainer && activeList) {
-            if (activeList.length === 0) {
-                activeContainer.innerHTML = '<p class="text-gray-500 col-span-3">No active assets listed right now.</p>';
+        if (activeContainer) {
+            // CONTROL DE SEGURIDAD: Si no hay propiedades disponibles, mostramos un mensaje descriptivo
+            if (!activeList || activeList.length === 0) {
+                activeContainer.innerHTML = `
+                    <div class="col-span-1 md:col-span-3 p-6 bg-blue-50 border border-blue-200 rounded-lg text-center">
+                        <p class="text-blue-900 font-semibold text-sm">No active luxury assets listed for sale right now.</p>
+                        <p class="text-blue-700 text-xs mt-1">Please contact an agent below to discover upcoming timeshare opportunities.</p>
+                    </div>`;
             } else {
                 const activeHTML = activeList.map(prop => {
                     const imageHeader = prop.image_url 
@@ -97,21 +102,25 @@ async function loadPublicMarketplace(client) {
         }
         const pastContainer = document.getElementById("past-properties");
         if (pastContainer && pastList) {
-            const pastHTML = pastList.map(prop => {
-                const badgeColor = prop.status === 'SOLD' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
-                return `
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-5 relative overflow-hidden hover:shadow-md transition opacity-90">
-                        <span class="absolute top-3 right-3 text-[9px] font-extrabold tracking-widest px-2 py-0.5 rounded ${badgeColor}">${prop.status}</span>
-                        <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 rounded mb-2">${prop.listing_type || 'N/A'}</span>
-                        <h4 class="font-bold text-gray-900 text-base truncate pr-12">${prop.resort_name || 'Unknown'}</h4>
-                        <p class="text-gray-500 text-xs mb-3">Assigned Week: ${prop.week_number || 'N/A'}</p>
-                        <div class="pt-2 border-t border-gray-100">
-                            <p class="text-lg font-extrabold text-blue-900">$${Number(prop.asking_price || 0).toLocaleString()}</p>
+            if (!pastList || pastList.length === 0) {
+                pastContainer.innerHTML = '<p class="text-gray-400 text-xs col-span-3">No historical records available.</p>';
+            } else {
+                const pastHTML = pastList.map(prop => {
+                    const badgeColor = prop.status === 'SOLD' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+                    return `
+                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-5 relative overflow-hidden hover:shadow-md transition opacity-90">
+                            <span class="absolute top-3 right-3 text-[9px] font-extrabold tracking-widest px-2 py-0.5 rounded ${badgeColor}">${prop.status}</span>
+                            <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 rounded mb-2">${prop.listing_type || 'N/A'}</span>
+                            <h4 class="font-bold text-gray-900 text-base truncate pr-12">${prop.resort_name || 'Unknown'}</h4>
+                            <p class="text-gray-500 text-xs mb-3">Assigned Week: ${prop.week_number || 'N/A'}</p>
+                            <div class="pt-2 border-t border-gray-100">
+                                <p class="text-lg font-extrabold text-blue-900">$${Number(prop.asking_price || 0).toLocaleString()}</p>
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
-            pastContainer.innerHTML = pastHTML.join('');
+                    `;
+                });
+                pastContainer.innerHTML = pastHTML.join('');
+            }
         }
     } catch (error) {
         console.error("Error loading marketplace assets:", error.message);
