@@ -1,6 +1,12 @@
 // ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
+// Intenta leer desde las variables del sistema inyectadas por Vercel, si no existen, usa las cadenas por defecto.
+const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
+  || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
+  || "https://ztojbyfbyidzzrqicjvn.supabase.co";
+
+const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
+  || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
+  || "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
 
 let supabaseClientInstance = null;
 
@@ -11,7 +17,7 @@ let supabaseClientInstance = null;
  */
 function getSupabaseClient() {
   if (!supabaseClientInstance) {
-    // FIX: Using window.supabase explicitly to avoid variable clashing and infinite loops
+    // FIX: Usar window.supabase de forma explícita para evitar bucles infinitos en navegadores
     if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
       supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } else {
@@ -20,15 +26,16 @@ function getSupabaseClient() {
           supabaseClientInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
       } catch (error) {
-        console.error("Error: 'createClient' no está definido. Asegúrate de instalar/importar el SDK de Supabase.");
+        console.error("Error: 'createClient' no está definido. Asegúrate de que el script de unpkg en tu HTML cargue primero.");
       }
     }
   }
   return supabaseClientInstance;
 }
 
-// FIX: Renamed local variable to 'supabaseClient' to completely prevent global window context clashing
+// Inicialización del cliente global seguro
 const supabaseClient = getSupabaseClient();
+
 
 // Automated listener routing mapping elements on load
 document.addEventListener("DOMContentLoaded", () => {
