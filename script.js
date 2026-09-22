@@ -2,6 +2,7 @@
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
   || "https://ztojbyfbyidzzrqicjvn.supabase.co";
+
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
   || "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
@@ -55,34 +56,83 @@ async function loadPublicMarketplace(client) {
         if (activeContainer) {
             if (!activeList || activeList.length === 0) {
                 activeContainer.innerHTML = `
-                    <div class="col-span-1 md:col-span-3 p-6 bg-blue-50 border border-blue-200 rounded-lg text-center">
-                        <p class="text-blue-900 font-semibold text-sm">No active luxury assets listed for sale right now.</p>
-                        <p class="text-blue-700 text-xs mt-1">Please contact an agent below to discover upcoming timeshare opportunities.</p>
+                    <div class="col-span-1 md:col-span-3 p-8 bg-blue-50/50 border border-blue-200/50 rounded-2xl text-center backdrop-blur-sm">
+                        <p class="text-blue-950 font-bold text-sm">No active luxury assets listed for sale right now.</p>
+                        <p class="text-blue-600 text-xs mt-1 font-medium">Please contact a licensed broker below to evaluate private inventory pools.</p>
                     </div>`;
             } else {
-                const activeHTML = activeList.map(prop => {
-                    const imageHeader = prop.image_url 
-                        ? `<div class="h-48 w-full overflow-hidden bg-gray-100">
-                            <img src="${prop.image_url}" alt="${prop.resort_name}" class="h-full w-full object-cover">
-                           </div>`
-                        : `<div class="h-32 w-full bg-gradient-to-r from-blue-900 to-indigo-950 flex items-center justify-center">
-                            <span class="text-white text-xs font-semibold opacity-75">TMG Luxury Properties</span>
-                           </div>`;
+                const activeHTML = activeList.map((prop, index) => {
+                    
+                    // NUEVO: Agrupamos de forma automática hasta 10 columnas de imágenes del registro de Supabase
+                    const photos = [];
+                    // Si existe la columna vieja image_url la añadimos como primera opción
+                    if (prop.image_url) photos.push(prop.image_url);
+                    
+                    // Ciclo dinámico que escanea desde image_url1 hasta image_url10
+                    for (let i = 1; i <= 10; i++) {
+                        if (prop[`image_url${i}`]) {
+                            photos.push(prop[`image_url${i}`]);
+                        }
+                    }
+
+                    // Renderizado del Header de la Tarjeta según la cantidad de imágenes detectadas
+                    let imageHeader = "";
+                    
+                    if (photos.length === 0) {
+                        // Respaldo visual si no hay ninguna foto
+                        imageHeader = `
+                            <div class="h-52 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative">
+                                <span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>
+                            </div>`;
+                    } else {
+                        // NUEVO: Galería premium con slider nativo por CSS y contador flotante inteligente
+                        const slidesHTML = photos.map((url, imgIdx) => `
+                            <div id="slide-${index}-${imgIdx}" class="w-full h-full flex-shrink-0 snap-start relative">
+                                <img src="${url}" alt="${prop.resort_name} - Photo ${imgIdx + 1}" class="h-full w-full object-cover">
+                            </div>
+                        `).join('');
+
+                        imageHeader = `
+                            <div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100">
+                                <!-- Contenedor Deslizable Snap-x -->
+                                <div id="carousel-${index}" class="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+                                    ${slidesHTML}
+                                </div>
+                                
+                                <!-- Contador Flotante Estilo Airbnb (Máximo 10) -->
+                                <div class="absolute bottom-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full tracking-wider z-20 shadow-sm border border-white/10">
+                                    <span id="counter-${index}">1</span> / ${photos.length}
+                                </div>
+
+                                <!-- Botones de Navegación Flotantes e Interactivos (Solo si hay más de 1 foto) -->
+                                ${photos.length > 1 ? `
+                                    <button onclick="navigateCarousel(index, -1, {photos.length})" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">
+                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                                    </button>
+                                    <button onclick="navigateCarousel(index, 1, {photos.length})" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">
+                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                    </button>
+                                ` : ''}
+                            </div>`;
+                    }
 
                     return `
-                        <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col justify-between">
-                            <div>
+                        <div class="group bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-xl hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between">
+                            <div class="overflow-hidden relative">
                                 ${imageHeader}
-                                <div class="p-5">
-                                    <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded mb-2">${prop.listing_type || 'N/A'}</span>
-                                    <h3 class="text-lg font-bold text-gray-900">${prop.resort_name || 'Unknown Resort'}</h3>
-                                    <p class="text-gray-500 text-sm">Assigned Week: ${prop.week_number || 'N/A'}</p>
+                                <div class="p-6">
+                                    <span class="inline-block text-[9px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-700 border border-cyan-200/40 px-2.5 py-1 rounded-md mb-3">${prop.listing_type || 'N/A'}</span>
+                                    <h3 class="text-lg font-black text-slate-900 tracking-tight leading-snug group-hover:text-cyan-600 transition-colors">${prop.resort_name || 'Unknown Resort'}</h3>
+                                    <p class="text-slate-400 text-xs font-semibold mt-1 flex items-center">
+                                        <svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        Assigned Interval: Week ${prop.week_number || 'N/A'}
+                                    </p>
                                 </div>
                             </div>
-                            <div class="p-5 pt-0">
-                                <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                                    <span class="text-xl font-extrabold text-blue-900">$${Number(prop.asking_price || 0).toLocaleString()}</span>
-                                    <button data-id="${prop.id}" class="inquire-btn bg-blue-900 text-white text-xs font-semibold px-4 py-2 rounded hover:bg-blue-800 transition">Inquire</button>
+                            <div class="p-6 pt-0">
+                                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                                    <span class="text-2xl font-black text-blue-950 tracking-tight">$${Number(prop.asking_price || 0).toLocaleString()}</span>
+                                    <button data-id="${prop.id}" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm shadow-blue-950/10">Inquire</button>
                                 </div>
                             </div>
                         </div>
@@ -100,18 +150,18 @@ async function loadPublicMarketplace(client) {
         const pastContainer = document.getElementById("past-properties");
         if (pastContainer && pastList) {
             if (!pastList || pastList.length === 0) {
-                pastContainer.innerHTML = '<p class="text-gray-400 text-xs col-span-3">No historical records available.</p>';
+                pastContainer.innerHTML = '<p class="text-slate-400 text-xs font-medium col-span-3">No historical records available.</p>';
             } else {
                 const pastHTML = pastList.map(prop => {
-                    const badgeColor = prop.status === 'SOLD' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+                    const badgeColor = prop.status === 'SOLD' ? 'bg-red-50 text-red-700 border-red-200/50' : 'bg-cyan-50 text-cyan-700 border-cyan-200/50';
                     return `
-                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-5 relative overflow-hidden hover:shadow-md transition opacity-90">
-                            <span class="absolute top-3 right-3 text-[9px] font-extrabold tracking-widest px-2 py-0.5 rounded ${badgeColor}">${prop.status}</span>
-                            <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 rounded mb-2">${prop.listing_type || 'N/A'}</span>
-                            <h4 class="font-bold text-gray-900 text-base truncate pr-12">${prop.resort_name || 'Unknown'}</h4>
-                            <p class="text-gray-500 text-xs mb-3">Assigned Week: ${prop.week_number || 'N/A'}</p>
-                            <div class="pt-2 border-t border-gray-100">
-                                <p class="text-lg font-extrabold text-blue-900">$${Number(prop.asking_price || 0).toLocaleString()}</p>
+                        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 relative overflow-hidden hover:shadow-md hover:border-slate-300 transition-all duration-300 opacity-90">
+                            <span class="absolute top-4 right-4 text-[9px] font-black tracking-widest px-2.5 py-1 rounded-md border ${badgeColor}">${prop.status}</span>
+                            <span class="inline-block text-[9px] font-black uppercase tracking-widest bg-slate-50 text-slate-500 border border-slate-200/40 px-2 py-0.5 rounded mb-2.5">${prop.listing_type || 'N/A'}</span>
+                            <h4 class="font-extrabold text-slate-900 text-base truncate pr-16 tracking-tight">${prop.resort_name || 'Unknown'}</h4>
+                            <p class="text-slate-400 text-xs font-semibold mt-0.5">Ownership Interval Week ${prop.week_number || 'N/A'}</p>
+                            <div class="pt-3 mt-4 border-t border-slate-100">
+                                <p class="text-xl font-black text-blue-950 tracking-tight">$${Number(prop.asking_price || 0).toLocaleString()}</p>
                             </div>
                         </div>
                     `;
@@ -124,6 +174,37 @@ async function loadPublicMarketplace(client) {
     }
 }
 
+// NUEVO: Lógica de control encargada de desplazar los contenedores y actualizar los indicadores del contador flotante
+let currentSlideIndexes = {};
+
+function navigateCarousel(cardIdx, direction, maxPhotos) {
+    if (currentSlideIndexes[cardIdx] === undefined) {
+        currentSlideIndexes[cardIdx] = 0;
+    }
+
+    currentSlideIndexes[cardIdx] += direction;
+
+    // Control de límites tipo loop infinito circular
+    if (currentSlideIndexes[cardIdx] < 0) {
+        currentSlideIndexes[cardIdx] = maxPhotos - 1;
+    } else if (currentSlideIndexes[cardIdx] >= maxPhotos) {
+        currentSlideIndexes[cardIdx] = 0;
+    }
+
+    const carousel = document.getElementById(`carousel-${cardIdx}`);
+    const targetSlide = document.getElementById(`slide-${cardIdx}-${currentSlideIndexes[cardIdx]}`);
+    const counter = document.getElementById(`counter-${cardIdx}`);
+
+    if (carousel && targetSlide && counter) {
+        // Desplazamiento horizontal nativo fluido
+        carousel.scrollTo({
+            left: targetSlide.offsetLeft,
+            behavior: 'smooth'
+        });
+        // Actualizamos el número flotante
+        counter.innerText = currentSlideIndexes[cardIdx] + 1;
+    }
+}
 // ====== FRONTEND UTILITIES & CAPTURE FOR FORMS ======
 function setupLeadSubmission(client) {
     const leadForm = document.getElementById("general-lead-form");
@@ -131,7 +212,6 @@ function setupLeadSubmission(client) {
 
     leadForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        
         const name = document.getElementById("lead-name").value;
         const email = document.getElementById("lead-email").value;
         const message = document.getElementById("lead-message").value;
@@ -142,8 +222,7 @@ function setupLeadSubmission(client) {
                 .insert([{ full_name: name, email_address: email, message: message }]);
 
             if (error) throw error;
-
-            alert("¡Solicitud enviada con éxito! Un agente se pondrá en contacto pronto.");
+            alert("¡Solicitud procesada con éxito! Un bróker certificado responderá a su correo.");
             leadForm.reset();
         } catch (error) {
             console.error("Error submitting lead application:", error.message);
@@ -152,7 +231,6 @@ function setupLeadSubmission(client) {
     });
 }
 
-// BLINDAJE CRÍTICO DEL PORTAL PRIVADO: Si el usuario es correcto en Supabase Auth, el panel abre obligatoriamente.
 function setupPortalAuthentication(client) {
     const loginForm = document.getElementById("login-form");
     if (!loginForm) return;
@@ -174,16 +252,12 @@ function setupPortalAuthentication(client) {
             if (error) throw error;
 
             if (data?.user) {
-                // Intercambio de contenedores visuales instantáneo
                 document.getElementById("login-card")?.classList.add("hidden");
                 const dashboard = document.getElementById("portal-dashboard");
                 if (dashboard) {
                     dashboard.classList.remove("hidden");
                     document.getElementById("owner-title").innerText = `Welcome back, ${data.user.email}`;
-                    
-                    // Intentamos rellenar los detalles del propietario de forma segura
                     loadOwnerMetadata(client, data.user.id);
-                    // Intentamos cargar las ofertas
                     loadUserOffers(client, data.user.id);
                 }
             }
@@ -197,11 +271,10 @@ function setupPortalAuthentication(client) {
     });
 }
 
-// Consulta de metadatos segura sin bloquear la interfaz si la tabla no existe
 async function loadOwnerMetadata(client, userId) {
     try {
         const { data: ownerData, error } = await client
-            .from('Owners')
+            .from('Owners') 
             .select('*')
             .eq('user_id', userId)
             .single();
@@ -216,7 +289,7 @@ async function loadOwnerMetadata(client, userId) {
             document.getElementById("metric-views").innerText = ownerData.views_count || "0";
         }
     } catch (err) {
-        console.warn("Owner profile row missing or RLS blocked. Using default placeholders.");
+        console.warn("Owner profile row missing from 'Owners' table.");
     }
 }
 
@@ -243,7 +316,6 @@ async function updateOfferStatus(btn, offerId, newStatus) {
         console.error("Error updating ledger status:", error.message);
         alert("No se pudo actualizar el estado de la oferta.");
         btn.disabled = false;
-        btn.innerText = newStatus === 'ACCEPTED' ? 'Accept' : 'Decline';
     }
 }
 
@@ -261,7 +333,7 @@ async function loadUserOffers(client, userId) {
         if (error) throw error;
 
         if (!offers || offers.length === 0) {
-            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-slate-400 text-xs font-medium">No offers recorded for your property interval yet.</td></tr>`;
+            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs font-medium">No active purchase offers recorded yet.</td></tr>`;
             return;
         }
 
@@ -273,28 +345,27 @@ async function loadUserOffers(client, userId) {
             let actionContent = "";
             if (off.status === 'PENDING' || !off.status) {
                 actionContent = `
-                    <div class="flex justify-center space-x-2">
-                        <button onclick="updateOfferStatus(this, '${off.id}', 'ACCEPTED')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow-sm">Accept</button>
-                        <button onclick="updateOfferStatus(this, '${off.id}', 'REJECTED')" class="bg-red-600 hover:bg-red-700 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow-sm">Decline</button>
+                    <div class="flex justify-center space-x-1.5">
+                        <button onclick="updateOfferStatus(this, '${off.id}', 'ACCEPTED')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md shadow-emerald-500/10">Accept</button>
+                        <button onclick="updateOfferStatus(this, '${off.id}', 'REJECTED')" class="bg-rose-500 hover:bg-rose-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md shadow-rose-500/10">Decline</button>
                     </div>`;
             } else {
-                let badgeColor = "bg-yellow-100 text-yellow-800";
-                if (off.status === 'ACCEPTED') badgeColor = "bg-emerald-100 text-emerald-800";
-                if (off.status === 'REJECTED') badgeColor = "bg-red-100 text-red-800";
-                actionContent = `<div class="text-center"><span class="inline-block text-[10px] font-black px-2 py-0.5 rounded shadow-sm ${badgeColor}">${off.status}</span></div>`;
+                let badgeColor = "bg-amber-50 text-amber-700 border-amber-200/60";
+                if (off.status === 'ACCEPTED') badgeColor = "bg-emerald-50 text-emerald-700 border-emerald-200/60";
+                if (off.status === 'REJECTED') badgeColor = "bg-rose-50 text-rose-700 border-rose-200/60";
+                actionContent = `<div class="text-center"><span class="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border shadow-sm ${badgeColor}">${off.status}</span></div>`;
             }
 
             return `
-                <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition text-slate-700 font-medium">
-                    <td class="p-3 text-[11px] text-slate-400">${dateStr}</td>
-                    <td class="p-3">${typeStr}</td>
-                    <td class="p-3 font-bold text-blue-900">${priceStr}</td>
-                    <td class="p-3">${actionContent}</td>
+                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition text-slate-700 font-semibold">
+                    <td class="p-3.5 text-[11px] text-slate-400 font-medium">${dateStr}</td>
+                    <td class="p-3.5 text-xs">${typeStr}</td>
+                    <td class="p-3.5 font-bold text-blue-950 text-xs">${priceStr}</td>
+                    <td class="p-3.5">${actionContent}</td>
                 </tr>`;
         }).join('');
 
     } catch (error) {
         console.error("Error loading ledger offers:", error.message);
-        ledgerBody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-red-400 text-xs font-medium">Offers table RLS restricted. Check Supabase Policies.</td></tr>`;
     }
 }
