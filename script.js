@@ -1,7 +1,7 @@
 // ====== CONFIGURATION STEP ======
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
-  || "https://ztojbyfbyidzzrqicjvn.supabase.co";
+  ||"https://ztojbyfbyidzzrqicjvn.supabase.co";
 
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 300);
 });
-
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace(client) {
     try {
@@ -62,49 +61,38 @@ async function loadPublicMarketplace(client) {
                     </div>`;
             } else {
                 const activeHTML = activeList.map((prop, index) => {
-                    
-                    // NUEVO: Agrupamos de forma automática hasta 10 columnas de imágenes del registro de Supabase
+                    // Agrupamos las imágenes disponibles desde image_url hasta image_url10
                     const photos = [];
-                    // Si existe la columna vieja image_url la añadimos como primera opción
                     if (prop.image_url) photos.push(prop.image_url);
                     
-                    // Ciclo dinámico que escanea desde image_url1 hasta image_url10
                     for (let i = 1; i <= 10; i++) {
                         if (prop[`image_url${i}`]) {
                             photos.push(prop[`image_url${i}`]);
                         }
                     }
 
-                    // Renderizado del Header de la Tarjeta según la cantidad de imágenes detectadas
                     let imageHeader = "";
-                    
                     if (photos.length === 0) {
-                        // Respaldo visual si no hay ninguna foto
                         imageHeader = `
-                            <div class="h-52 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative">
+                            <div class="h-56 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative">
                                 <span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>
                             </div>`;
                     } else {
-                        // NUEVO: Galería premium con slider nativo por CSS y contador flotante inteligente
                         const slidesHTML = photos.map((url, imgIdx) => `
                             <div id="slide-${index}-${imgIdx}" class="w-full h-full flex-shrink-0 snap-start relative">
                                 <img src="${url}" alt="${prop.resort_name} - Photo ${imgIdx + 1}" class="h-full w-full object-cover">
                             </div>
                         `).join('');
-
                         imageHeader = `
                             <div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100">
-                                <!-- Contenedor Deslizable Snap-x -->
-                                <div id="carousel-${index}" class="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+                                <div id="carousel-${index}" class="flex w-full h-full overflow-x-hidden snap-x snap-mandatory scroll-smooth no-scrollbar">
                                     ${slidesHTML}
                                 </div>
                                 
-                                <!-- Contador Flotante Estilo Airbnb (Máximo 10) -->
-                                <div class="absolute bottom-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full tracking-wider z-20 shadow-sm border border-white/10">
+                                <div class="absolute bottom-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-bold text-[10px] px-2.5 py-1 rounded-full tracking-wider z-20 shadow-sm border border-white/10">
                                     <span id="counter-${index}">1</span> / ${photos.length}
                                 </div>
 
-                                <!-- Botones de Navegación Flotantes e Interactivos (Solo si hay más de 1 foto) -->
                                 ${photos.length > 1 ? `
                                     <button onclick="navigateCarousel(index, -1, {photos.length})" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">
                                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
@@ -124,7 +112,7 @@ async function loadPublicMarketplace(client) {
                                     <span class="inline-block text-[9px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-700 border border-cyan-200/40 px-2.5 py-1 rounded-md mb-3">${prop.listing_type || 'N/A'}</span>
                                     <h3 class="text-lg font-black text-slate-900 tracking-tight leading-snug group-hover:text-cyan-600 transition-colors">${prop.resort_name || 'Unknown Resort'}</h3>
                                     <p class="text-slate-400 text-xs font-semibold mt-1 flex items-center">
-                                        <svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                         Assigned Interval: Week ${prop.week_number || 'N/A'}
                                     </p>
                                 </div>
@@ -147,225 +135,3 @@ async function loadPublicMarketplace(client) {
                 });
             }
         }
-        const pastContainer = document.getElementById("past-properties");
-        if (pastContainer && pastList) {
-            if (!pastList || pastList.length === 0) {
-                pastContainer.innerHTML = '<p class="text-slate-400 text-xs font-medium col-span-3">No historical records available.</p>';
-            } else {
-                const pastHTML = pastList.map(prop => {
-                    const badgeColor = prop.status === 'SOLD' ? 'bg-red-50 text-red-700 border-red-200/50' : 'bg-cyan-50 text-cyan-700 border-cyan-200/50';
-                    return `
-                        <div class="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 relative overflow-hidden hover:shadow-md hover:border-slate-300 transition-all duration-300 opacity-90">
-                            <span class="absolute top-4 right-4 text-[9px] font-black tracking-widest px-2.5 py-1 rounded-md border ${badgeColor}">${prop.status}</span>
-                            <span class="inline-block text-[9px] font-black uppercase tracking-widest bg-slate-50 text-slate-500 border border-slate-200/40 px-2 py-0.5 rounded mb-2.5">${prop.listing_type || 'N/A'}</span>
-                            <h4 class="font-extrabold text-slate-900 text-base truncate pr-16 tracking-tight">${prop.resort_name || 'Unknown'}</h4>
-                            <p class="text-slate-400 text-xs font-semibold mt-0.5">Ownership Interval Week ${prop.week_number || 'N/A'}</p>
-                            <div class="pt-3 mt-4 border-t border-slate-100">
-                                <p class="text-xl font-black text-blue-950 tracking-tight">$${Number(prop.asking_price || 0).toLocaleString()}</p>
-                            </div>
-                        </div>
-                    `;
-                });
-                pastContainer.innerHTML = pastHTML.join('');
-            }
-        }
-    } catch (error) {
-        console.error("Error loading marketplace assets:", error.message);
-    }
-}
-
-// NUEVO: Lógica de control encargada de desplazar los contenedores y actualizar los indicadores del contador flotante
-let currentSlideIndexes = {};
-
-function navigateCarousel(cardIdx, direction, maxPhotos) {
-    if (currentSlideIndexes[cardIdx] === undefined) {
-        currentSlideIndexes[cardIdx] = 0;
-    }
-
-    currentSlideIndexes[cardIdx] += direction;
-
-    // Control de límites tipo loop infinito circular
-    if (currentSlideIndexes[cardIdx] < 0) {
-        currentSlideIndexes[cardIdx] = maxPhotos - 1;
-    } else if (currentSlideIndexes[cardIdx] >= maxPhotos) {
-        currentSlideIndexes[cardIdx] = 0;
-    }
-
-    const carousel = document.getElementById(`carousel-${cardIdx}`);
-    const targetSlide = document.getElementById(`slide-${cardIdx}-${currentSlideIndexes[cardIdx]}`);
-    const counter = document.getElementById(`counter-${cardIdx}`);
-
-    if (carousel && targetSlide && counter) {
-        // Desplazamiento horizontal nativo fluido
-        carousel.scrollTo({
-            left: targetSlide.offsetLeft,
-            behavior: 'smooth'
-        });
-        // Actualizamos el número flotante
-        counter.innerText = currentSlideIndexes[cardIdx] + 1;
-    }
-}
-// ====== FRONTEND UTILITIES & CAPTURE FOR FORMS ======
-function setupLeadSubmission(client) {
-    const leadForm = document.getElementById("general-lead-form");
-    if (!leadForm) return;
-
-    leadForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const name = document.getElementById("lead-name").value;
-        const email = document.getElementById("lead-email").value;
-        const message = document.getElementById("lead-message").value;
-
-        try {
-            const { error } = await client
-                .from('leads')
-                .insert([{ full_name: name, email_address: email, message: message }]);
-
-            if (error) throw error;
-            alert("¡Solicitud procesada con éxito! Un bróker certificado responderá a su correo.");
-            leadForm.reset();
-        } catch (error) {
-            console.error("Error submitting lead application:", error.message);
-            alert("No se pudo procesar la solicitud en este momento.");
-        }
-    });
-}
-
-function setupPortalAuthentication(client) {
-    const loginForm = document.getElementById("login-form");
-    if (!loginForm) return;
-
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("auth-email").value;
-        const password = document.getElementById("auth-password").value;
-        const errorMsg = document.getElementById("login-error");
-
-        if (errorMsg) errorMsg.classList.add("hidden");
-
-        try {
-            const { data, error } = await client.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) throw error;
-
-            if (data?.user) {
-                document.getElementById("login-card")?.classList.add("hidden");
-                const dashboard = document.getElementById("portal-dashboard");
-                if (dashboard) {
-                    dashboard.classList.remove("hidden");
-                    document.getElementById("owner-title").innerText = `Welcome back, ${data.user.email}`;
-                    loadOwnerMetadata(client, data.user.id);
-                    loadUserOffers(client, data.user.id);
-                }
-            }
-        } catch (error) {
-            console.error("Portal login authentication failure:", error.message);
-            if (errorMsg) {
-                errorMsg.innerText = `Auth Error: ${error.message}`;
-                errorMsg.classList.remove("hidden");
-            }
-        }
-    });
-}
-
-async function loadOwnerMetadata(client, userId) {
-    try {
-        const { data: ownerData, error } = await client
-            .from('Owners') 
-            .select('*')
-            .eq('user_id', userId)
-            .single();
-
-        if (error) throw error;
-
-        if (ownerData) {
-            document.getElementById("detail-resort").innerText = ownerData.resort_name || "N/A";
-            document.getElementById("detail-price").innerText = ownerData.asking_price ? `$${Number(ownerData.asking_price).toLocaleString()}` : "N/A";
-            document.getElementById("detail-week").innerText = ownerData.week_number || "N/A";
-            document.getElementById("detail-type").innerText = ownerData.listing_type || "N/A";
-            document.getElementById("metric-views").innerText = ownerData.views_count || "0";
-        }
-    } catch (err) {
-        console.warn("Owner profile row missing from 'Owners' table.");
-    }
-}
-
-async function updateOfferStatus(btn, offerId, newStatus) {
-    const client = getSupabaseClient();
-    if (!client) return;
-
-    try {
-        btn.disabled = true;
-        btn.innerText = "...";
-
-        const { error } = await client
-            .from('offers')
-            .update({ status: newStatus })
-            .eq('id', offerId);
-
-        if (error) throw error;
-
-        alert(`Oferta marcada como ${newStatus === 'ACCEPTED' ? 'Aceptada' : 'Rechazada'} con éxito.`);
-        const sessionUser = (await client.auth.getUser()).data.user;
-        if (sessionUser) loadUserOffers(client, sessionUser.id);
-
-    } catch (error) {
-        console.error("Error updating ledger status:", error.message);
-        alert("No se pudo actualizar el estado de la oferta.");
-        btn.disabled = false;
-    }
-}
-
-async function loadUserOffers(client, userId) {
-    const ledgerBody = document.getElementById("offers-ledger-body");
-    if (!ledgerBody) return;
-
-    try {
-        const { data: offers, error } = await client
-            .from('offers')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        if (!offers || offers.length === 0) {
-            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs font-medium">No active purchase offers recorded yet.</td></tr>`;
-            return;
-        }
-
-        ledgerBody.innerHTML = offers.map(off => {
-            const dateStr = new Date(off.created_at).toLocaleDateString();
-            const typeStr = off.offer_type || 'Purchase';
-            const priceStr = `$${Number(off.amount || 0).toLocaleString()}`;
-            
-            let actionContent = "";
-            if (off.status === 'PENDING' || !off.status) {
-                actionContent = `
-                    <div class="flex justify-center space-x-1.5">
-                        <button onclick="updateOfferStatus(this, '${off.id}', 'ACCEPTED')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md shadow-emerald-500/10">Accept</button>
-                        <button onclick="updateOfferStatus(this, '${off.id}', 'REJECTED')" class="bg-rose-500 hover:bg-rose-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md shadow-rose-500/10">Decline</button>
-                    </div>`;
-            } else {
-                let badgeColor = "bg-amber-50 text-amber-700 border-amber-200/60";
-                if (off.status === 'ACCEPTED') badgeColor = "bg-emerald-50 text-emerald-700 border-emerald-200/60";
-                if (off.status === 'REJECTED') badgeColor = "bg-rose-50 text-rose-700 border-rose-200/60";
-                actionContent = `<div class="text-center"><span class="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border shadow-sm ${badgeColor}">${off.status}</span></div>`;
-            }
-
-            return `
-                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition text-slate-700 font-semibold">
-                    <td class="p-3.5 text-[11px] text-slate-400 font-medium">${dateStr}</td>
-                    <td class="p-3.5 text-xs">${typeStr}</td>
-                    <td class="p-3.5 font-bold text-blue-950 text-xs">${priceStr}</td>
-                    <td class="p-3.5">${actionContent}</td>
-                </tr>`;
-        }).join('');
-
-    } catch (error) {
-        console.error("Error loading ledger offers:", error.message);
-    }
-}
