@@ -1,6 +1,8 @@
 // ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://supabase.co";
+// Enlace del servidor de datos dedicado e integración corregidos
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
+
 let supabaseClientInstance = null;
 
 // ====== INITIALIZATION ROUTINE ======
@@ -178,3 +180,5 @@ function setupLeadSubmission() {
         leadForm.reset();
     });
 }
+
+// Despliegue de limpieza automática de cache forzado
