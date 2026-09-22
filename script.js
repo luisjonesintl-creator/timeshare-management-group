@@ -1,7 +1,7 @@
 // ====== CONFIGURATION STEP ======
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
-  || "https://ztojbyfbyidzzrqicjvn.supabase.co"
+  ||   || "https://ztojbyfbyidzzrqicjvn.supabase.co";
 
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
@@ -20,7 +20,7 @@ function getSupabaseClient() {
   return supabaseClientInstance;
 }
 
-// Rutina de arranque segura con tolerancia a retrasos de red
+// Inicialización segura tras la carga de la interfaz
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const client = getSupabaseClient();
@@ -55,7 +55,6 @@ async function loadPublicMarketplace(client) {
 
         const activeContainer = document.getElementById("active-properties");
         if (activeContainer) {
-            // CONTROL DE SEGURIDAD: Si no hay propiedades disponibles, mostramos un mensaje descriptivo
             if (!activeList || activeList.length === 0) {
                 activeContainer.innerHTML = `
                     <div class="col-span-1 md:col-span-3 p-6 bg-blue-50 border border-blue-200 rounded-lg text-center">
@@ -191,6 +190,37 @@ function setupPortalAuthentication(client) {
     });
 }
 
+// Función global encargada de actualizar el valor en Supabase y refrescar la tabla
+async function updateOfferStatus(btn, offerId, newStatus) {
+    const client = getSupabaseClient();
+    if (!client) return;
+
+    try {
+        btn.disabled = true;
+        btn.innerText = "...";
+
+        const { error } = await client
+            .from('offers')
+            .update({ status: newStatus })
+            .eq('id', offerId);
+
+        if (error) throw error;
+
+        alert(`Oferta marcada como ${newStatus === 'ACCEPTED' ? 'Aceptada' : 'Rechazada'} con éxito.`);
+        
+        // Solicita el usuario activo en la sesión para refrescar las filas
+        const sessionUser = (await client.auth.getUser()).data.user;
+        if (sessionUser) loadUserOffers(client, sessionUser.id);
+
+    } catch (error) {
+        console.error("Error updating ledger status:", error.message);
+        alert("No se pudo actualizar el estado de la oferta.");
+        btn.disabled = false;
+        btn.innerText = newStatus === 'ACCEPTED' ? 'Accept' : 'Decline';
+    }
+}
+
+// Carga las ofertas e inyecta los botones interactivos si están PENDING
 async function loadUserOffers(client, userId) {
     const ledgerBody = document.getElementById("offers-ledger-body");
     if (!ledgerBody) return;
@@ -205,21 +235,36 @@ async function loadUserOffers(client, userId) {
         if (error) throw error;
 
         if (!offers || offers.length === 0) {
-            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for your property yet.</td></tr>`;
+            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-slate-400 text-xs font-medium">No offers recorded for your property interval yet.</td></tr>`;
             return;
         }
 
         ledgerBody.innerHTML = offers.map(off => {
-            let statusColor = "bg-yellow-100 text-yellow-800";
-            if (off.status === 'ACCEPTED') statusColor = "bg-green-100 text-green-800";
-            if (off.status === 'REJECTED') statusColor = "bg-red-100 text-red-800";
+            const dateStr = new Date(off.created_at).toLocaleDateString();
+            const typeStr = off.offer_type || 'Purchase';
+            const priceStr = `$${Number(off.amount || 0).toLocaleString()}`;
+            
+            let actionContent = "";
+            if (off.status === 'PENDING' || !off.status) {
+                actionContent = `
+                    <div class="flex justify-center space-x-2">
+                        <button onclick="updateOfferStatus(this, '${off.id}', 'ACCEPTED')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow-sm">Accept</button>
+                        <button onclick="updateOfferStatus(this, '${off.id}', 'REJECTED')" class="bg-red-600 hover:bg-red-700 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow-sm">Decline</button>
+                    </div>`;
+            } else {
+                let badgeColor = "bg-yellow-100 text-yellow-800";
+                if (off.status === 'ACCEPTED') badgeColor = "bg-emerald-100 text-emerald-800";
+                if (off.status === 'REJECTED') badgeColor = "bg-red-100 text-red-800";
+                
+                actionContent = `<div class="text-center"><span class="inline-block text-[10px] font-black px-2 py-0.5 rounded shadow-sm ${badgeColor}">${off.status}</span></div>`;
+            }
 
             return `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3 text-xs text-gray-600">${new Date(off.created_at).toLocaleDateString()}</td>
-                    <td class="p-3 font-medium">${off.offer_type || 'Purchase'}</td>
-                    <td class="p-3 font-bold text-blue-900">$${Number(off.amount || 0).toLocaleString()}</td>
-                    <td class="p-3 text-center"><span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded ${statusColor}">${off.status || 'PENDING'}</span></td>
+                <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition text-slate-700 font-medium">
+                    <td class="p-3 text-[11px] text-slate-400">${dateStr}</td>
+                    <td class="p-3">${typeStr}</td>
+                    <td class="p-3 font-bold text-blue-900">${priceStr}</td>
+                    <td class="p-3">${actionContent}</td>
                 </tr>`;
         }).join('');
 
