@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timeshare Management Group</title>
-    <!-- FIX: CDN oficial y estable de Tailwind CSS sustituyendo el enlace roto de la línea 8 -->
-    <link href="https://jsdelivr.net" rel="stylesheet">
-    <!-- Librería oficial completa de Supabase v2 -->
+    <!-- SOLUCIÓN CORB/STYLESHEET: Usamos la versión moderna de Tailwind CSS via CDN oficial que evita bloqueos del navegador -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- SOLUCIÓN CORB: Cargamos el script de Supabase de manera estándar y compatible con navegadores -->
     <script src="https://unpkg.com"></script>
 </head>
-
 <body class="bg-gray-50 text-gray-800">
 
     <!-- SECCIÓN: Catálogo de Propiedades Públicas -->
@@ -18,13 +17,11 @@
         
         <h2 class="text-xl font-bold text-gray-700 mb-4">Active Properties</h2>
         <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <!-- Las propiedades activas se inyectarán aquí desde script.js -->
             <p class="text-gray-500 col-span-3">Loading properties...</p>
         </div>
 
         <h2 class="text-xl font-bold text-gray-700 mb-4">Past Sales / Rentals</h2>
         <div id="past-properties" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <!-- Las propiedades del historial se inyectarán aquí -->
         </div>
     </main>
 
@@ -33,11 +30,12 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Client Portal</h2>
         <form id="login-form" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                <!-- SOLUCIÓN ACCESIBILIDAD: Se asocian las etiquetas usando el atributo 'for' que coincide con el 'id' del input -->
+                <label for="auth-email" class="block text-sm font-medium text-gray-700">Email Address</label>
                 <input type="email" id="auth-email" required class="mt-1 w-full p-2 border rounded">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Password</label>
+                <label for="auth-password" class="block text-sm font-medium text-gray-700">Password</label>
                 <input type="password" id="auth-password" required class="mt-1 w-full p-2 border rounded">
             </div>
             <p id="login-error" class="text-red-600 text-sm hidden">Invalid credentials. Please try again.</p>
@@ -86,21 +84,22 @@
             </table>
         </div>
     </section>
-    
+
     <!-- SECCIÓN: Formulario de Captación de Leads -->
     <section id="contact" class="max-w-lg mx-auto my-12 p-6 bg-white border border-gray-200 rounded-lg shadow">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Contact An Agent</h2>
         <form id="general-lead-form" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                <!-- SOLUCIÓN ACCESIBILIDAD: Se asocian las etiquetas usando el atributo 'for' correspondientes -->
+                <label for="lead-name" class="block text-sm font-medium text-gray-700">Full Name</label>
                 <input type="text" id="lead-name" required class="mt-1 w-full p-2 border rounded">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                <label for="lead-email" class="block text-sm font-medium text-gray-700">Email Address</label>
                 <input type="email" id="lead-email" required class="mt-1 w-full p-2 border rounded">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Message</label>
+                <label class="block text-sm font-medium text-gray-700" for="lead-message">Message</label>
                 <textarea id="lead-message" rows="3" required class="mt-1 w-full p-2 border rounded"></textarea>
             </div>
             <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded font-semibold hover:bg-blue-800">Submit Request</button>
@@ -108,10 +107,7 @@
     </section>
 
     <!-- ==================== LIBRERÍAS Y SCRIPTS ==================== -->
-    <!-- Enlace inferior de Supabase corregido con la plantilla oficial de UNPKG -->
-    <script src="https://unpkg.com"></script>
-
-    <!-- 2. Tu archivo de lógica de negocio (Sincronizado) -->
+    <!-- 2. Tu archivo de lógica de negocio sincronizado -->
     <script src="script.js"></script>
 </body>
 </html>
