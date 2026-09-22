@@ -1,6 +1,5 @@
 // ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
-// Asegúrate de que esta sea la clave "anon public" de tu panel de Supabase
+const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
 
 let supabaseClientInstance = null;
@@ -22,6 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
         setupPortalAuthentication();
     }
 });
+
+// ====== CONFIGURATION STEP ======
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
+// Asegúrate de que esta sea la clave "anon public" de tu panel de Supabase
+const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
+
+let supabaseClientInstance = null;
+
+// ====== INITIALIZATION ROUTI
 
 // ====== CONFIGURATION STEP ======
 // FIX: Uso estricto de tu URL dedicada para romper el congelamiento en "Loading properties..."
