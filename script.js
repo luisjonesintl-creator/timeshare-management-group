@@ -70,19 +70,35 @@ async function loadPublicMarketplace() {
             if (activeList.length === 0) {
                 activeContainer.innerHTML = '<p class="text-gray-500 col-span-3">No active assets listed right now.</p>';
             } else {
-                const activeHTML = activeList.map(prop => `
-                    <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-md transition">
-                        <div class="p-5">
-                            <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded mb-2">${prop.listing_type || 'N/A'}</span>
-                            <h3 class="text-lg font-bold text-gray-900">${prop.resort_name || 'Unknown Resort'}</h3>
-                            <p class="text-gray-500 text-sm mb-4">Assigned Week: ${prop.week_number || 'N/A'}</p>
-                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                                <span class="text-xl font-extrabold text-blue-900">$${Number(prop.asking_price || 0).toLocaleString()}</span>
-                                <button data-id="${prop.id}" class="inquire-btn bg-blue-900 text-white text-xs font-semibold px-4 py-2 rounded hover:bg-blue-800 transition">Inquire</button>
+                               const activeHTML = activeList.map(prop => {
+                    // Si el registro cuenta con imagen, la usa; si no, coloca un diseño azul plano de respaldo
+                    const imageHeader = prop.image_url 
+                        ? `<div class="h-48 w-full overflow-hidden bg-gray-100">
+                            <img src="${prop.image_url}" alt="${prop.resort_name}" class="h-full w-full object-cover">
+                           </div>`
+                        : `<div class="h-32 w-full bg-gradient-to-r from-blue-900 to-indigo-950 flex items-center justify-center">
+                            <span class="text-white text-xs font-semibold opacity-75">TMG Luxury Properties</span>
+                           </div>`;
+
+                    return `
+                        <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col justify-between">
+                            <div>
+                                ${imageHeader}
+                                <div class="p-5">
+                                    <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded mb-2">${prop.listing_type || 'N/A'}</span>
+                                    <h3 class="text-lg font-bold text-gray-900">${prop.resort_name || 'Unknown Resort'}</h3>
+                                    <p class="text-gray-500 text-sm">Assigned Week: ${prop.week_number || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <div class="p-5 pt-0">
+                                <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                                    <span class="text-xl font-extrabold text-blue-900">$${Number(prop.asking_price || 0).toLocaleString()}</span>
+                                    <button data-id="${prop.id}" class="inquire-btn bg-blue-900 text-white text-xs font-semibold px-4 py-2 rounded hover:bg-blue-800 transition">Inquire</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `);
+                    `;
+                });
                 activeContainer.innerHTML = activeHTML.join('');
                 
                 activeContainer.querySelectorAll('.inquire-btn').forEach(btn => {
