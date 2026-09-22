@@ -70,7 +70,6 @@ async function loadPublicMarketplace() {
                 activeContainer.innerHTML = '<p class="text-gray-500 col-span-3">No active assets listed right now.</p>';
             } else {
                 const activeHTML = activeList.map(prop => {
-                    // Si el registro cuenta con imagen, la usa; si no, coloca un diseño azul plano de respaldo
                     const imageHeader = prop.image_url 
                         ? `<div class="h-48 w-full overflow-hidden bg-gray-100">
                             <img src="${prop.image_url}" alt="${prop.resort_name}" class="h-full w-full object-cover">
