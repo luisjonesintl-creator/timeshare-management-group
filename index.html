@@ -1,7 +1,7 @@
 // ====== CONFIGURATION STEP ======
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
- "https://ztojbyfbyidzzrqicjvn.supabase.co";
+  || "https://ztojbyfbyidzzrqicjvn.supabase.co";
 
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
@@ -20,6 +20,7 @@ function getSupabaseClient() {
   return supabaseClientInstance;
 }
 
+// Inicialización controlada con temporizador para evitar retrasos de red del SDK
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const client = getSupabaseClient();
@@ -36,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 300);
 });
-
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace(client) {
     try {
@@ -61,6 +61,7 @@ async function loadPublicMarketplace(client) {
                     </div>`;
             } else {
                 const activeHTML = activeList.map((prop, index) => {
+                    // Escaneo y agrupación dinámica de las 10 columnas de imágenes de Supabase
                     const photos = [];
                     if (prop.image_url) photos.push(prop.image_url);
                     for (let i = 1; i <= 10; i++) {
@@ -82,7 +83,7 @@ async function loadPublicMarketplace(client) {
                             </div>
                         `).join('');
 
-                        // CORRECCIÓN FINAL DE SINTAXIS PARA LAS FLECHAS DEL CARRUSEL
+                        // INTERPOLACIÓN FIJA: Corregidos los índices de plantilla escapados
                         imageHeader = `
                             <div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100">
                                 <div id="carousel-${index}" class="flex w-full h-full overflow-x-hidden snap-x snap-mandatory scroll-smooth no-scrollbar">
@@ -126,8 +127,7 @@ async function loadPublicMarketplace(client) {
                         </div>
                     `;
                 });
-                activeListHtml = activeHTML.join('');
-                activeContainer.innerHTML = activeListHtml;
+                activeContainer.innerHTML = activeHTML.join('');
                 
                 activeContainer.querySelectorAll('.inquire-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -163,6 +163,7 @@ async function loadPublicMarketplace(client) {
     }
 }
 
+// ====== PARTE A: CONTROLADOR MATEMÁTICO DEL CARRUSEL ======
 let currentSlideIndexes = {};
 
 function navigateCarousel(cardIdx, direction, maxPhotos) {
@@ -190,7 +191,8 @@ function navigateCarousel(cardIdx, direction, maxPhotos) {
         counter.innerText = currentSlideIndexes[cardIdx] + 1;
     }
 }
-// ====== FRONTEND UTILITIES & CAPTURE FOR FORMS ======
+
+// ====== PARTE B: CAPTACIÓN, ACCESO PRIVADO Y GESTIÓN DE OFERTAS ======
 function setupLeadSubmission(client) {
     const leadForm = document.getElementById("general-lead-form");
     if (!leadForm) return;
@@ -214,7 +216,6 @@ function setupLeadSubmission(client) {
         }
     });
 }
-
 function setupPortalAuthentication(client) {
     const loginForm = document.getElementById("login-form");
     if (!loginForm) return;
@@ -298,6 +299,7 @@ async function updateOfferStatus(btn, offerId, newStatus) {
 
     } catch (error) {
         console.error("Error updating ledger status:", error.message);
+        alert("No se pudo actualizar el estado de la oferta.");
         btn.disabled = false;
     }
 }
@@ -335,8 +337,8 @@ async function loadUserOffers(client, userId) {
             if (off.status === 'PENDING' || !off.status) {
                 actionContent = `
                     <div class="flex justify-center space-x-1.5">
-                        <button onclick="updateOfferStatus(this, '${off.id}', 'ACCEPTED')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md">Accept</button>
-                        <button onclick="updateOfferStatus(this, '${off.id}', 'REJECTED')" class="bg-rose-500 hover:bg-rose-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md">Decline</button>
+                        <button onclick="updateOfferStatus(this, '${off.id}', 'ACCEPTED')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md shadow-emerald-500/10">Accept</button>
+                        <button onclick="updateOfferStatus(this, '${off.id}', 'REJECTED')" class="bg-rose-500 hover:bg-rose-600 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition shadow-md shadow-rose-500/10">Decline</button>
                     </div>`;
             } else {
                 let badgeColor = "bg-amber-50 text-amber-700 border-amber-200/60";
