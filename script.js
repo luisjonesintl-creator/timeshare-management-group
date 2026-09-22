@@ -5,22 +5,31 @@ const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
 let supabaseClientInstance = null;
 
 // ====== INITIALIZATION ROUTINE ======
-document.addEventListener("DOMContentLoaded", () => {
-    if (typeof supabase !== 'undefined') {
-        supabaseClientInstance = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/**
+ * Inicializa y retorna la instancia única del cliente de Supabase.
+ * @returns {SupabaseClient} Instancia del cliente de Supabase.
+ */
+function getSupabaseClient() {
+  // Si la instancia ya existe, la reutiliza para optimizar conexiones
+  if (!supabaseClientInstance) {
+    // Si estás en Node.js/Vite/Web y usas el SDK oficial @supabase/supabase-js
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+      supabaseClientInstance = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } else {
-        console.error("Supabase engine connection block detected. Ensure unpkg script loaded correctly.");
-        return;
+      // Intento de importación dinámica o asume que createClient está disponible globalmente (vía CDN script)
+      try {
+        // Si usas módulos ES (import) o CommonJS (require), asegúrate de haber importado { createClient }
+        supabaseClientInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch (error) {
+        console.error("Error: 'createClient' no está definido. Asegúrate de instalar/importar el SDK de Supabase.");
+      }
     }
+  }
+  return supabaseClientInstance;
+}
 
-    if (document.getElementById("active-properties")) {
-        loadPublicMarketplace();
-        setupLeadSubmission();
-    }
-    if (document.getElementById("login-form")) {
-        setupPortalAuthentication();
-    }
-});
+// Iniciar la instancia inmediatamente
+const supabase = getSupabaseClient();
 
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace() {
