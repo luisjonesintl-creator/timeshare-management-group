@@ -5,24 +5,30 @@ const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
 let supabaseClientInstance = null;
 
 // ====== INITIALIZATION ROUTINE ======
+/**
+ * Inicializa y retorna la instancia única del cliente de Supabase.
+ * @returns {SupabaseClient} Instancia del cliente de Supabase.
+ */
 function getSupabaseClient() {
   if (!supabaseClientInstance) {
     // FIX: Using window.supabase explicitly to avoid variable clashing and infinite loops
     if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
       supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else if (typeof createClient !== 'undefined') {
+    } else {
       try {
-        supabaseClientInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        if (typeof createClient !== 'undefined') {
+          supabaseClientInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
       } catch (error) {
-        console.error("Error standard fallback instantiation failed:", error);
+        console.error("Error: 'createClient' no está definido. Asegúrate de instalar/importar el SDK de Supabase.");
       }
     }
   }
   return supabaseClientInstance;
 }
 
-// Initialize instance immediately upon evaluation pool
-getSupabaseClient();
+// FIX: Renamed local variable to 'supabaseClient' to completely prevent global window context clashing
+const supabaseClient = getSupabaseClient();
 
 // Automated listener routing mapping elements on load
 document.addEventListener("DOMContentLoaded", () => {
@@ -99,150 +105,3 @@ async function loadPublicMarketplace() {
         console.error("Error loading marketplace assets:", error.message);
     }
 }
-// ====== CLIENT PORTAL CORE AUTHENTICATION ENGINE ======
-function setupPortalAuthentication() {
-    const loginForm = document.getElementById("login-form");
-    if (!loginForm) return;
-
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        
-        const email = document.getElementById("auth-email")?.value.trim();
-        const inputPassword = document.getElementById("auth-password")?.value.trim();
-        const errorMsg = document.getElementById("login-error");
-
-        if (errorMsg) errorMsg.classList.add("hidden");
-        if (!email || !inputPassword) return;
-
-        try {
-            // Autenticación nativa y segura con tu cliente configurado
-            const { data: authData, error: authError } = await supabaseClientInstance.auth.signInWithPassword({
-                email: email,
-                password: inputPassword,
-            });
-
-            if (authError || !authData.user) {
-                if (errorMsg) errorMsg.classList.remove("hidden");
-                return;
-            }
-            
-            // Obtenemos los detalles adicionales del cliente vinculando el ID de autenticación
-            const { data: userAccount, error: clientError } = await supabaseClientInstance
-                .from('clients')
-                .select('*')
-                .eq('id', authData.user.id)
-                .maybeSingle();
-
-            if (clientError || !userAccount) {
-                console.error("Client profile not found:", clientError?.message);
-                if (errorMsg) errorMsg.classList.remove("hidden");
-                return;
-            }
-            
-            // Obtenemos las propiedades asociadas al cliente
-            const { data: properties, error: propError } = await supabaseClientInstance
-                .from('properties')
-                .select('*')
-                .eq('owner_id', userAccount.id);
-
-            if (propError) throw propError;
-
-            // Transición visual exitosa del dashboard
-            document.getElementById("login-card")?.classList.add("hidden");
-            document.getElementById("portal-dashboard")?.classList.remove("hidden");
-            
-            const ownerTitle = document.getElementById("owner-title");
-            if (ownerTitle) ownerTitle.innerText = `Welcome back, ${userAccount.client_name}`;
-
-            if (properties && properties.length > 0) {
-                const myProp = properties[0];
-                
-                const finalMetricViews = myProp.manual_views_override !== null 
-                    ? myProp.manual_views_override 
-                    : myProp.auto_views_count;
-
-                const metricViewsEl = document.getElementById("metric-views");
-                if (metricViewsEl) metricViewsEl.innerText = Number(finalMetricViews || 0).toLocaleString();
-
-                // Rellenado de campos de detalles del inmueble asignado al dueño logueado
-                const resortEl = document.getElementById("detail-resort");
-                if (resortEl) resortEl.innerText = myProp.resort_name || 'N/A';
-
-                const priceEl = document.getElementById("detail-price");
-                if (priceEl) priceEl.innerText = `$${Number(myProp.asking_price || 0).toLocaleString()}`;
-
-                const weekEl = document.getElementById("detail-week");
-                if (weekEl) weekEl.innerText = `Week ${myProp.week_number || 'N/A'}`;
-
-                const typeEl = document.getElementById("detail-type");
-                if (typeEl) typeEl.innerText = myProp.listing_type || 'N/A';
-
-                // Ejecución automática del libro de ofertas vinculadas al ID del inmueble
-                loadPropertyOffers(myProp.id);
-            }
-        } catch (error) {
-            console.error("Login process error:", error.message);
-        }
-    });
-}
-
-// ====== OFFERS DATA RENDERING GRID UTILITIES ======
-async function loadPropertyOffers(propertyId) {
-    if (!propertyId) return;
-    try {
-        let { data: offersList, error } = await supabaseClientInstance
-            .from('offers')
-            .select('*')
-            .eq('property_id', propertyId)
-            .order('date_received', { ascending: false });
-
-        if (error) throw error;
-
-        const ledgerBody = document.getElementById("offers-ledger-body");
-        if (!ledgerBody) return;
-        
-        if (offersList && offersList.length > 0) {
-            ledgerBody.innerHTML = '';
-            offersList.forEach(off => {
-                const dateStr = off.date_received ? new Date(off.date_received).toLocaleDateString() : 'Recent';
-                let badgeClass = 'bg-yellow-100 text-yellow-800';
-                if (off.status === 'ACCEPTED') badgeClass = 'bg-green-100 text-green-800';
-                if (off.status === 'DECLINED') badgeClass = 'bg-red-100 text-red-800';
-
-                ledgerBody.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition border-b border-gray-100">
-                        <td class="p-3 text-gray-600 font-medium">${dateStr}</td>
-                        <td class="p-3"><span class="text-xs uppercase font-semibold px-2 py-0.5 bg-gray-100 text-gray-700 rounded">${off.offer_type}</span></td>
-                        <td class="p-3 font-bold text-gray-900">$${Number(off.offer_amount || 0).toLocaleString()}</td>
-                        <td class="p-3 text-center"><span class="text-xs font-bold px-2.5 py-1 rounded-full ${badgeClass}">${off.status}</span></td>
-                    </tr>
-                `;
-            });
-        } else {
-            ledgerBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for this property yet.</td></tr>`;
-        }
-    } catch (err) {
-        console.error("Error fetching offers ledger:", err.message);
-    }
-}
-
-// ====== LEAD GENERATION INTAKE UTILITIES ======
-function setupLeadSubmission() {
-    const leadForm = document.getElementById("general-lead-form");
-    if (!leadForm) return;
-
-    leadForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        
-        const payload = {
-            name: document.getElementById("lead-name").value,
-            email: document.getElementById("lead-email").value,
-            message: document.getElementById("lead-message").value
-        };
-
-        alert(`Thank you, ${payload.name}! Our agents at Timeshare Management Group have received your request and will follow up shortly.`);
-        leadForm.reset();
-    });
-}
-
-// Despliegue de actualización limpia forzada v1.4.0 sin loops de variables
