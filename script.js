@@ -2,7 +2,7 @@
 // Intenta leer desde las variables del sistema inyectadas por Vercel, si no existen, usa las cadenas por defecto.
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
-  || "https://supabase.co";
+  || "https://ztojbyfbyidzzrqicjvn.supabase.co";
 
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
@@ -17,13 +17,17 @@ let supabaseClientInstance = null;
  */
 function getSupabaseClient() {
   if (!supabaseClientInstance) {
-    // Verifica todas las variantes posibles en las que se inyecta el SDK en HTML puro
-    const creator = window.supabase?.createClient || window.createClient || (typeof createClient !== 'undefined' ? createClient : null);
-    
-    if (creator) {
-      supabaseClientInstance = creator(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // FIX: Usar window.supabase de forma explícita para evitar bucles infinitos en navegadores
+    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+      supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } else {
-      console.error("Critical Connection Error: No se detectó el script de Supabase inyectado en el HTML.");
+      try {
+        if (typeof createClient !== 'undefined') {
+          supabaseClientInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+      } catch (error) {
+        console.error("Error: 'createClient' no está definido. Asegúrate de que el script de unpkg en tu HTML cargue primero.");
+      }
     }
   }
   return supabaseClientInstance;
