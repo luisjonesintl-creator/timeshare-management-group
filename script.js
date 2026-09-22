@@ -93,24 +93,25 @@ async function loadPublicMarketplace() {
             }
         }
 
-        const pastContainer = document.getElementById("past-properties");
+               const pastContainer = document.getElementById("past-properties");
         if (pastContainer && pastList) {
             const pastHTML = pastList.map(prop => {
                 const badgeColor = prop.status === 'SOLD' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
                 return `
-                    <div class="bg-gray-100 border border-gray-200 rounded p-4 relative opacity-85">
-                        <span class="absolute top-2 right-2 text-[9px] font-extrabold tracking-widest px-2 py-0.5 rounded ${badgeColor}">${prop.status}</span>
-                        <h4 class="font-bold text-gray-800 text-sm mt-2 truncate">${prop.resort_name || 'Unknown'}</h4>
-                        <p class="text-xs text-gray-600 font-medium">$${Number(prop.asking_price || 0).toLocaleString()}</p>
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-5 relative overflow-hidden hover:shadow-md transition opacity-90">
+                        <span class="absolute top-3 right-3 text-[9px] font-extrabold tracking-widest px-2 py-0.5 rounded ${badgeColor}">${prop.status}</span>
+                        <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 rounded mb-2">${prop.listing_type || 'N/A'}</span>
+                        <h4 class="font-bold text-gray-900 text-base truncate pr-12">${prop.resort_name || 'Unknown'}</h4>
+                        <p class="text-gray-500 text-xs mb-3">Assigned Week: ${prop.week_number || 'N/A'}</p>
+                        <div class="pt-2 border-t border-gray-100">
+                            <p class="text-lg font-extrabold text-blue-900">$${Number(prop.asking_price || 0).toLocaleString()}</p>
+                        </div>
                     </div>
                 `;
             });
             pastContainer.innerHTML = pastHTML.join('');
         }
-    } catch (error) {
-        console.error("Error loading marketplace assets:", error.message);
-    }
-}
+
 // ====== FRONTEND UTILITIES & CAPTURE FOR Forms ======
 
 /**
