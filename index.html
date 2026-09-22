@@ -1,111 +1,220 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timeshare Management Group</title>
-    <!-- SOLUCIÓN AL ERROR DE ESTILOS: Script oficial de Tailwind que no genera bloqueos CORS -->
+    <title>Timeshare Management Group | Resale Marketplace</title>
+    <!-- Motor nativo oficial de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SOLUCIÓN AL FALLO CRÍTICO DE SUPABASE: Enlace oficial de respaldo directo de UNPKG sin redirecciones -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- SDK de Supabase Universal empaquetado para producción -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
-    <!-- SECCIÓN: Catálogo de Propiedades Públicas -->
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <h1 class="text-3xl font-extrabold text-blue-900 mb-6">Marketplace</h1>
-        <div id="past-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <h2 class="text-xl font-bold text-gray-700 mb-4">Active Properties</h2>
-        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <p class="text-gray-500 col-span-3">Loading properties...</p>
+    <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR (Estilo Corporativo Premium) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
+            <!-- Logotipo -->
+            <div class="flex items-center space-x-2">
+                <div class="bg-blue-900 text-white p-2.5 rounded-lg font-black tracking-wider text-xl shadow-md">TMG</div>
+                <div class="hidden sm:block">
+                    <span class="block text-sm font-black tracking-tight text-blue-950 uppercase">Timeshare</span>
+                    <span class="block text-[11px] text-slate-500 font-bold uppercase tracking-widest -mt-1">Management Group</span>
+                </div>
+            </div>
+            
+            <!-- Enlaces de navegación rápidos -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-bold text-slate-600">
+                <a href="#marketplace-section" class="hover:text-blue-900 transition flex items-center">Marketplace</a>
+                <a href="#contact" class="hover:text-blue-900 transition">Speak to a Broker</a>
+            </nav>
+
+            <!-- Acceso al Portal rápido -->
+            <div class="flex items-center space-x-4">
+                <a href="tel:18778154227" class="hidden lg:block text-xs font-black text-slate-500 hover:text-blue-900">
+                    <span class="block text-[10px] uppercase text-slate-400 font-bold">Toll Free Support</span>
+                    1-877-TMG-POOL
+                </a>
+                <a href="#login-card" class="bg-slate-100 hover:bg-slate-200 text-blue-950 text-xs font-bold px-4 py-2.5 rounded-lg transition border border-slate-200">
+                    Owner Portal
+                </a>
+            </div>
         </div>
+    </header>
 
-        <h2 class="text-xl font-bold text-gray-700 mb-4">Past Sales / Rentals</h2>
-        <div id="past-properties" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <!-- 2. HERO BANNER PRINCIPAL (Inspirado en SellMyTimeshareNow) -->
+    <section class="relative bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 py-20 px-4 text-center text-white shadow-inner">
+        <div class="max-w-4xl mx-auto space-y-6">
+            <span class="inline-block bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[11px] font-black tracking-widest uppercase px-3 py-1 rounded-full">
+                Secondary Resale Marketplace
+            </span>
+            <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+                Luxury Timeshares For Sale <br><span class="text-blue-400">By Owner</span>
+            </h1>
+            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-medium">
+                Save up to 70% off original developer pricing. Browse our extensive selection of verified resorts, weeks, and vacation club points online with zero pressure.
+            </p>
+            
+            <!-- Barra de búsqueda estética simulada -->
+            <div class="max-w-xl mx-auto bg-white p-2 rounded-xl shadow-2xl flex flex-col sm:flex-row gap-2 border border-slate-700/50">
+                <input type="text" placeholder="Search by resort name, brand or destination..." class="w-full bg-transparent px-4 py-3 text-slate-800 text-sm focus:outline-none placeholder-slate-400 font-medium" disabled>
+                <button class="bg-blue-900 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-lg hover:bg-blue-800 transition shadow-md whitespace-nowrap">
+                    Search Resales
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. CUADRÍCULA DEL CATALOGO PÚBLICO -->
+    <main class="max-w-7xl mx-auto px-4 py-16" id="marketplace-section">
+        <div class="border-b border-slate-200 pb-5 mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+            <div>
+                <h2 class="text-2xl font-black text-blue-950 tracking-tight">Featured Resale Listings</h2>
+                <p class="text-slate-500 text-sm font-medium mt-1">Verified active intervals currently listed on the secondary market.</p>
+            </div>
+            <span class="bg-emerald-50 text-emerald-800 text-[11px] font-extrabold px-3 py-1 rounded-md border border-emerald-200/50 flex items-center shadow-sm">
+                <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Live Feeds Synchronized
+            </span>
+        </div>
+        
+        <!-- Contenedor inyector de propiedades activas -->
+        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+            <div class="col-span-1 md:col-span-3 text-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900 mx-auto mb-3"></div>
+                <p class="text-slate-400 text-xs font-bold tracking-widest uppercase">Loading Active Catalog Assets...</p>
+            </div>
+        </div>
+        <!-- SECCIÓN: Historial de Ventas / Rentas -->
+        <div class="border-b border-slate-200 pb-5 mb-8">
+            <h3 class="text-xl font-black text-blue-950 tracking-tight">Past Transactions & Closed Sales</h3>
+            <p class="text-slate-500 text-sm font-medium mt-1">Historical ledger of ownership transfers processed through escrow.</p>
+        </div>
+        <div id="past-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
             <!-- Las propiedades del historial se inyectarán aquí -->
         </div>
     </main>
 
-    <!-- SECCIÓN: Portal de Clientes (Autenticación) -->
-    <section class="max-w-md mx-auto my-12 p-6 bg-white rounded-lg shadow-lg" id="login-card">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Client Portal</h2>
-        <form id="login-form" class="space-y-4">
-            <div>
-                <label for="auth-email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                <input type="email" id="auth-email" required class="mt-1 w-full p-2 border rounded">
-            </div>
-            <div>
-                <label for="auth-password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" id="auth-password" required class="mt-1 w-full p-2 border rounded">
-            </div>
-            <p id="login-error" class="text-red-600 text-sm hidden">Invalid credentials. Please try again.</p>
-            <button type="submit" class="w-full bg-blue-900 text-white p-2 rounded font-semibold hover:bg-blue-800">Sign In</button>
-        </form>
-    </section>
+    <!-- 4. CONTENEDOR DUAL: PORTAL DE ACCESO Y CAPTACIÓN -->
+    <div class="bg-slate-100 border-t border-b border-slate-200/80 py-20 px-4">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            
+            <!-- Portal de Clientes (Lado Izquierdo - Autenticación) -->
+            <section class="lg:col-span-5 bg-white p-8 rounded-2xl shadow-xl border border-slate-200" id="login-card">
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-black text-blue-950 tracking-tight">Verified Owner Portal</h2>
+                    <p class="text-slate-400 text-xs font-medium mt-1">Manage performance data and evaluate live offers.</p>
+                </div>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="auth-email" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Email Address</label>
+                        <input type="email" id="auth-email" required class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/20 transition">
+                    </div>
+                    <div>
+                        <label for="auth-password" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Password</label>
+                        <input type="password" id="auth-password" required class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/20 transition">
+                    </div>
+                    <p id="login-error" class="text-red-600 text-xs font-semibold hidden bg-red-50 p-2.5 rounded-lg border border-red-200/50">Invalid owner credentials. Please try again.</p>
+                    <button type="submit" class="w-full bg-blue-900 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-800 transition shadow-md">
+                        Sign In To Portal
+                    </button>
+                </form>
+            </section>
 
-    <!-- SECCIÓN: Dashboard Privado (Oculto inicialmente) -->
-    <section id="portal-dashboard" class="max-w-4xl mx-auto my-12 p-6 bg-white rounded-lg shadow-lg hidden">
-        <div class="flex justify-between items-center mb-6">
-            <h2 id="owner-title" class="text-2xl font-bold text-blue-900">Welcome back</h2>
-            <button onclick="window.location.reload()" class="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 transition">Log Out</button>
+            <!-- Dashboard Privado (Oculto inicialmente, se muestra tras iniciar sesión) -->
+            <section id="portal-dashboard" class="lg:col-span-5 bg-white p-8 rounded-2xl shadow-xl border border-blue-200 hidden bg-gradient-to-b from-white to-blue-50/30">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                    <h2 id="owner-title" class="text-lg font-black text-blue-950">Welcome back</h2>
+                    <button onclick="window.location.reload()" class="text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-red-600 border border-slate-200 px-2.5 py-1 rounded-md bg-white shadow-sm transition">Log Out</button>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-4 mb-6">
+                    <div class="p-4 bg-blue-900 text-white rounded-xl shadow-md flex flex-col justify-between relative overflow-hidden">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-blue-300">Property Performance</span>
+                        <p class="text-4xl font-black mt-2" id="metric-views">0</p>
+                        <p class="text-[10px] text-blue-200 mt-1 font-medium">Total resale views tracked this monthly cycle</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs font-medium">
+                        <span class="block text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Asset Allocation</span>
+                        <p class="flex justify-between border-b border-slate-200/50 pb-1 text-slate-600"><strong>Resort:</strong> <span id="detail-resort" class="font-bold text-slate-900">N/A</span></p>
+                        <p class="flex justify-between border-b border-slate-200/50 pb-1 text-slate-600"><strong>Market Price:</strong> <span id="detail-price" class="font-bold text-blue-900">N/A</span></p>
+                        <p class="flex justify-between border-b border-slate-200/50 pb-1 text-slate-600"><strong>Week Number:</strong> <span id="detail-week" class="font-bold text-slate-900">N/A</span></p>
+                        <p class="flex justify-between text-slate-600"><strong>Interval Type:</strong> <span id="detail-type" class="font-bold text-slate-900">N/A</span></p>
+                    </div>
+                </div>
+
+                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Live Offers Ledger</h3>
+                <div class="overflow-hidden border border-slate-200 rounded-xl shadow-inner bg-white">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase border-b border-slate-200 text-[10px] tracking-wider">
+                            <tr>
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Type</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="offers-ledger-body">
+                            <tr>
+                                <td colspan="4" class="p-5 text-center text-slate-400 text-xs font-medium">No offers recorded for this property interval yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <!-- Formulario de Leads (Lado Derecho - Contacto con Broker) -->
+            <section id="contact" class="lg:col-span-7 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+                <h2 class="text-xl font-black text-blue-950 tracking-tight">Speak to a Licensed Broker</h2>
+                <p class="text-slate-400 text-xs font-medium mt-1 mb-6">Have questions about timeshare resale closing services? Our escrow agents are standing by.</p>
+                <form id="general-lead-form" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="lead-name" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Full Name</label>
+                            <input type="text" id="lead-name" required class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/20 transition">
+                        </div>
+                        <div>
+                            <label for="lead-email" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Email Address</label>
+                            <input type="email" id="lead-email" required class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/20 transition">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="lead-message" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Inquiry Details</label>
+                        <textarea id="lead-message" rows="3" required placeholder="Specify your desired resort brand, week preferences or questions regarding transfer title escrow..." class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/20 transition placeholder-slate-400 font-medium"></textarea>
+                    </div>
+                    <button type="submit" class="bg-blue-900 text-white px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-800 transition shadow-md">
+                        Submit Broker Request
+                    </button>
+                </form>
+            </section>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="p-4 bg-blue-50 border border-blue-200 rounded flex flex-col justify-between">
-                <h3 class="text-sm font-semibold text-blue-800 uppercase">Property Performance</h3>
-                <p class="text-4xl font-black text-blue-950 mt-2" id="metric-views">0</p>
-                <p class="text-xs text-blue-600 mt-1">Total views tracked</p>
+    </div>
+
+    <!-- 5. CORPORATE FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div class="space-y-3">
+                <span class="block text-white font-black tracking-wider text-sm uppercase">Timeshare Management Group</span>
+                <p class="text-slate-500 leading-relaxed font-medium">
+                    TMG is an independent for-sale-by-owner marketplace for timeshares and vacation clubs intervals. Pricing is determined directly by individual owners.
+                </p>
             </div>
-            <div class="p-4 bg-gray-50 border border-gray-200 rounded space-y-1">
-                <h3 class="text-sm font-semibold text-gray-700 uppercase mb-2">Property Details</h3>
-                <p class="text-sm"><strong>Resort:</strong> <span id="detail-resort">N/A</span></p>
-                <p class="text-sm"><strong>Price:</strong> <span id="detail-price">N/A</span></p>
-                <p class="text-sm"><strong>Week:</strong> <span id="detail-week">N/A</span></p>
-                <p class="text-sm"><strong>Type:</strong> <span id="detail-type">N/A</span></p>
+            <div class="space-y-2 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[11px] mb-2">Resale Partners & Industry Trust</span>
+                <p>• Official Escrow closing title transfer service tracking</p>
+                <p>• BBB A+ Accredited Resale Platform standards</p>
+            </div>
+            <div class="space-y-2 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[11px] mb-2">Corporate Correspondence</span>
+                <p>8545 Commodity Circle, Orlando, FL 32819</p>
+                <p>Contact Support: <a href="mailto:support@tmgmarketplace.com" class="text-blue-400 hover:underline">support@tmgresales.com</a></p>
             </div>
         </div>
-
-        <h3 class="text-lg font-bold text-gray-800 mb-3">Offers Ledger</h3>
-        <div class="overflow-x-auto border rounded">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
-                    <tr>
-                        <th class="p-3">Date</th>
-                        <th class="p-3">Type</th>
-                        <th class="p-3">Amount</th>
-                        <th class="p-3 text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="offers-ledger-body">
-                    <tr>
-                        <td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for this property yet.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="max-w-7xl mx-auto px-4 pt-6 border-t border-slate-800 text-center text-slate-600 font-medium">
+            &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. Privacy Policy | Terms of Use.
         </div>
-    </section>
+    </footer>
 
-    <!-- SECCIÓN: Formulario de Captación de Leads -->
-    <section id="contact" class="max-w-lg mx-auto my-12 p-6 bg-white border border-gray-200 rounded-lg shadow">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Contact An Agent</h2>
-        <form id="general-lead-form" class="space-y-4">
-            <div>
-                <label for="lead-name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                <input type="text" id="lead-name" required class="mt-1 w-full p-2 border rounded">
-            </div>
-            <div>
-                <label for="lead-email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                <input type="email" id="lead-email" required class="mt-1 w-full p-2 border rounded">
-            </div>
-            <div>
-                <label for="lead-message" class="block text-sm font-medium text-gray-700">Message</label>
-                <textarea id="lead-message" rows="3" required class="mt-1 w-full p-2 border rounded"></textarea>
-            </div>
-            <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded font-semibold hover:bg-blue-800">Submit Request</button>
-        </form>
-    </section>
-
-    <!-- Tu archivo de lógica de negocio local sin alteraciones externas -->
+    <!-- Archivo de control lógico inalterado -->
     <script src="script.js"></script>
 </body>
 </html>
