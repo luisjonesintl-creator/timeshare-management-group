@@ -16,6 +16,7 @@
         <h2 class="text-xl font-bold text-gray-700 mb-4">Active Properties</h2>
         <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <!-- Las propiedades activas se inyectarán aquí de forma eficiente -->
+            <p class="text-gray-500 col-span-3">Loading properties...</p>
         </div>
 
         <h2 class="text-xl font-bold text-gray-700 mb-4">Past Sales / Rentals</h2>
@@ -43,12 +44,15 @@
 
     <!-- SECCIÓN: Dashboard Privado (Oculto inicialmente) -->
     <section id="portal-dashboard" class="max-w-4xl mx-auto my-12 p-6 bg-white rounded-lg shadow-lg hidden">
-        <h2 id="owner-title" class="text-2xl font-bold text-blue-900 mb-6">Welcome back</h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="owner-title" class="text-2xl font-bold text-blue-900">Welcome back</h2>
+            <button onclick="window.location.reload()" class="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 transition">Log Out</button>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="p-4 bg-blue-50 border border-blue-200 rounded">
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded flex flex-col justify-between">
                 <h3 class="text-sm font-semibold text-blue-800 uppercase">Property Performance</h3>
-                <p class="text-3xl font-black text-blue-950 mt-2" id="metric-views">0</p>
+                <p class="text-4xl font-black text-blue-950 mt-2" id="metric-views">0</p>
                 <p class="text-xs text-blue-600 mt-1">Total views tracked</p>
             </div>
             <div class="p-4 bg-gray-50 border border-gray-200 rounded space-y-1">
@@ -73,6 +77,9 @@
                 </thead>
                 <tbody id="offers-ledger-body">
                     <!-- Las ofertas se cargarán aquí dinámicamente -->
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for this property yet.</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -99,10 +106,10 @@
     </section>
 
     <!-- ==================== LIBRERÍAS Y SCRIPTS ==================== -->
-    <!-- 1. Motor oficial de Supabase importado vía CDN seguro -->
+    <!-- FIX 1: Enlace definitivo y completo para jalar el motor de Supabase JS v2 de UNPKG -->
     <script src="https://unpkg.com"></script>
 
-    <!-- 2. Tu archivo de lógica de negocio (Fuerza la limpieza de caché con ?v=1.0.1) -->
-    <script src="app.js?v=1.0.1"></script>
+    <!-- FIX 2: Sincronización exacta con el nombre real de tu controlador lógico 'script.js' -->
+    <script src="script.js?v=1.0.2"></script>
 </body>
 </html>
