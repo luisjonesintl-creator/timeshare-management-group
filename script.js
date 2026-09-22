@@ -201,7 +201,7 @@ function setupPortalAuthentication(client) {
 async function loadOwnerMetadata(client, userId) {
     try {
         const { data: ownerData, error } = await client
-            .from('owners')
+            .from('Owners')
             .select('*')
             .eq('user_id', userId)
             .single();
