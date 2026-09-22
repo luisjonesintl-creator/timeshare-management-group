@@ -1,5 +1,5 @@
 // ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://supabase.co";
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
 
 let supabaseClientInstance = null;
@@ -21,22 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setupPortalAuthentication();
     }
 });
-
-// ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
-// Asegúrate de que esta sea la clave "anon public" de tu panel de Supabase
-const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
-
-let supabaseClientInstance = null;
-
-// ====== INITIALIZATION ROUTI
-
-// ====== CONFIGURATION STEP ======
-// FIX: Uso estricto de tu URL dedicada para romper el congelamiento en "Loading properties..."
-const SUPABASE_URL = "https://supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
-
-let supabaseClientInstance = null;
 
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace() {
@@ -108,7 +92,6 @@ async function trackPageImpression(propertyId) {
         console.error("Tracking impression failed:", error.message);
     }
 }
-
 // ====== CLIENT PORTAL CORE AUTHENTICATION ENGINE ======
 function setupPortalAuthentication() {
     const loginForm = document.getElementById("login-form");
@@ -136,7 +119,7 @@ function setupPortalAuthentication() {
                 return;
             }
             
-            // Obtenemos los detalles adicionales del cliente vinculando el auth.uid()
+            // Obtenemos los detalles adicionales del cliente vinculando el ID de autenticación
             const { data: userAccount, error: clientError } = await supabaseClientInstance
                 .from('clients')
                 .select('*')
@@ -253,5 +236,4 @@ function setupLeadSubmission() {
     });
 }
 
-// Despliegue de actualización limpia forzada final v1.0.6
-// Clear Vercel cache and compile live production build v1.0.7
+// Despliegue de actualización limpia forzada final v1.0.9
