@@ -1,183 +1,115 @@
-// ====== CONFIGURATION STEP ======
-// Enlace del servidor de datos dedicado e integración corregidos
-const SUPABASE_URL = "https://supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeshare Management Group</title>
+    <!-- Cargamos Tailwind CSS para asegurar que los estilos de tus componentes funcionen -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
 
-let supabaseClientInstance = null;
-
-// ====== INITIALIZATION ROUTINE ======
-document.addEventListener("DOMContentLoaded", () => {
-    if (typeof supabase !== 'undefined') {
-        supabaseClientInstance = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else {
-        console.error("Supabase engine connection block detected.");
-        return;
-    }
-
-    if (document.getElementById("active-properties")) {
-        loadPublicMarketplace();
-        setupLeadSubmission();
-    }
-    if (document.getElementById("login-form")) {
-        setupPortalAuthentication();
-    }
-});
-
-// ====== FRONTEND PUBLIC CATALOG UTILITIES ======
-async function loadPublicMarketplace() {
-    let { data: activeList, error: err1 } = await supabaseClientInstance
-        .from('properties')
-        .select('*')
-        .eq('status', 'AVAILABLE');
-
-    let { data: pastList, error: err2 } = await supabaseClientInstance
-        .from('properties')
-        .select('*')
-        .in('status', ['SOLD', 'RENTED'])
-        .order('created_at', { ascending: false });
-
-    if (!err1 && activeList) {
-        const activeContainer = document.getElementById("active-properties");
-        activeContainer.innerHTML = activeList.length === 0 ? '<p class="text-gray-500">No active assets listed right now.</p>' : '';
-        activeList.forEach(prop => {
-            activeContainer.innerHTML += `
-                <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-md transition">
-                    <div class="p-5">
-                        <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded mb-2">${prop.listing_type}</span>
-                        <h3 class="text-lg font-bold text-gray-900">${prop.resort_name}</h3>
-                        <p class="text-gray-500 text-sm mb-4">Assigned Week: ${prop.week_number || 'N/A'}</p>
-                        <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                            <span class="text-xl font-extrabold text-blue-900">$${Number(prop.asking_price).toLocaleString()}</span>
-                            <a href="#contact" onclick="trackPageImpression(${prop.id})" class="bg-blue-900 text-white text-xs font-semibold px-4 py-2 rounded hover:bg-blue-800 transition">Inquire</a>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    if (!err2 && pastList) {
-        const pastContainer = document.getElementById("past-properties");
-        pastContainer.innerHTML = '';
-        pastList.forEach(prop => {
-            const badgeColor = prop.status === 'SOLD' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
-            pastContainer.innerHTML += `
-                <div class="bg-gray-100 border border-gray-200 rounded p-4 relative opacity-85">
-                    <span class="absolute top-2 right-2 text-[9px] font-extrabold tracking-widest px-2 py-0.5 rounded ${badgeColor}">${prop.status}</span>
-                    <h4 class="font-bold text-gray-800 text-sm mt-2 truncate">${prop.resort_name}</h4>
-                    <p class="text-xs text-gray-600 font-medium">$${Number(prop.asking_price).toLocaleString()}</p>
-                </div>
-            `;
-        });
-    }
-}
-
-async function trackPageImpression(propertyId) {
-    if (supabaseClientInstance) {
-        await supabaseClientInstance.rpc('increment_view_counter', { row_id: propertyId });
-    }
-}
-
-// ====== CLIENT PORTAL CORE AUTHENTICATION ENGINE ======
-function setupPortalAuthentication() {
-    const loginForm = document.getElementById("login-form");
-    if (!loginForm) return;
-
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("auth-email").value.trim();
-        const inputPassword = document.getElementById("auth-password").value.trim();
-        const errorMsg = document.getElementById("login-error");
-
-        if (errorMsg) errorMsg.classList.add("hidden");
-
-        let { data: users, error } = await supabaseClientInstance
-            .from('clients')
-            .select('*')
-            .eq('email', email)
-            .eq('visible_password', inputPassword);
-
-        if (error || !users || users.length === 0) {
-            if (errorMsg) errorMsg.classList.remove("hidden");
-            return;
-        }
-
-        const clientAccount = users[0]; 
+    <!-- SECCIÓN: Catálogo de Propiedades Públicas -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-extrabold text-blue-900 mb-6">Marketplace</h1>
         
-        let { data: properties } = await supabaseClientInstance
-            .from('properties')
-            .select('*')
-            .eq('owner_id', clientAccount.id);
+        <h2 class="text-xl font-bold text-gray-700 mb-4">Active Properties</h2>
+        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Las propiedades activas se inyectarán aquí de forma eficiente -->
+            <p class="text-gray-500 col-span-3">Loading properties...</p>
+        </div>
 
-        document.getElementById("login-card").classList.add("hidden");
-        document.getElementById("portal-dashboard").classList.remove("hidden");
-        document.getElementById("owner-title").innerText = `Welcome back, ${clientAccount.client_name}`;
+        <h2 class="text-xl font-bold text-gray-700 mb-4">Past Sales / Rentals</h2>
+        <div id="past-properties" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Las propiedades vendidas/rentadas se inyectarán aquí -->
+        </div>
+    </main>
 
-        if (properties && properties.length > 0) {
-            const myProp = properties[0];
-            
-            const finalMetricViews = myProp.manual_views_override !== null 
-                ? myProp.manual_views_override 
-                : myProp.auto_views_count;
+    <!-- SECCIÓN: Portal de Clientes (Autenticación y Dashboard) -->
+    <section class="max-w-md mx-auto my-12 p-6 bg-white rounded-lg shadow-lg" id="login-card">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Client Portal</h2>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                <input type="email" id="auth-email" required class="mt-1 w-full p-2 border rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="auth-password" required class="mt-1 w-full p-2 border rounded">
+            </div>
+            <p id="login-error" class="text-red-600 text-sm hidden">Invalid credentials. Please try again.</p>
+            <button type="submit" class="w-full bg-blue-900 text-white p-2 rounded font-semibold hover:bg-blue-800">Sign In</button>
+        </form>
+    </section>
 
-            document.getElementById("metric-views").innerText = finalMetricViews.toLocaleString();
-            document.getElementById("detail-resort").innerText = myProp.resort_name;
-            document.getElementById("detail-price").innerText = `$${Number(myProp.asking_price).toLocaleString()}`;
-            document.getElementById("detail-week").innerText = `Week ${myProp.week_number}`;
-            document.getElementById("detail-type").innerText = myProp.listing_type;
-
-            loadPropertyOffers(myProp.id);
-        }
-    });
-}
-
-// ====== OFFERS DATA RENDERING GRID UTILITIES ======
-async function loadPropertyOffers(propertyId) {
-    let { data: offersList } = await supabaseClientInstance
-        .from('offers')
-        .select('*')
-        .eq('property_id', propertyId)
-        .order('date_received', { ascending: false });
-
-    const ledgerBody = document.getElementById("offers-ledger-body");
-    if (!ledgerBody) return;
-    
-    if (offersList && offersList.length > 0) {
-        ledgerBody.innerHTML = '';
-        offersList.forEach(off => {
-            const dateStr = new Date(off.date_received).toLocaleDateString();
-            let badgeClass = 'bg-yellow-100 text-yellow-800';
-            if (off.status === 'ACCEPTED') badgeClass = 'bg-green-100 text-green-800';
-            if (off.status === 'DECLINED') badgeClass = 'bg-red-100 text-red-800';
-
-            ledgerBody.innerHTML += `
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="p-3 text-gray-600 font-medium">${dateStr}</td>
-                    <td class="p-3"><span class="text-xs uppercase font-semibold px-2 py-0.5 bg-gray-100 text-gray-700 rounded">${off.offer_type}</span></td>
-                    <td class="p-3 font-bold text-gray-900">$${Number(off.offer_amount).toLocaleString()}</td>
-                    <td class="p-3 text-center"><span class="text-xs font-bold px-2.5 py-1 rounded-full ${badgeClass}">${off.status}</span></td>
-                </tr>
-            `;
-        });
-    }
-}
-
-// ====== LEAD GENERATION INTAKE UTILITIES ======
-function setupLeadSubmission() {
-    const leadForm = document.getElementById("general-lead-form");
-    if (!leadForm) return;
-
-    leadForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    <!-- SECCIÓN: Dashboard Privado (Oculto inicialmente) -->
+    <section id="portal-dashboard" class="max-w-4xl mx-auto my-12 p-6 bg-white rounded-lg shadow-lg hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="owner-title" class="text-2xl font-bold text-blue-900">Welcome back</h2>
+            <button onclick="window.location.reload()" class="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 transition">Log Out</button>
+        </div>
         
-        const payload = {
-            name: document.getElementById("lead-name").value,
-            email: document.getElementById("lead-email").value,
-            message: document.getElementById("lead-message").value
-        };
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded flex flex-col justify-between">
+                <h3 class="text-sm font-semibold text-blue-800 uppercase">Property Performance</h3>
+                <p class="text-4xl font-black text-blue-950 mt-2" id="metric-views">0</p>
+                <p class="text-xs text-blue-600 mt-1">Total views tracked</p>
+            </div>
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded space-y-1">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase mb-2">Property Details</h3>
+                <p class="text-sm"><strong>Resort:</strong> <span id="detail-resort">N/A</span></p>
+                <p class="text-sm"><strong>Price:</strong> <span id="detail-price">N/A</span></p>
+                <p class="text-sm"><strong>Week:</strong> <span id="detail-week">N/A</span></p>
+                <p class="text-sm"><strong>Type:</strong> <span id="detail-type">N/A</span></p>
+            </div>
+        </div>
 
-        alert(`Thank you, ${payload.name}! Our agents at Timeshare Management Group have received your request and will follow up shortly.`);
-        leadForm.reset();
-    });
-}
+        <h3 class="text-lg font-bold text-gray-800 mb-3">Offers Ledger</h3>
+        <div class="overflow-x-auto border rounded">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+                    <tr>
+                        <th class="p-3">Date</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">Amount</th>
+                        <th class="p-3 text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="offers-ledger-body">
+                    <!-- Las ofertas se cargarán aquí dinámicamente -->
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for this property yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
+    <!-- SECCIÓN: Formulario de Captación de Leads -->
+    <section id="contact" class="max-w-lg mx-auto my-12 p-6 bg-white border border-gray-200 rounded-lg shadow">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Contact An Agent</h2>
+        <form id="general-lead-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" id="lead-name" required class="mt-1 w-full p-2 border rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                <input type="email" id="lead-email" required class="mt-1 w-full p-2 border rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Message</label>
+                <textarea id="lead-message" rows="3" required class="mt-1 w-full p-2 border rounded"></textarea>
+            </div>
+            <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded font-semibold hover:bg-blue-800">Submit Request</button>
+        </form>
+    </section>
+
+    <!-- ==================== LIBRERÍAS Y SCRIPTS ==================== -->
+    <!-- FIX 1: Enlace definitivo y completo para jalar el motor de Supabase JS v2 de UNPKG -->
+    <script src="https://unpkg.com"></script>
+
+    <!-- FIX 2: Sincronización exacta con el nombre real de tu controlador lógico 'script.js' -->
+    <script src="script.js?v=1.0.2"></script>
+</body>
+</html>
