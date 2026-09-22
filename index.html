@@ -4,30 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timeshare Management Group</title>
-    <!-- 1. Motor de Diseño v2 Estable y Confiable -->
+    <!-- 1. Enlace de producción ultra estable para activar los colores y diseño azul marino -->
     <link href="https://cloudflare.com" rel="stylesheet">
-    <!-- 2. Conector Oficial de Producción de Supabase Cloud -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- 2. Librería oficial completa de Supabase v2 -->
+    <script src="https://unpkg.com"></script>
 </head>
-
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- SECCIÓN: Catálogo de Propiedades Públicas (Marketplace) -->
+    <!-- SECCIÓN: Catálogo de Propiedades Públicas -->
     <main class="max-w-7xl mx-auto px-4 py-8">
         <h1 class="text-3xl font-extrabold text-blue-900 mb-6">Marketplace</h1>
         
         <h2 class="text-xl font-bold text-gray-700 mb-4">Active Properties</h2>
         <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <!-- Las propiedades con estado 'AVAILABLE' se inyectarán aquí mediante script.js -->
+            <!-- Las propiedades activas se inyectarán aquí desde script.js -->
+            <p class="text-gray-500 col-span-3">Loading properties...</p>
         </div>
 
         <h2 class="text-xl font-bold text-gray-700 mb-4">Past Sales / Rentals</h2>
         <div id="past-properties" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <!-- Las propiedades con estado 'SOLD' o 'RENTED' se inyectarán aquí -->
+            <!-- Las propiedades del historial se inyectarán aquí -->
         </div>
     </main>
 
-    <!-- SECCIÓN: Portal de Acceso para Clientes (Login) -->
+    <!-- SECCIÓN: Portal de Clientes (Autenticación) -->
     <section class="max-w-md mx-auto my-12 p-6 bg-white rounded-lg shadow-lg" id="login-card">
         <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Client Portal</h2>
         <form id="login-form" class="space-y-4">
@@ -44,14 +44,17 @@
         </form>
     </section>
 
-    <!-- SECCIÓN: Dashboard de Control del Propietario (Oculto inicialmente) -->
+    <!-- SECCIÓN: Dashboard Privado (Oculto inicialmente) -->
     <section id="portal-dashboard" class="max-w-4xl mx-auto my-12 p-6 bg-white rounded-lg shadow-lg hidden">
-        <h2 id="owner-title" class="text-2xl font-bold text-blue-900 mb-6">Welcome back</h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="owner-title" class="text-2xl font-bold text-blue-900">Welcome back</h2>
+            <button onclick="window.location.reload()" class="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 transition">Log Out</button>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="p-4 bg-blue-50 border border-blue-200 rounded">
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded flex flex-col justify-between">
                 <h3 class="text-sm font-semibold text-blue-800 uppercase">Property Performance</h3>
-                <p class="text-3xl font-black text-blue-950 mt-2" id="metric-views">0</p>
+                <p class="text-4xl font-black text-blue-950 mt-2" id="metric-views">0</p>
                 <p class="text-xs text-blue-600 mt-1">Total views tracked</p>
             </div>
             <div class="p-4 bg-gray-50 border border-gray-200 rounded space-y-1">
@@ -75,13 +78,15 @@
                     </tr>
                 </thead>
                 <tbody id="offers-ledger-body">
-                    <!-- Las ofertas vinculadas a la propiedad se cargarán aquí -->
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-gray-400 text-xs">No offers recorded for this property yet.</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </section>
 
-    <!-- SECCIÓN: Formulario para Registro de Interés (Leads) -->
+    <!-- SECCIÓN: Formulario de Captación de Leads -->
     <section id="contact" class="max-w-lg mx-auto my-12 p-6 bg-white border border-gray-200 rounded-lg shadow">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Contact An Agent</h2>
         <form id="general-lead-form" class="space-y-4">
@@ -101,11 +106,6 @@
         </form>
     </section>
 
-    <!-- ==================== CONTROLADORES Y LIBRERÍAS ==================== -->
-    <!-- 1. Motor oficial JavaScript de Supabase vía CDN público de unpkg -->
-    <script src="https://unpkg.com"></script>
-
-    <!-- 2. Tu archivo de lógica de negocio enlazado como script.js (Evita datos obsoletos mediante ?v=1.0.1) -->
-    <script src="script.js?v=1.0.1"></script>
+    <script src="script.js"></script>
 </body>
 </html>
