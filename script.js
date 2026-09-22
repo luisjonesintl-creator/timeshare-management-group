@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setupPortalAuthentication();
     }
 });
-
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace() {
     try {
@@ -70,7 +69,7 @@ async function loadPublicMarketplace() {
             if (activeList.length === 0) {
                 activeContainer.innerHTML = '<p class="text-gray-500 col-span-3">No active assets listed right now.</p>';
             } else {
-                               const activeHTML = activeList.map(prop => {
+                const activeHTML = activeList.map(prop => {
                     // Si el registro cuenta con imagen, la usa; si no, coloca un diseño azul plano de respaldo
                     const imageHeader = prop.image_url 
                         ? `<div class="h-48 w-full overflow-hidden bg-gray-100">
@@ -109,7 +108,7 @@ async function loadPublicMarketplace() {
             }
         }
 
-               const pastContainer = document.getElementById("past-properties");
+        const pastContainer = document.getElementById("past-properties");
         if (pastContainer && pastList) {
             const pastHTML = pastList.map(prop => {
                 const badgeColor = prop.status === 'SOLD' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
@@ -127,8 +126,11 @@ async function loadPublicMarketplace() {
             });
             pastContainer.innerHTML = pastHTML.join('');
         }
-
-// ====== FRONTEND UTILITIES & CAPTURE FOR Forms ======
+    } catch (error) {
+        console.error("Error loading marketplace assets:", error.message);
+    }
+}
+// ====== FRONTEND UTILITIES & CAPTURE FOR FORMS ======
 
 /**
  * Gestiona el envío del formulario de contacto para captación de clientes potenciales.
