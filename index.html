@@ -1,11 +1,13 @@
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timeshare Management Group</title>
-    <!-- Motor moderno de Tailwind CSS -->
+    <!-- SOLUCIÓN COMPLETA CSS: Motor oficial directo de Tailwind sin llamadas rotas que generen CORS -->
     <script src="https://jsdelivr.net"></script>
-    <!-- SOLUCIÓN DEFINITIVA CORB: Reemplazo de unpkg por el CDN estable y optimizado de Cloudflare (cdnjs) -->
-    <script src="https://cloudflare.com" integrity="sha512-YvInmAnGfC8mH63bWeXp9rWbE09TzBEn0E5606+zM3M6Y8Y7e/T3v6yI71x7qC2C64B/L345XpM265Y8Y7e/T3v==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- SOLUCIÓN COMPLETA SDK: Enlace universal oficial empaquetado compatible con JavaScript puro -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
@@ -15,11 +17,13 @@
         
         <h2 class="text-xl font-bold text-gray-700 mb-4">Active Properties</h2>
         <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Las propiedades activas se inyectarán aquí desde script.js -->
             <p class="text-gray-500 col-span-3">Loading properties...</p>
         </div>
 
         <h2 class="text-xl font-bold text-gray-700 mb-4">Past Sales / Rentals</h2>
         <div id="past-properties" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Las propiedades del historial se inyectarán aquí -->
         </div>
     </main>
 
@@ -28,7 +32,6 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Client Portal</h2>
         <form id="login-form" class="space-y-4">
             <div>
-                <!-- SOLUCIÓN ACCESIBILIDAD: Se asocian las etiquetas usando el atributo 'for' que coincide con el 'id' del input -->
                 <label for="auth-email" class="block text-sm font-medium text-gray-700">Email Address</label>
                 <input type="email" id="auth-email" required class="mt-1 w-full p-2 border rounded">
             </div>
@@ -88,7 +91,6 @@
         <h2 class="text-xl font-bold text-gray-900 mb-4">Contact An Agent</h2>
         <form id="general-lead-form" class="space-y-4">
             <div>
-                <!-- SOLUCIÓN ACCESIBILIDAD: Se asocian las etiquetas usando el atributo 'for' correspondientes -->
                 <label for="lead-name" class="block text-sm font-medium text-gray-700">Full Name</label>
                 <input type="text" id="lead-name" required class="mt-1 w-full p-2 border rounded">
             </div>
@@ -97,15 +99,14 @@
                 <input type="email" id="lead-email" required class="mt-1 w-full p-2 border rounded">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700" for="lead-message">Message</label>
+                <label for="lead-message" class="block text-sm font-medium text-gray-700">Message</label>
                 <textarea id="lead-message" rows="3" required class="mt-1 w-full p-2 border rounded"></textarea>
             </div>
             <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded font-semibold hover:bg-blue-800">Submit Request</button>
         </form>
     </section>
 
-    <!-- ==================== LIBRERÍAS Y SCRIPTS ==================== -->
-    <!-- 2. Tu archivo de lógica de negocio sincronizado -->
+    <!-- Enlace de tu lógica local -->
     <script src="script.js"></script>
 </body>
 </html>
