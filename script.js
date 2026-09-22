@@ -246,3 +246,4 @@ function setupLeadSubmission() {
 }
 
 // Despliegue de actualización limpia forzada final v1.0.6
+// Clear Vercel cache and compile live production build v1.0.7
