@@ -1,7 +1,7 @@
 // ====== CONFIGURATION STEP ======
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
-  ||   || "https://ztojbyfbyidzzrqicjvn.supabase.co";
+  || "https://supabase.co";
 
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
@@ -20,7 +20,6 @@ function getSupabaseClient() {
   return supabaseClientInstance;
 }
 
-// Inicialización segura tras la carga de la interfaz
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const client = getSupabaseClient();
@@ -154,6 +153,7 @@ function setupLeadSubmission(client) {
     });
 }
 
+// BLINDAJE CRÍTICO DEL PORTAL PRIVADO: Si el usuario es correcto en Supabase Auth, el panel abre obligatoriamente.
 function setupPortalAuthentication(client) {
     const loginForm = document.getElementById("login-form");
     if (!loginForm) return;
@@ -175,22 +175,52 @@ function setupPortalAuthentication(client) {
             if (error) throw error;
 
             if (data?.user) {
+                // Intercambio de contenedores visuales instantáneo
                 document.getElementById("login-card")?.classList.add("hidden");
                 const dashboard = document.getElementById("portal-dashboard");
                 if (dashboard) {
                     dashboard.classList.remove("hidden");
                     document.getElementById("owner-title").innerText = `Welcome back, ${data.user.email}`;
+                    
+                    // Intentamos rellenar los detalles del propietario de forma segura
+                    loadOwnerMetadata(client, data.user.id);
+                    // Intentamos cargar las ofertas
                     loadUserOffers(client, data.user.id);
                 }
             }
         } catch (error) {
-            console.error("Portal login reference error:", error.message);
-            if (errorMsg) errorMsg.classList.remove("hidden");
+            console.error("Portal login authentication failure:", error.message);
+            if (errorMsg) {
+                errorMsg.innerText = `Auth Error: ${error.message}`;
+                errorMsg.classList.remove("hidden");
+            }
         }
     });
 }
 
-// Función global encargada de actualizar el valor en Supabase y refrescar la tabla
+// Consulta de metadatos segura sin bloquear la interfaz si la tabla no existe
+async function loadOwnerMetadata(client, userId) {
+    try {
+        const { data: ownerData, error } = await client
+            .from('owners')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+        if (error) throw error;
+
+        if (ownerData) {
+            document.getElementById("detail-resort").innerText = ownerData.resort_name || "N/A";
+            document.getElementById("detail-price").innerText = ownerData.asking_price ? `$${Number(ownerData.asking_price).toLocaleString()}` : "N/A";
+            document.getElementById("detail-week").innerText = ownerData.week_number || "N/A";
+            document.getElementById("detail-type").innerText = ownerData.listing_type || "N/A";
+            document.getElementById("metric-views").innerText = ownerData.views_count || "0";
+        }
+    } catch (err) {
+        console.warn("Owner profile row missing or RLS blocked. Using default placeholders.");
+    }
+}
+
 async function updateOfferStatus(btn, offerId, newStatus) {
     const client = getSupabaseClient();
     if (!client) return;
@@ -207,8 +237,6 @@ async function updateOfferStatus(btn, offerId, newStatus) {
         if (error) throw error;
 
         alert(`Oferta marcada como ${newStatus === 'ACCEPTED' ? 'Aceptada' : 'Rechazada'} con éxito.`);
-        
-        // Solicita el usuario activo en la sesión para refrescar las filas
         const sessionUser = (await client.auth.getUser()).data.user;
         if (sessionUser) loadUserOffers(client, sessionUser.id);
 
@@ -220,7 +248,6 @@ async function updateOfferStatus(btn, offerId, newStatus) {
     }
 }
 
-// Carga las ofertas e inyecta los botones interactivos si están PENDING
 async function loadUserOffers(client, userId) {
     const ledgerBody = document.getElementById("offers-ledger-body");
     if (!ledgerBody) return;
@@ -255,7 +282,6 @@ async function loadUserOffers(client, userId) {
                 let badgeColor = "bg-yellow-100 text-yellow-800";
                 if (off.status === 'ACCEPTED') badgeColor = "bg-emerald-100 text-emerald-800";
                 if (off.status === 'REJECTED') badgeColor = "bg-red-100 text-red-800";
-                
                 actionContent = `<div class="text-center"><span class="inline-block text-[10px] font-black px-2 py-0.5 rounded shadow-sm ${badgeColor}">${off.status}</span></div>`;
             }
 
@@ -270,5 +296,6 @@ async function loadUserOffers(client, userId) {
 
     } catch (error) {
         console.error("Error loading ledger offers:", error.message);
+        ledgerBody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-red-400 text-xs font-medium">Offers table RLS restricted. Check Supabase Policies.</td></tr>`;
     }
 }
