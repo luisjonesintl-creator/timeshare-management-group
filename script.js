@@ -51,7 +51,7 @@ async function loadPublicMarketplace(client) {
         if (err1) throw err1;
         if (err2) throw err2;
 
-        const activeContainer = document.getElementById("active-properties");
+                const activeContainer = document.getElementById("active-properties");
         if (activeContainer) {
             if (!activeList || activeList.length === 0) {
                 activeContainer.innerHTML = 
@@ -131,3 +131,7 @@ async function loadPublicMarketplace(client) {
                 });
             }
         }
+    } catch (error) {
+        console.error("Critical failure rendering active marketplace:", error);
+    }
+}
