@@ -1,135 +1,213 @@
-// ====== CONFIGURATION STEP ======
-const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
-  || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
-  || "https://ztojbyfbyidzzrqicjvn.supabase.co";
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeshare Management Group | Premier Resale Marketplace</title>
+    <!-- Motor nativo oficial de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SDK de Supabase Universal empaquetado para producción -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Fuentes tipográficas modernas -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* Oculta la barra de scroll nativa para mantener el diseño del carrusel totalmente limpio */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50/50 text-slate-800 antialiased selection:bg-cyan-500/20 selection:text-cyan-900">
 
-const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
-  || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
-  || "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
+    <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR (Efecto Glassmorphism) -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <!-- Logotipo Combinado -->
+            <div class="flex items-center space-x-3 group">
+                <div class="bg-gradient-to-tr from-blue-900 via-blue-950 to-cyan-600 text-white p-2.5 rounded-xl font-black tracking-wider text-xl shadow-lg shadow-blue-900/20 group-hover:scale-105 transition-transform duration-300">TMG</div>
+                <div>
+                    <span class="block text-sm font-extrabold tracking-tight text-slate-900 uppercase">Timeshare</span>
+                    <span class="block text-[10px] text-cyan-600 font-black uppercase tracking-widest -mt-0.5">Management Group</span>
+                </div>
+            </div>
+            
+            <!-- Enlaces de navegación interactivos -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+                <a href="#marketplace-section" class="hover:text-blue-950 hover:underline decoration-cyan-500 decoration-2 underline-offset-4 transition-all">Resale Marketplace</a>
+                <a href="#contact" class="hover:text-blue-950 hover:underline decoration-cyan-500 decoration-2 underline-offset-4 transition-all">Speak to a Broker</a>
+            </nav>
 
-let supabaseClientInstance = null;
+            <!-- Acceso al Portal y Soporte Activo -->
+            <div class="flex items-center space-x-6">
+                <a href="tel:18778154227" class="hidden lg:block text-xs font-bold text-slate-500 hover:text-blue-950 transition-colors">
+                    <span class="block text-[9px] uppercase text-slate-400 font-extrabold tracking-wider">Toll Free Help</span>
+                    1-877-TMG-POOL
+                </a>
+                <a href="#login-card" class="bg-gradient-to-r from-slate-900 to-blue-950 hover:from-cyan-600 hover:to-cyan-700 text-white text-xs font-bold px-5 py-3 rounded-xl transition-all duration-300 shadow-md shadow-slate-950/10 hover:shadow-cyan-500/20 hover:-translate-y-0.5">
+                    Owner Portal
+                </a>
+            </div>
+        </div>
+    </header>
 
-// ====== INITIALIZATION ROUTINE ======
-function getSupabaseClient() {
-  if (!supabaseClientInstance) {
-    const creator = window.supabase?.createClient || window.createClient || (typeof createClient !== 'undefined' ? createClient : null);
-    if (creator) {
-      supabaseClientInstance = creator(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-  }
-  return supabaseClientInstance;
-}
+    <!-- 2. HERO BANNER VIVO (Degradado con Toques de Luz) -->
+    <section class="relative bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900 py-24 px-6 text-center text-white overflow-hidden">
+        <!-- Luces de fondo decorativas -->
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
 
-document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-        const client = getSupabaseClient();
-        if (!client) {
-            console.error("Critical connection failure: Supabase engine not initialized.");
-            return;
-        }
-        if (document.getElementById("active-properties")) {
-            loadPublicMarketplace(client);
-            setupLeadSubmission(client);
-        }
-        if (document.getElementById("login-form")) {
-            setupPortalAuthentication(client);
-        }
-    }, 300);
-});
-// ====== FRONTEND PUBLIC CATALOG UTILITIES ======
-async function loadPublicMarketplace(client) {
-    try {
-        const [activeResult, pastResult] = await Promise.all([
-            client.from('properties').select('*').eq('status', 'AVAILABLE'),
-            client.from('properties').select('*').in('status', ['SOLD', 'RENTED']).order('created_at', { ascending: false })
-        ]);
+        <div class="relative max-w-4xl mx-auto space-y-6">
+            <span class="inline-block bg-cyan-500/10 text-cyan-400 border border-cyan-400/20 text-[10px] font-extrabold tracking-widest uppercase px-3 py-1.5 rounded-full shadow-inner backdrop-blur-sm">
+                Secondary Resale Marketplace
+            </span>
+            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+                Luxury Timeshares For Sale <br><span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">By Certified Owners</span>
+            </h1>
+            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+                Save up to 70% off original developer prices. Browse our verified luxury resorts, weeks, and premium points packages online with full corporate escrow security.
+            </p>
+            
+            <!-- Barra de búsqueda mejorada visualmente -->
+            <div class="max-w-xl mx-auto bg-white p-2.5 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2 border border-slate-200/20 backdrop-blur-md">
+                <div class="w-full flex items-center px-3">
+                    <svg class="h-5 w-5 text-slate-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" placeholder="Search by resort name, brand or destination..." class="w-full bg-transparent py-2 text-slate-800 text-sm focus:outline-none placeholder-slate-400 font-medium" disabled>
+                </div>
+                <button class="bg-gradient-to-r from-blue-900 to-blue-950 text-white font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-md shadow-blue-950/20 whitespace-nowrap">
+                    Search Resales
+                </button>
+            </div>
+        </div>
+    </section>
 
-        const { data: activeList, error: err1 } = activeResult;
-        const { data: pastList, error: err2 } = pastResult;
+    <!-- 3. SECCIÓN DE MARCAS DE CONFIANZA -->
+    <section class="bg-white border-b border-slate-200/60 py-12 shadow-sm relative z-10 -mt-4 rounded-t-3xl">
+        <div class="max-w-7xl mx-auto px-6">
+            <p class="text-center text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-8">Trusted Vacation Brands Available</p>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 items-center">
+                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
+                    <span class="font-serif text-xl font-black tracking-tight text-blue-950 block group-hover:text-cyan-600 transition-colors">Marriott</span>
+                    <span class="text-[9px] uppercase tracking-widest font-black text-cyan-600">Vacation Club</span>
+                </div>
+                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
+                    <span class="font-sans text-xl font-black tracking-tight text-orange-500 block group-hover:scale-105 transition-transform">Disney</span>
+                    <span class="text-[9px] uppercase tracking-widest font-black text-slate-400">Vacation Club</span>
+                </div>
+                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
+                    <span class="font-sans text-2xl font-black tracking-wide text-slate-700 block">Hilton</span>
+                    <span class="text-[9px] uppercase tracking-widest font-black text-amber-600">Grand Vacations</span>
+                </div>
+                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
+                    <span class="font-serif text-xl font-bold italic tracking-wide text-blue-900 block">Wyndham</span>
+                    <span class="text-[9px] uppercase tracking-widest font-black text-slate-400">Vacation Resorts</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- 4. CUADRÍCULA DEL CATALOGO PÚBLICO (Marketplace) -->
+    <main class="max-w-7xl mx-auto px-6 py-16" id="marketplace-section">
+        <div class="border-b border-slate-200/60 pb-6 mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+            <div>
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Featured Resale Listings</h2>
+                <p class="text-slate-500 text-sm font-medium mt-1">Verified active intervals currently open for purchase offers.</p>
+            </div>
+            <span class="bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-emerald-200/60 flex items-center shadow-sm">
+                <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2 animate-ping"></span> Live Feeds Active
+            </span>
+        </div>
+        
+        <!-- Contenedor dinámico de propiedades activas -->
+        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+            <div class="col-span-1 md:col-span-3 text-center py-16">
+                <div class="animate-spin rounded-full h-9 w-9 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                <p class="text-slate-400 text-xs font-bold tracking-widest uppercase animate-pulse">Synchronizing secure data catalog...</p>
+            </div>
+        </div>
 
-        if (err1) throw err1;
-        if (err2) throw err2;
+        <!-- Seccion Historial Cerrado -->
+        <div class="border-b border-slate-200/60 pb-6 mb-12">
+            <h3 class="text-2xl font-black text-slate-900 tracking-tight">Past Transactions & Closed Sales</h3>
+            <p class="text-slate-500 text-sm font-medium mt-1">Historical ledger of successfully transferred intervals processed through escrow.</p>
+        </div>
+        <div id="past-properties" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+            <!-- El historial se inyecta desde script.js -->
+        </div>
+    </main>
 
-        const activeContainer = document.getElementById("active-properties");
-        if (activeContainer) {
-            if (!activeList || activeList.length === 0) {
-                activeContainer.innerHTML = 
-                    '<div class="col-span-1 md:col-span-3 p-8 bg-blue-50/50 border border-blue-200/50 rounded-2xl text-center backdrop-blur-sm">' +
-                        '<p class="text-blue-950 font-bold text-sm">No active luxury assets listed for sale right now.</p>' +
-                        '<p class="text-blue-600 text-xs mt-1 font-medium">Please contact a licensed broker below.</p>' +
-                    '</div>';
-            } else {
-                const activeHTML = activeList.map((prop, index) => {
-                    const photos = [];
-                    if (prop.image_url) photos.push(prop.image_url);
-                    for (let i = 1; i <= 10; i++) {
-                        if (prop['image_url' + i]) {
-                            photos.push(prop['image_url' + i]);
-                        }
-                    }
+    <!-- 5. ACCESOS PORTAL DUEÑOS Y CAPTACIÓN DE LEADS -->
+    <div class="bg-gradient-to-b from-slate-100 to-slate-200/40 border-t border-slate-200/60 py-24 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            
+            <!-- Tarjeta de Login del Propietario -->
+            <section class="lg:col-span-5 bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/80 border border-slate-200/60 relative overflow-hidden" id="login-card">
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 to-cyan-500"></div>
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Verified Owner Portal</h2>
+                    <p class="text-slate-400 text-xs font-medium mt-1">Access analytics, track views, and manage active purchase offers.</p>
+                </div>
+                <form id="login-form" class="space-y-5">
+                    <div>
+                        <label for="auth-email" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Email Address</label>
+                        <input type="email" id="auth-email" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
+                    </div>
+                    <div>
+                        <label for="auth-password" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Security Password</label>
+                        <input type="password" id="auth-password" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
+                    </div>
+                    <p id="login-error" class="text-red-600 text-xs font-bold hidden bg-red-50 p-3 rounded-xl border border-red-200/60">Invalid owner credentials. Please try again.</p>
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-900 to-blue-950 hover:from-cyan-600 hover:to-cyan-700 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-md shadow-blue-950/10 hover:shadow-cyan-500/20">
+                        Sign In To Secure Portal
+                    </button>
+                </form>
+            </section>
 
-                    let imageHeader = "";
-                    if (photos.length === 0) {
-                        imageHeader = 
-                            '<div class="h-56 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative">' +
-                                '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
-                            '</div>';
-                    } else {
-                        const slidesHTML = photos.map((url, imgIdx) => 
-                            '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative">' +
-                                '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="h-full w-full object-cover">' +
-                            '</div>'
-                        ).join('');
-
-                        imageHeader = 
-                            '<div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100">' +
-                                '<div id="carousel-' + index + '" class="flex w-full h-full overflow-x-hidden snap-x snap-mandatory scroll-smooth no-scrollbar">' +
-                                    slidesHTML +
-                                '</div>' +
-                                '<div class="absolute bottom-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-bold text-[10px] px-2.5 py-1 rounded-full tracking-wider z-20 shadow-sm border border-white/10">' +
-                                    '<span id="counter-' + index + '">1</span> / ' + photos.length +
-                                '</div>' +
-                                (photos.length > 1 ? 
-                                    '<button onclick="navigateCarousel(' + index + ', -1, ' + photos.length + ')" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">' +
-                                        '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>' +
-                                    '</button>' +
-                                    '<button onclick="navigateCarousel(' + index + ', 1, ' + photos.length + ')" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">' +
-                                        '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>' +
-                                    '</button>' : '') +
-                            '</div>';
-                    }
-
-                    return `
-                        <div class="group bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-xl hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between">
-                            <div class="overflow-hidden relative">
-                                ${imageHeader}
-                                <div class="p-6">
-                                    <span class="inline-block text-[9px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-700 border border-cyan-200/40 px-2.5 py-1 rounded-md mb-3">${prop.listing_type || 'N/A'}</span>
-                                    <h3 class="text-lg font-black text-slate-900 tracking-tight leading-snug group-hover:text-cyan-600 transition-colors">${prop.resort_name || 'Unknown Resort'}</h3>
-                                    <p class="text-slate-400 text-xs font-semibold mt-1 flex items-center">
-                                        <svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        Assigned Interval: Week ${prop.week_number || 'N/A'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="p-6 pt-0">
-                                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-                                    <span class="text-2xl font-black text-blue-950 tracking-tight">$${Number(prop.asking_price || 0).toLocaleString()}</span>
-                                    <button data-id="${prop.id}" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm shadow-blue-950/10">Inquire</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                activeContainer.innerHTML = activeHTML.join('');
+            <!-- Dashboard Privado (Oculto inicialmente) -->
+            <section id="portal-dashboard" class="lg:col-span-5 bg-white p-8 rounded-3xl shadow-xl border border-slate-200 hidden bg-gradient-to-b from-white to-cyan-50/10 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-400 to-blue-500"></div>
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                        <span class="block text-[9px] font-black text-cyan-600 uppercase tracking-widest">Active Session</span>
+                        <h2 id="owner-title" class="text-lg font-black text-slate-900 mt-0.5">Welcome back</h2>
+                    </div>
+                    <button onclick="window.location.reload()" class="text-[10px] font-black uppercase tracking-wider text-red-500 hover:text-white border border-red-200 hover:bg-red-500 px-3 py-1.5 rounded-xl transition-all shadow-sm">Log Out</button>
+                </div>
                 
-                activeContainer.querySelectorAll('.inquire-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.getElementById("contact")?.scrollIntoView({ behavior: 'smooth' });
-                    });
-                });
-            }
-        }
+                <div class="grid grid-cols-1 gap-4 mb-6">
+                    <div class="p-5 bg-gradient-to-br from-blue-950 to-slate-900 text-white rounded-2xl shadow-lg flex flex-col justify-between relative overflow-hidden">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-cyan-400">Resale Analytics (Monthly views)</span>
+                        <p class="text-5xl font-black mt-2 tracking-tight text-white" id="metric-views">0</p>
+                        <p class="text-[10px] text-slate-400 mt-2 font-medium flex items-center"><span class="h-1.5 w-1.5 bg-cyan-400 rounded-full mr-1.5 animate-pulse"></span> Tracking live consumer engagement data</p>
+                    </div>
+                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 text-xs font-semibold">
+                        <span class="block text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Registered Asset Allocation</span>
+                        <p class="flex justify-between border-b border-slate-200/50 pb-1.5 text-slate-600"><strong>Resort Name:</strong> <span id="detail-resort" class="font-bold text-slate-900">N/A</span></p>
+                        <p class="flex justify-between border-b border-slate-200/50 pb-1.5 text-slate-600"><strong>Market Price:</strong> <span id="detail-price" class="font-extrabold text-blue-900">N/A</span></p>
+                        <p class="flex justify-between border-b border-slate-200/50 pb-1.5 text-slate-600"><strong>Week Number:</strong> <span id="detail-week" class="font-bold text-slate-900">N/A</span></p>
+                        <p class="flex justify-between text-slate-600"><strong>Interval Type:</strong> <span id="detail-type" class="font-bold text-slate-900">N/A</span></p>
+                    </div>
+                </div>
+
+                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2.5">Live Offers Ledger</h3>
+                <div class="overflow-hidden border border-slate-200 rounded-2xl shadow-sm bg-white">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase border-b border-slate-200 text-[10px] tracking-wider">
+                            <tr>
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Details</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="offers-ledger-body">
+                            <tr>
+                                <td colspan="4" class="p-6 text-center text-slate-400 text-xs font-medium">No offers recorded for this interval yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
             <!-- Formulario de Leads (Contacto con Escrow Broker) -->
             <section id="contact" class="lg:col-span-7 bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/80 border border-slate-200/60 relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 to-cyan-500"></div>
