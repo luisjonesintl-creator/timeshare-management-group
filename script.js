@@ -1,31 +1,37 @@
-// ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
+// =========================================================================
+// TIMESHARE MANAGEMENT GROUP — MASTER CORE ENGINE (PRODUCTION V2.0)
+// =========================================================================
 
-// NUEVA CLAVE INTEGRADA: Conexión segura actualizada al 100%
+// ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 let supabaseClientInstance = null;
+let globalActiveListings = []; // Caché local para búsquedas en tiempo real
 
-// ====== INITIALIZATION ROUTINE ======
+// ====== 2. INICIALIZACIÓN DEL MOTOR DE BASE DE DATOS ======
 function getSupabaseClient() {
-  if (!supabaseClientInstance) {
-    const creator = window.supabase?.createClient || window.createClient || (typeof createClient !== 'undefined' ? createClient : null);
-    if (creator) {
-      supabaseClientInstance = creator(SUPABASE_URL, SUPABASE_ANON_KEY);
+    if (!supabaseClientInstance) {
+        const creator = window.supabase?.createClient || window.createClient || (typeof createClient !== 'undefined' ? createClient : null);
+        if (creator) {
+            supabaseClientInstance = creator(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
     }
-  }
-  return supabaseClientInstance;
+    return supabaseClientInstance;
 }
 
+// ====== 3. ENRUTADOR INTELIGENTE DE CICLO DE VIDA ======
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const client = getSupabaseClient();
         if (!client) {
-            console.error("Critical connection failure: Supabase engine not initialized.");
+            console.error("Critical core failure: Supabase engine could not be initialized.");
             return;
         }
+
+        // Detecta qué componentes inyectar dependiendo de los IDs de la página actual
         if (document.getElementById("active-properties")) {
-            loadPublicMarketplace(client);
+            initPublicMarketplace(client);
             setupLeadSubmission(client);
         }
         if (document.getElementById("login-form")) {
@@ -33,110 +39,150 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 300);
 });
-
-// ====== FRONTEND PUBLIC CATALOG UTILITIES ======
-async function loadPublicMarketplace(client) {
+// ====== 4. CATÁLOGO PÚBLICO INTEGRADO (ALGORITMOS SMTN) ======
+async function initPublicMarketplace(client) {
     try {
-        // ====== REEMPLAZA ESTE BLOQUE EXACTO EN TU SCRIPT.JS ======
-const slidesHTML = photos.map((url, imgIdx) => 
-    '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative bg-slate-950/90 flex items-center justify-center">' +
-        // CAMBIADO: Se cambió object-cover por object-contain y se añadió un fondo oscuro elegante
-        '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain transition-all duration-300">' +
-    '</div>'
-).join('');
+        // Consulta unificada optimizada para traer el inventario disponible
+        const { data: activeList, error: err } = await client
+            .from('properties')
+            .select('*')
+            .eq('status', 'AVAILABLE')
+            .order('created_at', { ascending: false });
 
-      const { data: activeList, error: err1 } = activeResult;
-        const { data: pastList, error: err2 } = pastResult;
+        if (err) throw err;
 
-        if (err1) throw err1;
-        if (err2) throw err2;
+        // Guardamos en la memoria caché global para permitir filtrado instantáneo
+        globalActiveListings = activeList || [];
+        
+        // Renderizado inicial con todos los registros encontrados
+        renderCatalogCards(globalActiveListings);
+        
+        // Inicializamos el motor predictivo de búsqueda en el Hero
+        setupLiveSearchEngine();
 
-        const activeContainer = document.getElementById("active-properties");
-        if (activeContainer) {
-            if (!activeList || activeList.length === 0) {
-                activeContainer.innerHTML = 
-                    '<div class="col-span-1 md:col-span-3 p-8 bg-blue-50/50 border border-blue-200/50 rounded-2xl text-center backdrop-blur-sm">' +
-                        '<p class="text-blue-950 font-bold text-sm">No active luxury assets listed for sale right now.</p>' +
-                        '<p class="text-blue-600 text-xs mt-1 font-medium">Please contact a licensed broker below.</p>' +
-                    '</div>';
-            } else {
-                const activeHTML = activeList.map((prop, index) => {
-                    const photos = [];
-                    if (prop.image_url) photos.push(prop.image_url);
-                    for (let i = 1; i <= 10; i++) {
-                        if (prop['image_url' + i]) {
-                            photos.push(prop['image_url' + i]);
-                        }
-                    }
-
-                    let imageHeader = "";
-                    if (photos.length === 0) {
-                        imageHeader = 
-                            '<div class="h-56 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative rounded-t-2xl">' +
-                                '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
-                            '</div>';
-                    } else {
-                        // ====== BUSCA ESTE BLOQUE EXACTO EN TU SCRIPT.JS Y REEMPLÁZALO ======
-const slidesHTML = photos.map((url, imgIdx) => 
-    '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative">' +
-        '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="h-full w-full object-cover">' +
-    '</div>'
-).join('');
-
-                        imageHeader = 
-                            '<div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100">' +
-                                '<div id="carousel-' + index + '" class="flex w-full h-full overflow-x-hidden snap-x snap-mandatory scroll-smooth no-scrollbar">' +
-                                    slidesHTML +
-                                '</div>' +
-                                '<div class="absolute bottom-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-bold text-[10px] px-2.5 py-1 rounded-full tracking-wider z-20 shadow-sm border border-white/10">' +
-                                    '<span id="counter-' + index + '">1</span> / ' + photos.length +
-                                '</div>' +
-                                (photos.length > 1 ? 
-                                    '<button onclick="navigateCarousel(' + index + ', -1, ' + photos.length + ')" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">' +
-                                        '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>' +
-                                    '</button>' +
-                                    '<button onclick="navigateCarousel(' + index + ', 1, ' + photos.length + ')" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">' +
-                                        '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>' +
-                                    '</button>' : '') +
-                            '</div>';
-                    }
-
-                    return `
-                        <div class="group bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-xl hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between">
-                            <div class="overflow-hidden relative">
-                                ${imageHeader}
-                                <div class="p-6">
-                                    <span class="inline-block text-[9px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-700 border border-cyan-200/40 px-2.5 py-1 rounded-md mb-3">${prop.listing_type || 'N/A'}</span>
-                                    <h3 class="text-lg font-black text-slate-900 tracking-tight leading-snug group-hover:text-cyan-600 transition-colors">${prop.resort_name || 'Unknown Resort'}</h3>
-                                    <p class="text-slate-400 text-xs font-semibold mt-1 flex items-center">
-                                        <svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        Assigned Interval: Week ${prop.week_number || 'N/A'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="p-6 pt-0">
-                                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-                                    <span class="text-2xl font-black text-blue-950 tracking-tight">$${Number(prop.asking_price || 0).toLocaleString()}</span>
-                                    <button data-id="${prop.id}" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm shadow-blue-950/10">Inquire</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                activeContainer.innerHTML = activeHTML.join('');
-                
-                activeContainer.querySelectorAll('.inquire-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.getElementById("contact")?.scrollIntoView({ behavior: 'smooth' });
-                    });
-                });
-            }
-        }
     } catch (error) {
-        console.error("Critical failure rendering active marketplace:", error);
+        console.error("Critical failure during catalog synchronization:", error);
     }
 }
-// ====== FRONTEND LEAD SUBMISSION UTILITIES ======
+
+// Función encargada de dibujar las tarjetas en el HTML
+function renderCatalogCards(listings) {
+    const container = document.getElementById("active-properties");
+    if (!container) return;
+
+    if (listings.length === 0) {
+        container.innerHTML = 
+            '<div class="col-span-1 md:col-span-3 p-12 bg-blue-50/50 border border-blue-200/50 rounded-3xl text-center backdrop-blur-sm">' +
+                '<p class="text-blue-950 font-bold text-sm">No match found for your search query.</p>' +
+                '<p class="text-slate-400 text-xs mt-1 font-medium">Try clearing your keywords or contact a broker below.</p>' +
+            '</div>';
+        return;
+    }
+    container.innerHTML = listings.map((prop, index) => {
+        // Recopilación secuencial de imágenes adicionales almacenadas
+        const photos = [];
+        if (prop.image_url) photos.push(prop.image_url);
+        for (let i = 1; i <= 10; i++) {
+            if (prop['image_url' + i]) photos.push(prop['image_url' + i]);
+        }
+
+        // Asignador automatizado de Badges de confianza según rango de valor SMTN
+        let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
+        const price = Number(prop.asking_price || 0);
+        if (price < 8000) {
+            dealBadge = '<span class="bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Best Value Deal</span>';
+        } else if (price > 16000) {
+            dealBadge = '<span class="bg-amber-50 text-amber-700 border border-amber-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">High Demand Asset</span>';
+        }
+
+        let imageHeader = "";
+        if (photos.length === 0) {
+            imageHeader = 
+                '<div class="h-56 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative rounded-t-2xl">' +
+                    '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
+                '</div>';
+        } else {
+            // Mapeo adaptativo: Genera las diapositivas horizontales
+            const slidesHTML = photos.map((url, imgIdx) => 
+                '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative bg-slate-950 flex items-center justify-center">' +
+                    '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain transition-all duration-500">' +
+                '</div>'
+            ).join('');
+            imageHeader = 
+                '<div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100 shadow-inner">' +
+                    '<div id="carousel-' + index + '" class="flex w-full h-full overflow-x-hidden snap-x snap-mandatory scroll-smooth no-scrollbar">' +
+                        slidesHTML +
+                    '</div>' +
+                    '<div class="absolute bottom-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-bold text-[10px] px-2.5 py-1 rounded-full tracking-wider z-20 shadow-sm border border-white/10">' +
+                        '<span id="counter-' + index + '">1</span> / ' + photos.length +
+                    '</div>' +
+                    (photos.length > 1 ? 
+                        '<button onclick="navigateCarousel(' + index + ', -1, ' + photos.length + ')" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">' +
+                            '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>' +
+                        '</button>' +
+                        '<button onclick="navigateCarousel(' + index + ', 1, ' + photos.length + ')" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full p-2 shadow-md hover:scale-105 transition-all z-20 opacity-0 group-hover/gallery:opacity-100 duration-300">' +
+                            '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>' +
+                        '</button>' : '') +
+                '</div>';
+        }
+
+        return `
+            <div class="group bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-xl hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between">
+                <div class="overflow-hidden relative">
+                    \${imageHeader}
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            \${dealBadge}
+                            <span class="text-[10px] font-bold text-slate-400">AD #TMG\${prop.id}</span>
+                        </div>
+                        <h3 class="text-base font-black text-slate-900 tracking-tight leading-snug group-hover:text-blue-900 transition-colors duration-300">\${prop.resort_name || 'Unknown Resort'}</h3>
+                        <p class="text-slate-400 text-xs font-semibold mt-2 flex items-center">
+                            <svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Assigned Schedule: Week \${prop.week_number || 'N/A'}
+                        </p>
+                    </div>
+                </div>
+                <div class="p-6 pt-0">
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                        <div class="flex flex-col">
+                            <span class="text-[9px] uppercase tracking-widest font-black text-slate-400 leading-none">\${prop.listing_type || 'SALE'}</span>
+                            <span class="text-xl font-black text-blue-950 tracking-tight mt-0.5">\$\${price.toLocaleString()}</span>
+                        </div>
+                        <button data-id="\${prop.id}" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm">Inquire</button>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+    // Re-vinculamos el scroll suave hacia el formulario de contacto público
+    container.querySelectorAll('.inquire-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById("contact")?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+}
+
+// ====== 5. MOTOR DE BÚSQUEDA PREDICTIVO EN TIEMPO REAL (LIVE SEARCH) ======
+function setupLiveSearchEngine() {
+    // Buscamos el campo input de búsqueda dentro del Hero Banner
+    const searchInput = document.querySelector("input[placeholder*='Search resorts']");
+    if (!searchInput) return;
+
+    // Habilitamos el campo de forma segura removiendo el atributo inactivo
+    searchInput.removeAttribute("disabled");
+    searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        // Filtramos la caché local en tiempo de ejecución sin saturar a Supabase
+        const filtered = globalActiveListings.filter(prop => 
+            (prop.resort_name && prop.resort_name.toLowerCase().includes(query)) ||
+            (prop.listing_type && prop.listing_type.toLowerCase().includes(query))
+        );
+        
+        renderCatalogCards(filtered);
+    });
+}
+
+// ====== 6. CAPTACIÓN ASÍNCRONA DE PROSPECTOS PÚBLICOS (LEADS) ======
 function setupLeadSubmission(client) {
     const form = document.getElementById("general-lead-form");
     if (!form) return;
@@ -150,14 +196,13 @@ function setupLeadSubmission(client) {
         const submitBtn = form.querySelector("button[type='submit']");
 
         if (!nameInput || !emailInput || !messageInput) return;
-
         try {
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerText = "Sending Request...";
             }
 
-            // Inserción segura de prospectos en la tabla 'leads'
+            // Inserción en caliente de leads
             const { error } = await client.from('leads').insert([
                 {
                     full_name: nameInput.value.trim(),
@@ -169,12 +214,11 @@ function setupLeadSubmission(client) {
 
             if (error) throw error;
 
-            form.innerHTML = `
-                <div class="p-6 bg-emerald-50 border border-emerald-200 text-center rounded-2xl">
-                    <p class="text-emerald-900 font-bold text-base">Thank you, ${nameInput.value.trim()}!</p>
-                    <p class="text-emerald-700 text-xs mt-1">Your broker request has been logged through escrow protection. An agent will contact you shortly.</p>
-                </div>
-            `;
+            form.innerHTML = 
+                '<div class="p-6 bg-emerald-50 border border-emerald-200 text-center rounded-2xl">' +
+                    '<p class="text-emerald-900 font-bold text-base font-sans">Thank you, ' + nameInput.value.trim() + '!</p>' +
+                    '<p class="text-emerald-700 text-xs mt-1">Your broker request has been logged through escrow protection. An agent will contact you shortly.</p>' +
+                '</div>';
 
         } catch (err) {
             console.error("Failed to submit broker lead:", err);
@@ -187,7 +231,7 @@ function setupLeadSubmission(client) {
     });
 }
 
-// ====== PRIVATE PROPRIETARY PORTAL UTILITIES ======
+// ====== 7. AUTENTICACIÓN Y CONSULTA DE PROPIETARIOS (PORTAL) ======
 function setupPortalAuthentication(client) {
     const loginForm = document.getElementById("login-form");
     if (!loginForm) return;
@@ -206,7 +250,6 @@ function setupPortalAuthentication(client) {
         try {
             if (errorAlert) errorAlert.classList.add("hidden");
 
-            // Inicio de sesión oficial con el módulo de Auth de Supabase
             const { data, error } = await client.auth.signInWithPassword({
                 email: emailInput.value.trim(),
                 password: passwordInput.value
@@ -227,11 +270,9 @@ function setupPortalAuthentication(client) {
         }
     });
 }
-
-// ====== PRIVATE PROPRIETARY PORTAL UTILITIES ======
+// Carga las métricas y la tabla de ofertas vinculadas al ID del usuario autenticado
 async function loadOwnerAssetDashboard(client, userId) {
     try {
-        // CORREGIDO: Ahora apunta exactamente a la tabla 'Owners' (con O mayúscula) de tu Supabase
         const { data: ownerAsset, error: propErr } = await client
             .from('Owners')
             .select('*')
@@ -241,14 +282,12 @@ async function loadOwnerAssetDashboard(client, userId) {
         if (propErr) throw propErr;
 
         if (ownerAsset) {
-            // Vinculamos los IDs de portal.html con los campos reales de tu tabla Owners
             document.getElementById("detail-resort").innerText = ownerAsset.resort_name || "Premium Resort Asset";
             document.getElementById("detail-price").innerText = ownerAsset.asking_price ? `$${Number(ownerAsset.asking_price).toLocaleString()}` : "N/A";
             document.getElementById("detail-week").innerText = ownerAsset.week_number ? `Week ${ownerAsset.week_number}` : "N/A";
             document.getElementById("detail-type").innerText = ownerAsset.listing_type || "N/A";
             document.getElementById("metric-views").innerText = ownerAsset.views_count ? Number(ownerAsset.views_count).toLocaleString() : "0";
 
-            // Consultar las ofertas vinculadas a esta propiedad
             const { data: offers, error: offErr } = await client
                 .from('offers')
                 .select('*')
@@ -260,7 +299,7 @@ async function loadOwnerAssetDashboard(client, userId) {
             const offersBody = document.getElementById("offers-ledger-body");
             if (offersBody) {
                 if (!offers || offers.length === 0) {
-                    offersBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400 bg-gray-50/50">No offers recorded for this interval yet.</td></tr>`;
+                    offersBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400 bg-gray-50/50">No offers recorded for this interval yet.</td></tr>';
                     return;
                 }
 
@@ -278,8 +317,7 @@ async function loadOwnerAssetDashboard(client, userId) {
                                     'bg-amber-50 text-amber-700 border border-amber-200'
                                 }">${off.status || 'PENDING'}</span>
                             </td>
-                        </tr>
-                    `;
+                        </tr>`;
                 }).join('');
             }
         }
@@ -288,7 +326,7 @@ async function loadOwnerAssetDashboard(client, userId) {
     }
 }
 
-// ====== INTERACTIVE CAROUSEL CONTROLLER ======
+// ====== 8. INTERACTIVE CAROUSEL CONTROLLER ======
 function navigateCarousel(carouselIdx, direction, totalPhotos) {
     const carousel = document.getElementById(`carousel-${carouselIdx}`);
     const counter = document.getElementById(`counter-${carouselIdx}`);
@@ -309,57 +347,190 @@ function navigateCarousel(carouselIdx, direction, totalPhotos) {
 
     counter.textContent = currentIdx + 1;
 }
-// ====== AGREGAR ESTO AL FINAL DE SCRIPT.JS ======
+
+// ====== 9. CONTROLADORES AUTOMATIZADOS PANEL ADMIN MASTER ======
 document.addEventListener("DOMContentLoaded", () => {
-    // Verificamos que el botón de guardar exista en la pantalla actual (portal.html)
-    const saveBtn = document.getElementById("ui-save-btn");
-    if (!saveBtn) return;
+    const addForm = document.getElementById("admin-add-form");
+    if (!addForm) return; 
 
-    saveBtn.addEventListener("click", async () => {
-        const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
-        if (!client) {
-            alert("Error: El motor de Supabase no está listo.");
-            return;
+    const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+    if (!client) {
+        console.error("Master Connection Failed: Admin panel cannot hook the active Supabase client.");
+        return;
+    }
+    // --- ACCIÓN A: CREAR / ALTA DE NUEVO RESORT ---
+    addForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const submitBtn = addForm.querySelector("button[type='submit']");
+        
+        const nameVal = document.getElementById("add-resort-name").value.trim();
+        const priceVal = document.getElementById("add-price").value;
+        const weekVal = document.getElementById("add-week").value;
+        const typeVal = document.getElementById("add-type").value;
+        const statusVal = document.getElementById("add-status").value;
+        const imageVal = document.getElementById("add-image").value.trim();
+
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Deploying Cluster Data...";
+
+            const { error } = await client.from('properties').insert([
+                {
+                    resort_name: nameVal,
+                    asking_price: Number(priceVal),
+                    week_number: Number(weekVal),
+                    listing_type: typeVal,
+                    status: statusVal,
+                    image_url: imageVal,
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+            if (error) throw error;
+            alert("¡Resort publicado exitosamente en el catálogo público!");
+            addForm.reset();
+
+        } catch (err) {
+            alert("Error al inyectar propiedad: " + err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Publish Asset To Marketplace";
         }
+    });
 
-        // Capturamos los valores ingresados en la interfaz visual
-        const idVal = document.getElementById("ui-edit-id")?.value;
-        const nameVal = document.getElementById("ui-edit-name")?.value.trim();
-        const priceVal = document.getElementById("ui-edit-price")?.value;
-        const weekVal = document.getElementById("ui-edit-week")?.value;
+    // --- ACCIÓN B: EDITAR / MODIFICAR PROPIEDAD EXISTENTE ---
+    const updateBtn = document.getElementById("admin-update-btn");
+    updateBtn?.addEventListener("click", async () => {
+        const idVal = document.getElementById("admin-edit-id").value;
+        const nameVal = document.getElementById("admin-edit-name").value.trim();
+        const priceVal = document.getElementById("admin-edit-price").value;
+        const weekVal = document.getElementById("admin-edit-week").value;
 
-        if (!idVal || !nameVal || !priceVal || !weekVal) {
-            alert("Por favor, llena todos los campos de edición antes de guardar.");
+        if (!idVal) {
+            alert("Por favor introduce el Target ID numérico del resort que deseas modificar.");
             return;
         }
 
         try {
-            saveBtn.disabled = true;
-            saveBtn.innerText = "Guardando cambios en Supabase...";
+            updateBtn.disabled = true;
+            updateBtn.innerText = "Synchronizing schema...";
 
-            // Actualizamos la fila directamente en la tabla 'properties'
+            const updateData = {};
+            if (nameVal) updateData.resort_name = nameVal;
+            if (priceVal) updateData.asking_price = Number(priceVal);
+            if (weekVal) updateData.week_number = Number(weekVal);
+            updateData.created_at = new Date().toISOString();
+
             const { error } = await client
                 .from('properties')
-                .update({
-                    resort_name: nameVal,
-                    asking_price: Number(priceVal),
-                    week_number: Number(weekVal),
-                    created_at: new Date().toISOString()
-                })
+                .update(updateData)
                 .eq('id', Number(idVal));
 
             if (error) throw error;
-
-            alert("¡Propiedad actualizada con éxito desde la UI!");
-            window.location.reload(); // Recarga la página para mostrar los nuevos valores de inmediato
+            alert("¡Registro ID #" + idVal + " modificado con éxito!");
+            
+            document.getElementById("admin-edit-id").value = "";
+            document.getElementById("admin-edit-name").value = "";
+            document.getElementById("admin-edit-price").value = "";
+            document.getElementById("admin-edit-week").value = "";
 
         } catch (err) {
-            console.error("Fallo al actualizar desde la UI:", err);
-            alert("Error al actualizar la base de datos: " + err.message);
+            alert("Fallo al actualizar registro: " + err.message);
         } finally {
-            saveBtn.disabled = false;
-            saveBtn.innerText = "Aplicar Cambios en Vivo";
+            updateBtn.disabled = false;
+            updateBtn.innerText = "Save Changes via UI";
+        }
+    });
+
+    // --- ACCIÓN C: CLONAR / DUPLICAR PROPIEDAD EXISTENTE ---
+    const cloneBtn = document.getElementById("admin-clone-btn");
+    cloneBtn?.addEventListener("click", async () => {
+        const sourceId = document.getElementById("admin-clone-source-id").value;
+
+        if (!sourceId) {
+            alert("Por favor, introduce el ID del resort base que deseas clonar.");
+            return;
+        }
+
+        try {
+            cloneBtn.disabled = true;
+            cloneBtn.innerText = "Extracting source record...";
+
+            const { data: sourceProperty, error: fetchErr } = await client
+                .from('properties')
+                .select('*')
+                .eq('id', Number(sourceId))
+                .single();
+
+            if (fetchErr) throw fetchErr;
+            if (!sourceProperty) {
+                alert("No se encontró ningún resort con el ID especificado.");
+                return;
+            }
+
+            cloneBtn.innerText = "Deploying duplicate listing...";
+
+            const { error: insertErr } = await client.from('properties').insert([
+                {
+                    resort_name: sourceProperty.resort_name,
+                    asking_price: sourceProperty.asking_price,
+                    week_number: sourceProperty.week_number,
+                    listing_type: sourceProperty.listing_type,
+                    status: sourceProperty.status,
+                    image_url: sourceProperty.image_url,
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+            if (insertErr) throw insertErr;
+            alert("¡Listado clonado con éxito! Ya puedes modificar su precio o semana de forma independiente con el panel de edición.");
+            document.getElementById("admin-clone-source-id").value = "";
+
+        } catch (err) {
+            alert("Error durante el proceso de clonación: " + err.message);
+        } finally {
+            cloneBtn.disabled = false;
+            cloneBtn.innerText = "Clone & Deploy Duplicate Listing";
+        }
+    });
+
+    // --- ACCIÓN D: ELIMINACIÓN DE INVENTARIO AL INSTANTE ---
+    const deleteBtn = document.getElementById("admin-delete-btn");
+    deleteBtn?.addEventListener("click", async () => {
+        const deleteId = document.getElementById("admin-delete-id").value;
+
+        if (!deleteId) {
+            alert("Por favor introduce el ID numérico exacto que deseas eliminar.");
+            return;
+        }
+
+        const confirmWipe = confirm("¿Estás seguro de eliminar permanentemente este registro de la base de datos?");
+        if (!confirmWipe) return;
+
+        try {
+            deleteBtn.disabled = true;
+            deleteBtn.innerText = "Wiping data stream...";
+
+            const { error } = await client
+                .from('properties')
+                .delete()
+                .eq('id', Number(deleteId));
+
+            if (error) throw error;
+            alert("¡Registro ID #" + deleteId + " borrado definitivamente!");
+            document.getElementById("admin-delete-id").value = "";
+
+        } catch (err) {
+            alert("Fallo crítico de borrado: " + err.message);
+        } finally {
+            deleteBtn.disabled = false;
+            deleteBtn.innerText = "Permanently Wipe Record";
         }
     });
 });
 
+
+
+
+
+                          
