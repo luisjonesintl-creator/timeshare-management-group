@@ -3,190 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timeshare Management Group | Premier Resale Marketplace</title>
-    <!-- Motor nativo oficial de Tailwind CSS -->
+    <title>Timeshare Management Group | Premier Resale & Rental Marketplace</title>
+    <!-- Motor de estilos optimizado para producción -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SDK de Supabase Universal empaquetado para producción -->
+    <!-- SDK de Supabase para conexiones asíncronas -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <!-- Fuentes tipográficas modernas -->
+    <!-- Tipografía corporativa Plus Jakarta Sans -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        /* Oculta la barra de scroll nativa para mantener el diseño del carrusel totalmente limpio */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-50/50 text-slate-800 antialiased selection:bg-cyan-500/20 selection:text-cyan-900">
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-500/20">
 
-    <!-- 1. BARRA DE NAVEGACIÓN SUPERIOR (Efecto Glassmorphism) -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50 shadow-sm transition-all duration-300">
+    <!-- BARRA DE INFORMACIÓN CORPORATIVA (Números de Asistencia) -->
+    <div class="bg-slate-900 text-slate-300 text-[11px] font-bold py-2.5 px-6 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-4">
+                <span><span class="text-cyan-400">Toll Free:</span> <a href="tel:18778154227" class="hover:text-white transition">1-877-815-4227</a></span>
+                <span class="hidden md:inline text-slate-600">|</span>
+                <span class="hidden md:inline"><span class="text-slate-400">International:</span> <a href="tel:16035160200" class="hover:text-white transition">1-603-516-0200</a></span>
+            </div>
+            <div class="flex items-center space-x-4 text-[10px] uppercase tracking-wider text-slate-400">
+                <span class="flex items-center"><span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> BBB A+ Accredited Marketplace</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN PRINCIPAL (Efecto Cristal de Alta Gama) -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm transition-all">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <!-- Logotipo Combinado -->
-            <div class="flex items-center space-x-3 group">
-                <div class="bg-gradient-to-tr from-blue-900 via-blue-950 to-cyan-600 text-white p-2.5 rounded-xl font-black tracking-wider text-xl shadow-lg shadow-blue-900/20 group-hover:scale-105 transition-transform duration-300">TMG</div>
+            <!-- Identidad Visual -->
+            <div class="flex items-center space-x-3 group cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                <div class="bg-gradient-to-tr from-blue-900 via-blue-950 to-blue-800 text-white p-2.5 rounded-xl font-black tracking-wider text-xl shadow-md">TMG</div>
                 <div>
                     <span class="block text-sm font-extrabold tracking-tight text-slate-900 uppercase">Timeshare</span>
-                    <span class="block text-[10px] text-cyan-600 font-black uppercase tracking-widest -mt-0.5">Management Group</span>
+                    <span class="block text-[10px] text-blue-600 font-black uppercase tracking-widest -mt-0.5">Management Group</span>
                 </div>
             </div>
             
-            <!-- Enlaces de navegación interactivos -->
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
-                <a href="#marketplace-section" class="hover:text-blue-950 hover:underline decoration-cyan-500 decoration-2 underline-offset-4 transition-all">Resale Marketplace</a>
-                <a href="#contact" class="hover:text-blue-950 hover:underline decoration-cyan-500 decoration-2 underline-offset-4 transition-all">Speak to a Broker</a>
+            <!-- Menú de Enlaces SMTN Style -->
+            <nav class="hidden lg:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider text-slate-600">
+                <a href="#marketplace-section" class="hover:text-blue-950 transition-colors">Buy a Timeshare</a>
+                <a href="#marketplace-section" class="hover:text-blue-950 transition-colors">Rent a Timeshare</a>
+                <a href="#contact" class="hover:text-blue-950 transition-colors">Sell Your Timeshare</a>
+                <a href="#metrics-section" class="hover:text-blue-950 transition-colors">Resources</a>
             </nav>
 
-            <!-- Acceso al Portal y Soporte Activo -->
-            <div class="flex items-center space-x-6">
-                <a href="tel:18778154227" class="hidden lg:block text-xs font-bold text-slate-500 hover:text-blue-950 transition-colors">
-                    <span class="block text-[9px] uppercase text-slate-400 font-extrabold tracking-wider">Toll Free Help</span>
-                    1-877-TMG-POOL
+            <!-- Acceso Privado Directo -->
+            <div class="flex items-center space-x-4">
+                <a href="portal.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-all">
+                    Login
                 </a>
-                <!-- OPTIMIZADO: Enlace configurado para abrir directamente tu archivo portal.html -->
-                <a href="portal.html" class="bg-gradient-to-r from-slate-900 to-blue-950 hover:from-cyan-600 hover:to-cyan-700 text-white text-xs font-bold px-5 py-3 rounded-xl transition-all duration-300 shadow-md shadow-slate-950/10 hover:shadow-cyan-500/20 hover:-translate-y-0.5">
-                    Owner Portal
+                <a href="#contact" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-900/10">
+                    Get Started
                 </a>
             </div>
         </div>
     </header>
-    <!-- 2. HERO BANNER VIVO (Degradado con Toques de Luz) -->
+    <!-- HERO PRINCIPAL MASIVO CON BUSCADOR INTEGRADO -->
     <section class="relative bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900 py-24 px-6 text-center text-white overflow-hidden">
-        <!-- Luces de fondo decorativas -->
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
 
         <div class="relative max-w-4xl mx-auto space-y-6">
-            <span class="inline-block bg-cyan-500/10 text-cyan-400 border border-cyan-400/20 text-[10px] font-extrabold tracking-widest uppercase px-3 py-1.5 rounded-full shadow-inner backdrop-blur-sm">
-                Secondary Resale Marketplace
+            <span class="inline-block bg-white/10 text-cyan-400 border border-white/10 text-[10px] font-extrabold tracking-widest uppercase px-3 py-1.5 rounded-full backdrop-blur-sm">
+                The Ultimate Secondary Timeshare Marketplace
             </span>
             <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
-                Luxury Timeshares For Sale <br><span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">By Certified Owners</span>
+                Timeshares for <span class="text-cyan-400">Sale</span> and <span class="text-blue-400">Rent</span> <br>By Certified Owners
             </h1>
             <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-                Save up to 70% off original developer prices. Browse our verified luxury resorts, weeks, and premium points packages online with full corporate escrow security.
+                Search over 75,000 timeshare rentals and resales in our open marketplace. Secure incredible wholesale prices from premium brands like Disney, Hilton, and Marriott.
             </p>
             
-            <!-- Barra de búsqueda mejorada visualmente -->
-            <div class="max-w-xl mx-auto bg-white p-2.5 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2 border border-slate-200/20 backdrop-blur-md">
+            <!-- Motor de búsqueda integrado -->
+            <div class="max-w-xl mx-auto bg-white p-2.5 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2 border border-white/10 backdrop-blur-md">
                 <div class="w-full flex items-center px-3">
                     <svg class="h-5 w-5 text-slate-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" placeholder="Search by resort name, brand or destination..." class="w-full bg-transparent py-2 text-slate-800 text-sm focus:outline-none placeholder-slate-400 font-medium" disabled>
+                    <input type="text" placeholder="Search resorts, locations, brands or destinations..." class="w-full bg-transparent py-2 text-slate-800 text-sm focus:outline-none placeholder-slate-400 font-medium" disabled>
                 </div>
-                <button class="bg-gradient-to-r from-blue-900 to-blue-950 text-white font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-md shadow-blue-950/20 whitespace-nowrap">
-                    Search Resales
+                <button class="bg-blue-900 text-white font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-xl hover:bg-blue-950 transition-all shadow-md whitespace-nowrap">
+                    Search Marketplace
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- 3. SECCIÓN DE MARCAS DE CONFIANZA -->
-    <section class="bg-white border-b border-slate-200/60 py-12 shadow-sm relative z-10 -mt-4 rounded-t-3xl">
-        <div class="max-w-7xl mx-auto px-6">
-            <p class="text-center text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-8">Trusted Vacation Brands Available</p>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 items-center">
-                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
-                    <span class="font-serif text-xl font-black tracking-tight text-blue-950 block group-hover:text-cyan-600 transition-colors">Marriott</span>
-                    <span class="text-[9px] uppercase tracking-widest font-black text-cyan-600">Vacation Club</span>
-                </div>
-                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
-                    <span class="font-sans text-xl font-black tracking-tight text-orange-500 block group-hover:scale-105 transition-transform">Disney</span>
-                    <span class="text-[9px] uppercase tracking-widest font-black text-slate-400">Vacation Club</span>
-                </div>
-                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
-                    <span class="font-sans text-2xl font-black tracking-wide text-slate-700 block">Hilton</span>
-                    <span class="text-[9px] uppercase tracking-widest font-black text-amber-600">Grand Vacations</span>
-                </div>
-                <div class="p-5 bg-gradient-to-b from-slate-50 to-white border border-slate-200/50 rounded-2xl hover:border-cyan-500/40 hover:shadow-md transition-all duration-300 text-center group">
-                    <span class="font-serif text-xl font-bold italic tracking-wide text-blue-900 block">Wyndham</span>
-                    <span class="text-[9px] uppercase tracking-widest font-black text-slate-400">Vacation Resorts</span>
-                </div>
+    <!-- BLOQUES DE MONETIZACIÓN DIRECTA PARA DUEÑOS -->
+    <section class="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200/60 hover:shadow-2xl transition group cursor-pointer" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+                <div class="h-10 w-10 bg-blue-50 text-blue-900 rounded-xl flex items-center justify-center font-bold mb-4 group-hover:bg-blue-900 group-hover:text-white transition">01</div>
+                <h3 class="text-lg font-black text-slate-900">Sell My Timeshare</h3>
+                <p class="text-slate-500 text-xs mt-1 leading-relaxed">Ready to exit? List your interval safely and ask our licensed agents about our corporate guarantee structure.</p>
+                <span class="inline-block text-blue-900 font-bold text-xs mt-3 uppercase tracking-wider group-hover:underline">Learn More &rarr;</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200/60 hover:shadow-2xl transition group cursor-pointer" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+                <div class="h-10 w-10 bg-cyan-50 text-cyan-900 rounded-xl flex items-center justify-center font-bold mb-4 group-hover:bg-cyan-900 group-hover:text-white transition">02</div>
+                <h3 class="text-lg font-black text-slate-900">Rent My Timeshare</h3>
+                <p class="text-slate-500 text-xs mt-1 leading-relaxed">Can't use your week this year? Turn unused intervals or points packages into immediate cash to cover maintenance fees.</p>
+                <span class="inline-block text-cyan-700 font-bold text-xs mt-3 uppercase tracking-wider group-hover:underline">Learn More &rarr;</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200/60 hover:shadow-2xl transition group cursor-pointer" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+                <div class="h-10 w-10 bg-slate-50 text-slate-900 rounded-xl flex items-center justify-center font-bold mb-4 group-hover:bg-slate-900 group-hover:text-white transition">03</div>
+                <h3 class="text-lg font-black text-slate-900">What's My Timeshare Worth?</h3>
+                <p class="text-slate-500 text-xs mt-1 leading-relaxed">Don't guess your market value. Get a 100% free, automated and data-driven evaluation of your vacation club asset.</p>
+                <span class="inline-block text-slate-700 font-bold text-xs mt-3 uppercase tracking-wider group-hover:underline">Evaluate Now &rarr;</span>
             </div>
         </div>
     </section>
 
-    <!-- 4. CUADRÍCULA DEL CATALOGO PÚBLICO (Marketplace) -->
-    <main class="max-w-7xl mx-auto px-6 py-16" id="marketplace-section">
-        <div class="border-b border-slate-200/60 pb-6 mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-            <div>
-                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Featured Resale Listings</h2>
-                <p class="text-slate-500 text-sm font-medium mt-1">Verified active intervals currently open for purchase offers.</p>
+    <!-- SECCIÓN DE MÉTRICAS CORPORATIVAS DE CREDIBILIDAD -->
+    <section id="metrics-section" class="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-5 space-y-4">
+            <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 block">Trusted Industry Leadership</span>
+            <h2 class="text-3xl font-black text-slate-900 tracking-tight leading-tight">Why Sell & Rent With TMG Marketplace?</h2>
+            <p class="text-slate-500 text-sm leading-relaxed">
+                Since 2003, our corporate marketing platform has been the most active and trusted resale company in the industry. We drive real cash results, making life easier for timeshare deed holders just like you.
+            </p>
+            <p class="text-slate-400 text-xs leading-relaxed italic">
+                Recommended across major financial and news information outlets as the primary marketplace to process closed escrow transfers.
+            </p>
+        </div>
+        <div class="lg:col-span-7 bg-slate-900 rounded-3xl p-8 text-white grid grid-cols-1 sm:grid-cols-2 gap-6 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-10 -bottom-10 h-40 w-40 bg-blue-500/10 rounded-full blur-2xl"></div>
+            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40">
+                <span class="block text-3xl font-black tracking-tight text-cyan-400">10,000+</span>
+                <span class="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mt-1">Unique Daily Visitors</span>
             </div>
-            <span class="bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-emerald-200/60 flex items-center shadow-sm">
-                <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2 animate-ping"></span> Live Feeds Active
+            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40">
+                <span class="block text-3xl font-black tracking-tight text-white">3.2 Million</span>
+                <span class="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mt-1">Annual Marketplace Visits</span>
+            </div>
+            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40">
+                <span class="block text-3xl font-black tracking-tight text-cyan-400">$254M</span>
+                <span class="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mt-1">Offers Driven Last Year</span>
+            </div>
+            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40 sm:col-span-2 bg-gradient-to-r from-blue-950 to-slate-900 border-blue-500/20">
+                <span class="block text-4xl font-black tracking-tight text-white">$5 BILLION+</span>
+                <span class="block text-[10px] uppercase tracking-widest font-black text-cyan-400 mt-1">Total Resale & Rental Offers Processed To Date</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTENEDOR DEL CATÁLOGO DE PROPIEDADES -->
+    <main class="max-w-7xl mx-auto px-6 py-10" id="marketplace-section">
+        <div class="border-b border-slate-200 pb-4 mb-8 flex justify-between items-end">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Active Resale Portfolio</h2>
+                <p class="text-slate-500 text-xs font-medium mt-0.5">Verified intervals and points packages open for purchase offers.</p>
+            </div>
+            <span class="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-emerald-200 flex items-center">
+                <span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1.5 animate-ping"></span> Live Catalog
             </span>
         </div>
         
-        <!-- Contenedor dinámico de propiedades activas -->
-        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-            <div class="col-span-1 md:col-span-3 text-center py-16">
-                <div class="animate-spin rounded-full h-9 w-9 border-b-2 border-cyan-500 mx-auto mb-4"></div>
-                <p class="text-slate-400 text-xs font-bold tracking-widest uppercase animate-pulse">Synchronizing secure data catalog...</p>
+        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <!-- Cargador visual animado -->
+            <div class="col-span-full text-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900 mx-auto mb-3"></div>
+                <p class="text-slate-400 text-xs uppercase tracking-widest font-bold animate-pulse">Synchronizing live resale feed...</p>
             </div>
         </div>
     </main>
-    <!-- 5. CAPTACIÓN DE LEADS (Contacto con Escrow Broker) -->
-    <div class="bg-gradient-to-b from-slate-100 to-slate-200/40 border-t border-slate-200/60 py-24 px-6">
-        <div class="max-w-4xl mx-auto items-start">
-            
-            <section id="contact" class="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/80 border border-slate-200/60 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 to-cyan-500"></div>
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Speak to a Licensed Broker</h2>
-                <p class="text-slate-400 text-xs font-medium mt-1 mb-6">Have questions regarding timeshare title transfer deed services or point value matching? Our agents are standing by.</p>
-                
-                <!-- OPTIMIZADO: ID sincronizado exactamente con lo que busca tu script.js -->
-                <form id="general-lead-form" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label for="lead-name" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Full Name</label>
-                            <input type="text" id="lead-name" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
-                        </div>
-                        <div>
-                            <label for="lead-email" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Email Address</label>
-                            <input type="email" id="lead-email" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="lead-message" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Inquiry Details</label>
-                        <textarea id="lead-message" rows="3" required placeholder="Specify your desired brand, complex location or questions regarding transfer title closing escrow..." class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all placeholder-slate-400 font-medium"></textarea>
-                    </div>
-                    <button type="submit" class="bg-gradient-to-r from-blue-900 to-blue-950 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-md shadow-blue-950/10 hover:shadow-cyan-500/20">
-                        Submit Broker Request
-                    </button>
-                </form>
-            </section>
-
-        </div>
-    </div>
-
-    <!-- 6. PIE DE PÁGINA CORPORATIVO -->
-    <footer class="bg-slate-900 text-slate-400 text-xs py-16 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-10">
-            <div class="space-y-4">
-                <span class="block text-white font-black tracking-wider text-sm uppercase">Timeshare Management Group</span>
-                <p class="text-slate-500 leading-relaxed font-medium">
-                    TMG is an independent secondary marketplace specializing in for-sale-by-owner interval and point-based vacation clubs resales. Prices are designated explicitly by individual deed holders.
-                </p>
-            </div>
-            <div class="space-y-3 font-medium">
-                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Resale Security & Escrow Trust</span>
-                <p class="flex items-center text-slate-400">• Official Escrow title transfer deed security processed</p>
-                <p class="flex items-center text-slate-400">• BBB A+ Accredited secondary market platform standards</p>
-            </div>
-            <div class="space-y-3 font-medium">
-                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Corporate Correspondence</span>
-                <p class="text-slate-400">8545 Commodity Circle, Orlando, FL 32819</p>
-                <p class="text-slate-400">Direct Support: <a href="mailto:support@tmgresales.com" class="text-cyan-400 hover:underline">support@tmgresales.com</a></p>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-800 text-center text-slate-500 font-semibold">
-            &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. Privacy Policy | Terms of Use.
-        </div>
-    </footer>
-
-    <!-- OPTIMIZADO: Sincronizado en concordancia con el nombre de tu archivo principal -->
-    <script src="script.js"></script>
-</body>
-</html>
