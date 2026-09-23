@@ -6,7 +6,7 @@ const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC
 // CORREGIDA: Se cambió 'qeRJ' por 'qcRJ' para coincidir con la clave anónima real de tu proyecto
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
-  || "sb_publishable_qcRJ-QyT9qEuVSG4DFvL3g_An-j7QPC";
+  || "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
 
 let supabaseClientInstance = null;
 
