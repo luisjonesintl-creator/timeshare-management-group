@@ -134,6 +134,39 @@
                     </table>
                 </div>
             </div>
+            <!-- PANTALLA VISUAL DE EDICIÓN (PEGA ESTO EN PORTAL.HTML) -->
+<div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xl max-w-xl mx-auto my-8">
+    <div class="border-b border-slate-100 pb-3 mb-4">
+        <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest text-blue-900">Editor Visual de Inventario</h3>
+        <p class="text-slate-400 text-[11px] font-medium mt-0.5">Modifica los detalles de tus resorts directamente en vivo.</p>
+    </div>
+    
+    <div class="space-y-4">
+        <div>
+            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">ID de la Propiedad en Supabase</label>
+            <input type="number" id="ui-edit-id" placeholder="Ej: 27" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-900">
+        </div>
+        <div>
+            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nuevo Nombre del Resort</label>
+            <input type="text" id="ui-edit-name" placeholder="Ej: Marriott's Aruba Surf Club" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-blue-900">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nuevo Precio ($)</label>
+                <input type="number" id="ui-edit-price" placeholder="Ej: 14900" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-900">
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nueva Semana (Número)</label>
+                <input type="number" id="ui-edit-week" placeholder="Ej: 52" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-900">
+            </div>
+        </div>
+        
+        <button id="ui-save-btn" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl shadow-md transition-all active:scale-[0.99] mt-2">
+            Aplicar Cambios en Vivo
+        </button>
+    </div>
+</div>
+
         </section>
 
     </main>
