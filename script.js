@@ -528,6 +528,41 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+// ====== VALIDADOR DE ACCESO PROTEGIDO CON CONTRASEÑA MAESTRA ======
+document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById("admin-login-form");
+    if (!loginForm) return; // Si no es la página de admin, abortamos de forma segura
+
+    // CONTRASEÑA MAESTRA: Modifica este texto si deseas poner una clave distinta
+    const MASTER_SECRET_TOKEN = "TMGAdmin2026";
+
+    loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const passwordInput = document.getElementById("admin-secret-pass");
+        const errorAlert = document.getElementById("admin-auth-error");
+        const authCard = document.getElementById("admin-auth-card");
+        const mainDashboard = document.getElementById("admin-main-dashboard");
+
+        if (!passwordInput || !authCard || !mainDashboard) return;
+
+        // Comprobamos si la contraseña ingresada coincide de forma exacta
+        if (passwordInput.value === MASTER_SECRET_TOKEN) {
+            if (errorAlert) errorAlert.classList.add("hidden");
+            
+            // Efecto de desvanecimiento visual: Removemos el bloqueo y abrimos los paneles
+            authCard.classList.add("hidden");
+            mainDashboard.classList.remove("hidden");
+            
+            alert("¡Autorización concedida! Accediendo al Master Control Room.");
+        } else {
+            // Si falla, mostramos la advertencia roja y limpiamos el campo
+            if (errorAlert) errorAlert.classList.remove("hidden");
+            passwordInput.value = "";
+            passwordInput.focus();
+        }
+    });
+});
 
 
 
