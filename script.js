@@ -3,7 +3,7 @@ const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
   || "https://ztojbyfbyidzzrqicjvn.supabase.co";
 
-// CORREGIDA: Se cambió 'qeRJ' por 'qcRJ' para que coincida exactamente con tu proyecto de Supabase
+// CORREGIDA: Se cambió 'qeRJ' por 'qcRJ' para coincidir con la clave anónima real de tu proyecto
 const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
   || "sb_publishable_qcRJ-QyT9qEuVSG4DFvL3g_An-j7QPC";
@@ -21,6 +21,7 @@ function getSupabaseClient() {
   return supabaseClientInstance;
 }
 
+// Inicializador inteligente para acoplar la lógica según el HTML activo
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const client = getSupabaseClient();
@@ -28,10 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Critical connection failure: Supabase engine not initialized.");
             return;
         }
+        
+        // Ejecución si el usuario se encuentra en index.html
         if (document.getElementById("active-properties")) {
             loadPublicMarketplace(client);
             setupLeadSubmission(client);
         }
+        
+        // Ejecución si el usuario se encuentra en portal.html
         if (document.getElementById("login-form")) {
             setupPortalAuthentication(client);
         }
@@ -51,7 +56,7 @@ async function loadPublicMarketplace(client) {
         if (err1) throw err1;
         if (err2) throw err2;
 
-                const activeContainer = document.getElementById("active-properties");
+        const activeContainer = document.getElementById("active-properties");
         if (activeContainer) {
             if (!activeList || activeList.length === 0) {
                 activeContainer.innerHTML = 
@@ -72,7 +77,7 @@ async function loadPublicMarketplace(client) {
                     let imageHeader = "";
                     if (photos.length === 0) {
                         imageHeader = 
-                            '<div class="h-56 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative">' +
+                            '<div class="h-56 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative rounded-t-2xl">' +
                                 '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
                             '</div>';
                     } else {
@@ -134,4 +139,174 @@ async function loadPublicMarketplace(client) {
     } catch (error) {
         console.error("Critical failure rendering active marketplace:", error);
     }
+}
+// ====== FRONTEND LEAD SUBMISSION UTILITIES ======
+function setupLeadSubmission(client) {
+    const form = document.getElementById("general-lead-form");
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const nameInput = document.getElementById("lead-name");
+        const emailInput = document.getElementById("lead-email");
+        const messageInput = document.getElementById("lead-message");
+        const submitBtn = form.querySelector("button[type='submit']");
+
+        if (!nameInput || !emailInput || !messageInput) return;
+
+        try {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Sending Request...";
+            }
+
+            // Inserción segura de prospectos en la tabla 'leads'
+            const { error } = await client.from('leads').insert([
+                {
+                    full_name: nameInput.value.trim(),
+                    email_address: emailInput.value.trim(),
+                    inquiry_details: messageInput.value.trim(),
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+            if (error) throw error;
+
+            form.innerHTML = `
+                <div class="p-6 bg-emerald-50 border border-emerald-200 text-center rounded-2xl">
+                    <p class="text-emerald-900 font-bold text-base">Thank you, ${nameInput.value.trim()}!</p>
+                    <p class="text-emerald-700 text-xs mt-1">Your broker request has been logged through escrow protection. An agent will contact you shortly.</p>
+                </div>
+            `;
+
+        } catch (err) {
+            console.error("Failed to submit broker lead:", err);
+            alert("We encountered an error processing your request. Please try again.");
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Broker Request";
+            }
+        }
+    });
+}
+
+// ====== PRIVATE PROPRIETARY PORTAL UTILITIES ======
+function setupPortalAuthentication(client) {
+    const loginForm = document.getElementById("login-form");
+    if (!loginForm) return;
+
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const emailInput = document.getElementById("auth-email");
+        const passwordInput = document.getElementById("auth-password");
+        const errorAlert = document.getElementById("login-error");
+        const loginCard = document.getElementById("login-card");
+        const dashboard = document.getElementById("portal-dashboard");
+
+        if (!emailInput || !passwordInput || !loginCard || !dashboard) return;
+
+        try {
+            if (errorAlert) errorAlert.classList.add("hidden");
+
+            // Inicio de sesión oficial con el módulo de Auth de Supabase
+            const { data, error } = await client.auth.signInWithPassword({
+                email: emailInput.value.trim(),
+                password: passwordInput.value
+            });
+
+            if (error) throw error;
+
+            loginCard.classList.add("hidden");
+            dashboard.classList.remove("hidden");
+
+            if (data.user) {
+                loadOwnerAssetDashboard(client, data.user.id);
+            }
+
+        } catch (err) {
+            console.error("Authentication rejected:", err);
+            if (errorAlert) errorAlert.classList.remove("hidden");
+        }
+    });
+}
+
+// Carga las métricas y la tabla de ofertas vinculadas al ID del usuario autenticado
+async function loadOwnerAssetDashboard(client, userId) {
+    try {
+        const { data: properties, error: propErr } = await client
+            .from('properties')
+            .select('*')
+            .eq('owner_id', userId)
+            .single();
+
+        if (propErr) throw propErr;
+
+        if (properties) {
+            document.getElementById("detail-resort").innerText = properties.resort_name || "Premium Resort Asset";
+            document.getElementById("detail-price").innerText = properties.asking_price ? `$${Number(properties.asking_price).toLocaleString()}` : "N/A";
+            document.getElementById("detail-week").innerText = properties.week_number ? `Week ${properties.week_number}` : "N/A";
+            document.getElementById("detail-type").innerText = properties.listing_type || "N/A";
+            document.getElementById("metric-views").innerText = properties.views_count ? Number(properties.views_count).toLocaleString() : "0";
+
+            const { data: offers, error: offErr } = await client
+                .from('offers')
+                .select('*')
+                .eq('property_id', properties.id)
+                .order('created_at', { ascending: false });
+
+            if (offErr) throw offErr;
+
+            const offersBody = document.getElementById("offers-ledger-body");
+            if (offersBody) {
+                if (!offers || offers.length === 0) {
+                    offersBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400 bg-gray-50/50">No offers recorded for this interval yet.</td></tr>`;
+                    return;
+                }
+
+                offersBody.innerHTML = offers.map(off => {
+                    const dateFormatted = off.created_at ? new Date(off.created_at).toLocaleDateString() : 'N/A';
+                    return `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-4 font-medium text-gray-900">${dateFormatted}</td>
+                            <td class="p-4">${off.offer_type || 'Purchase Offer'}</td>
+                            <td class="p-4 font-extrabold text-blue-950">$${Number(off.amount || 0).toLocaleString()}</td>
+                            <td class="p-4 text-center">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                    off.status === 'APPROVED' ? 'bg-green-50 text-green-700 border border-green-200' :
+                                    off.status === 'REJECTED' ? 'bg-red-50 text-red-700 border border-red-200' :
+                                    'bg-amber-50 text-amber-700 border border-amber-200'
+                                }">${off.status || 'PENDING'}</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+    } catch (err) {
+        console.error("Error retrieving owner metrics data:", err);
+    }
+}
+
+// ====== INTERACTIVE CAROUSEL CONTROLLER ======
+function navigateCarousel(carouselIdx, direction, totalPhotos) {
+    const carousel = document.getElementById(`carousel-${carouselIdx}`);
+    const counter = document.getElementById(`counter-${carouselIdx}`);
+    if (!carousel || !counter) return;
+
+    const width = carousel.offsetWidth;
+    let currentIdx = Math.round(carousel.scrollLeft / width);
+
+    currentIdx += direction;
+
+    if (currentIdx < 0) currentIdx = totalPhotos - 1;
+    if (currentIdx >= totalPhotos) currentIdx = 0;
+
+    carousel.scrollTo({
+        left: currentIdx * width,
+        behavior: 'smooth'
+    });
+
+    counter.textContent = currentIdx + 1;
 }
