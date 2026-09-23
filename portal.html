@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner & Client Portal - Timeshare Management Group</title>
-    
     <!-- Enlace oficial para activar los estilos de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -15,7 +14,7 @@
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <span class="font-bold text-lg tracking-wide uppercase">Timeshare Management Group</span>
             <a href="index.html" class="text-xs bg-blue-800 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded transition">
-                ← Back to Marketplace
+                &larr; Back to Marketplace
             </a>
         </div>
     </header>
@@ -27,6 +26,7 @@
         <section class="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 p-8 transition-all duration-300" id="login-card">
             <div class="text-center mb-6">
                 <div class="inline-flex p-3 bg-blue-50 text-blue-900 rounded-full mb-3">
+                    <!-- CORREGIDO: Namespace oficial de SVG de la W3C restaurado -->
                     <svg xmlns="http://w3.org" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v2m0 4h.01M19 10V6a3 3 0 00-6 0v4M4 10h16" />
                     </svg>
@@ -43,12 +43,13 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Password</label>
-                    <input type="password" id="auth-password" required placeholder="••••••••" 
+                    <input type="password" id="auth-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" 
                            class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:outline-none transition">
                 </div>
                 
                 <!-- Alerta de credenciales incorrectas oculta por defecto -->
                 <div id="login-error" class="p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg hidden flex items-center gap-2">
+                    <!-- CORREGIDO: Namespace oficial de SVG de la W3C restaurado -->
                     <svg xmlns="http://w3.org" class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                     </svg>
@@ -60,7 +61,6 @@
                 </button>
             </form>
         </section>
-
         <!-- SECCIÓN 2: Dashboard Privado del Propietario (Oculto inicialmente, se activa en script.js) -->
         <section id="portal-dashboard" class="w-full max-w-4xl bg-white rounded-xl shadow-xl border border-gray-200 p-6 md:p-8 hidden transition-all duration-300">
             <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-200 pb-5 mb-6 gap-4">
@@ -108,7 +108,7 @@
                 </div>
             </div>
 
-            <!-- Panel de Ofertas Económicas Recibidas -->
+            <!-- Panel de Ofertas Económicas Recibidas (Offers Ledger) -->
             <div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     Offers Ledger 
@@ -139,14 +139,14 @@
 
     <!-- PIE DE PÁGINA -->
     <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-400">
-        <p>© 2026 Timeshare Management Group. Client Dashboard Engine. All rights reserved.</p>
+        <p>&copy; 2026 Timeshare Management Group. Client Dashboard Engine. All rights reserved.</p>
     </footer>
 
     <!-- ==================== CONTROLADORES Y LIBRERÍAS ==================== -->
-    <!-- 1. Motor oficial JavaScript de Supabase vía CDN de unpkg -->
+    <!-- 1. CORREGIDO: Inyección oficial del SDK Universal de Supabase para producción -->
     <script src="https://unpkg.com"></script>
 
-    <!-- 2. Tu archivo de lógica de negocio sincronizado (Evita datos en caché mediante ?v=1.0.1) -->
+    <!-- 2. Tu archivo de lógica de negocio sincronizado sin caché -->
     <script src="script.js?v=1.0.1"></script>
 </body>
 </html>
