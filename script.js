@@ -1,12 +1,8 @@
 // ====== CONFIGURATION STEP ======
-// Intenta leer desde las variables del sistema inyectadas por Vercel, si no existen, usa las cadenas por defecto.
-const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
-  || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
-  || "https://ztojbyfbyidzzrqicjvn.supabase.co";
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
 
-const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) 
-  || window._env_?.NEXT_PUBLIC_SUPABASE_ANON_KEY 
-  || "sb_publishable_qeRJ-QyT9qEuVSG4DFVL3g_An-j7QPC";
+// Clave nueva directa sin intermediarios para evitar fallos de lectura local
+const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 let supabaseClientInstance = null;
 
