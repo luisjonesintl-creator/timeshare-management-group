@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeshares For Sale Master Listings | Timeshare Management Group</title>
+    <!-- Motor nativo oficial de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SDK de Supabase Universal -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Fuentes tipográficas modernas -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-500/20">
+
+    <!-- BARRA DE INFORMACIÓN CORPORATIVA (Números de Asistencia) -->
+    <div class="bg-slate-900 text-slate-300 text-[11px] font-bold py-2.5 px-6 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-4">
+                <span><span class="text-cyan-400">Toll Free:</span> <a href="tel:18778154227" class="hover:text-white transition">1-877-815-4227</a></span>
+                <span class="text-slate-600">|</span>
+                <span><span class="text-slate-400">International:</span> <a href="tel:16035160200" class="hover:text-white transition">1-603-516-0200</a></span>
+            </div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">
+                <span class="flex items-center"><span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> Secondary Market Master Ledger</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN PRINCIPAL (Con el nuevo TAB integrado) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center space-x-3 group cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="bg-gradient-to-tr from-blue-900 to-blue-950 text-white p-2.5 rounded-xl font-black tracking-wider text-xl">TMG</div>
+                <div>
+                    <span class="block text-sm font-extrabold tracking-tight text-slate-900 uppercase">Timeshare</span>
+                    <span class="block text-[10px] text-blue-600 font-black uppercase tracking-widest -mt-0.5">Management Group</span>
+                </div>
+            </div>
+            
+            <nav class="hidden lg:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider text-slate-600">
+                <a href="index.html#marketplace-section" class="hover:text-blue-950 transition-colors">Buy a Timeshare</a>
+                <!-- NUEVO TAB MASTER ACTIVADO -->
+                <a href="listings.html" class="text-blue-900 transition-colors font-extrabold border-b-2 border-blue-900 pb-1">Timeshares For Sale</a>
+                <a href="rentals.html" class="hover:text-blue-950 transition-colors">Last Minute Rentals</a>
+                <a href="index.html#contact" class="hover:text-blue-950 transition-colors">Sell Your Timeshare</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <a href="portal.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-all">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ENCABEZADO DE PORTAFOLIO GENERAL ESTILO SMTN -->
+    <section class="bg-gradient-to-r from-slate-950 to-blue-950 py-12 px-6 text-white">
+        <div class="max-w-7xl mx-auto space-y-3">
+            <span class="text-[10px] font-black uppercase tracking-widest text-cyan-400 block">Resorts Index A-Z</span>
+            <h1 class="text-3xl sm:text-4xl font-black tracking-tight">Timeshares for Sale By Owner Catalog</h1>
+            <p class="text-slate-300 text-sm max-w-3xl leading-relaxed">
+                Browse our comprehensive index of featured vacation clubs and premium properties available on the secondary resale market. Review active resale inventories and lock in wholesale pricing.
+            </p>
+        </div>
+    </section>
+
+    <!-- CONTENEDOR CENTRAL DE RESULTADOS CON TAB ACTIVO -->
+    <div class="bg-white border-b border-slate-200 py-4 px-6 sticky top-20 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-slate-600">
+            <div class="flex items-center space-x-2">
+                <!-- Pestañas estéticas al estilo SMTN (Resorts-Tab) -->
+                <button class="px-4 py-2 bg-blue-900 text-white rounded-lg transition shadow-sm">All Resorts Directory</button>
+            </div>
+            <div class="text-slate-500 font-medium text-[13px]">
+                Active Index Ledger: <span class="font-bold text-blue-950" id="master-listings-counter">0</span> Resorts Found
+            </div>
+        </div>
+    </div>
+    <!-- SECCIÓN DE CONTENIDO PRINCIPAL Y FEED DE RESORTS -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Lista Principal Dinámica de Complejos -->
+            <div id="master-resorts-feed" class="lg:col-span-12 space-y-6">
+                <!-- Cargador visual animado mientras Supabase responde -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-16 text-center shadow-sm">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900 mx-auto mb-3"></div>
+                    <p class="text-slate-400 text-xs uppercase tracking-widest font-bold animate-pulse">
+                        Compiling active timeshares for sale index ledger...
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- PIE DE PÁGINA CORPORATIVO -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800 mt-24">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-8">
+            <div class="space-y-4">
+                <span class="block text-white font-black tracking-wider text-sm uppercase">Timeshare Management Group</span>
+                <p class="text-slate-500 leading-relaxed font-medium">
+                    TMG specializes in for-sale-by-owner vacation club resales. Resale values and advertisement data are provided directly by individual verified deed holders.
+                </p>
+            </div>
+            <div class="space-y-2 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Corporate Infrastructure</span>
+                <p class="text-slate-400">8545 Commodity Circle, Orlando, FL 32819</p>
+                <p class="text-slate-400">One Harbour Place, Portsmouth, NH 03801</p>
+            </div>
+            <div class="space-y-2 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Support Services</span>
+                <p class="text-slate-400">Toll Free Help: 1-877-815-4227</p>
+                <p class="text-slate-400">Email: <a href="mailto:support@tmgresales.com" class="text-cyan-400 hover:underline">support@tmgresales.com</a></p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-slate-800 text-center text-slate-500 font-semibold">
+            &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE PROGRAMACIÓN ASÍNCRONA MASTER LEDGER -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(async () => {
+                // Heredamos la instancia cliente inicializada de tu script.js central
+                const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+                
+                if (!client) {
+                    console.error("Connection failed: Master Index component could not inherit the Supabase configuration instance.");
+                    return;
+                }
+
+                try {
+                    // Consultamos todas las propiedades con tipo de listado SALE y disponibles
+                    const { data: saleResorts, error } = await client
+                        .from('properties')
+                        .select('*')
+                        .eq('listing_type', 'SALE')
+                        .eq('status', 'AVAILABLE')
+                        .order('resort_name', { ascending: true });
+
+                    if (error) throw error;
+
+                    const feedContainer = document.getElementById("master-resorts-feed");
+                    const counterElement = document.getElementById("master-listings-counter");
+                    if (!feedContainer) return;
+
+                    if (saleResorts) {
+                        counterElement.textContent = saleResorts.length;
+                    }
+
+                    if (!saleResorts || saleResorts.length === 0) {
+                        feedContainer.innerHTML = `
+                            <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
+                                <p class="text-slate-600 font-bold text-sm">No vacation clubs are currently cataloged in the sale ledger.</p>
+                                <p class="text-slate-400 text-xs mt-1">Please register or sync new listings via the owner portal dashboard.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Renderizado dinámico estructurado en bloques anchos con imágenes al estilo SellMyTimeshareNow
+                    feedContainer.innerHTML = saleResorts.map((resort, idx) => {
+                        const image = resort.image_url || 'https://unsplash.com';
+                        const weekStr = resort.week_number ? `Week ${resort.week_number}` : 'Floating / Points';
+                        const price = Number(resort.asking_price || 0).toLocaleString();
+
+                        return `
+                            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col md:flex-row items-stretch">
+                                <!-- Contenedor de Imagen -->
+                                <div class="md:w-72 h-48 md:h-auto bg-slate-100 shrink-0 relative">
+                                    <img src="${image}" alt="${resort.resort_name || 'Resort'}" class="w-full h-full object-cover">
+                                    <div class="absolute top-3 left-3 bg-slate-950/70 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded border border-white/10">
+                                        Active Resale Available
+                                    </div>
+                                </div>
+                                
+                                <!-- Detalles del Complejo e Índice de Ubicación -->
+                                <div class="p-6 flex-grow flex flex-col justify-between gap-4">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="inline-block text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 rounded-md">Resale AD</span>
+                                            <span class="text-slate-300 text-xs font-bold">|</span>
+                                            <span class="text-slate-400 text-xs font-semibold">AD # TMG${resort.id || idx}</span>
+                                        </div>
+                                        <h2 class="text-lg font-black text-slate-900 tracking-tight leading-snug hover:text-blue-900 transition-colors">${resort.resort_name || 'Premium Vacation Club'}</h2>
+                                        <p class="text-slate-500 text-xs font-medium leading-relaxed">
+                                            This featured inventory includes premium travel accommodations with deeded rights, assigned for flexible interval schedules or internal points packages. Wholesale marketplace price clear and free of liens.
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Datos Técnicos del Listado -->
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-bold text-slate-600 border-t border-slate-50 pt-3">
+                                        <p class="flex items-center text-slate-500"><span class="text-slate-400 font-bold mr-1">Interval Setup:</span> ${weekStr}</p>
+                                        <p class="flex items-center text-slate-500"><span class="text-slate-400 font-bold mr-1">Marketplace Value:</span> <span class="text-blue-950 font-black">$${price}</span></p>
+                                    </div>
+                                </div>
+
+                                <!-- Botón de Acción Inline -->
+                                <div class="p-6 md:w-44 bg-slate-50/40 border-t md:border-t-0 md:border-l border-slate-100 flex flex-col justify-center items-center shrink-0">
+                                    <button onclick="window.location.href='index.html#contact'" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl shadow-sm transition active:scale-[0.98]">
+                                        View Ad Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                } catch (err) {
+                    console.error("Critical failure compiling index ledger ledger view:", err);
+                }
+            }, 400);
+        });
+    </script>
+    <!-- Cargamos tu lógica centralizada para heredar la configuración -->
+    <script src="script.js"></script>
+</body>
+</html>
