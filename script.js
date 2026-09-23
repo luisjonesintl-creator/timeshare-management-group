@@ -224,28 +224,31 @@ function setupPortalAuthentication(client) {
     });
 }
 
-// Carga las métricas y la tabla de ofertas vinculadas al ID del usuario autenticado
+// ====== PRIVATE PROPRIETARY PORTAL UTILITIES ======
 async function loadOwnerAssetDashboard(client, userId) {
     try {
-        const { data: properties, error: propErr } = await client
-            .from('properties')
+        // CORREGIDO: Ahora apunta exactamente a la tabla 'Owners' (con O mayúscula) de tu Supabase
+        const { data: ownerAsset, error: propErr } = await client
+            .from('Owners')
             .select('*')
             .eq('owner_id', userId)
             .single();
 
         if (propErr) throw propErr;
 
-        if (properties) {
-            document.getElementById("detail-resort").innerText = properties.resort_name || "Premium Resort Asset";
-            document.getElementById("detail-price").innerText = properties.asking_price ? `$${Number(properties.asking_price).toLocaleString()}` : "N/A";
-            document.getElementById("detail-week").innerText = properties.week_number ? `Week ${properties.week_number}` : "N/A";
-            document.getElementById("detail-type").innerText = properties.listing_type || "N/A";
-            document.getElementById("metric-views").innerText = properties.views_count ? Number(properties.views_count).toLocaleString() : "0";
+        if (ownerAsset) {
+            // Vinculamos los IDs de portal.html con los campos reales de tu tabla Owners
+            document.getElementById("detail-resort").innerText = ownerAsset.resort_name || "Premium Resort Asset";
+            document.getElementById("detail-price").innerText = ownerAsset.asking_price ? `$${Number(ownerAsset.asking_price).toLocaleString()}` : "N/A";
+            document.getElementById("detail-week").innerText = ownerAsset.week_number ? `Week ${ownerAsset.week_number}` : "N/A";
+            document.getElementById("detail-type").innerText = ownerAsset.listing_type || "N/A";
+            document.getElementById("metric-views").innerText = ownerAsset.views_count ? Number(ownerAsset.views_count).toLocaleString() : "0";
 
+            // Consultar las ofertas vinculadas a esta propiedad
             const { data: offers, error: offErr } = await client
                 .from('offers')
                 .select('*')
-                .eq('property_id', properties.id)
+                .eq('property_id', ownerAsset.id)
                 .order('created_at', { ascending: false });
 
             if (offErr) throw offErr;
