@@ -73,11 +73,12 @@ async function loadPublicMarketplace(client) {
                                 '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
                             '</div>';
                     } else {
-                        const slidesHTML = photos.map((url, imgIdx) => 
-                            '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative">' +
-                                '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="h-full w-full object-cover">' +
-                            '</div>'
-                        ).join('');
+                        // ====== BUSCA ESTE BLOQUE EXACTO EN TU SCRIPT.JS Y REEMPLÁZALO ======
+const slidesHTML = photos.map((url, imgIdx) => 
+    '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative">' +
+        '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="h-full w-full object-cover">' +
+    '</div>'
+).join('');
 
                         imageHeader = 
                             '<div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100">' +
