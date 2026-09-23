@@ -306,3 +306,57 @@ function navigateCarousel(carouselIdx, direction, totalPhotos) {
 
     counter.textContent = currentIdx + 1;
 }
+// ====== AGREGAR ESTO AL FINAL DE SCRIPT.JS ======
+document.addEventListener("DOMContentLoaded", () => {
+    // Verificamos que el botón de guardar exista en la pantalla actual (portal.html)
+    const saveBtn = document.getElementById("ui-save-btn");
+    if (!saveBtn) return;
+
+    saveBtn.addEventListener("click", async () => {
+        const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+        if (!client) {
+            alert("Error: El motor de Supabase no está listo.");
+            return;
+        }
+
+        // Capturamos los valores ingresados en la interfaz visual
+        const idVal = document.getElementById("ui-edit-id")?.value;
+        const nameVal = document.getElementById("ui-edit-name")?.value.trim();
+        const priceVal = document.getElementById("ui-edit-price")?.value;
+        const weekVal = document.getElementById("ui-edit-week")?.value;
+
+        if (!idVal || !nameVal || !priceVal || !weekVal) {
+            alert("Por favor, llena todos los campos de edición antes de guardar.");
+            return;
+        }
+
+        try {
+            saveBtn.disabled = true;
+            saveBtn.innerText = "Guardando cambios en Supabase...";
+
+            // Actualizamos la fila directamente en la tabla 'properties'
+            const { error } = await client
+                .from('properties')
+                .update({
+                    resort_name: nameVal,
+                    asking_price: Number(priceVal),
+                    week_number: Number(weekVal),
+                    created_at: new Date().toISOString()
+                })
+                .eq('id', Number(idVal));
+
+            if (error) throw error;
+
+            alert("¡Propiedad actualizada con éxito desde la UI!");
+            window.location.reload(); // Recarga la página para mostrar los nuevos valores de inmediato
+
+        } catch (err) {
+            console.error("Fallo al actualizar desde la UI:", err);
+            alert("Error al actualizar la base de datos: " + err.message);
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerText = "Aplicar Cambios en Vivo";
+        }
+    });
+});
+
