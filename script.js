@@ -1,5 +1,4 @@
 // ====== CONFIGURATION STEP ======
-// ====== CONFIGURATION STEP ======
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) 
   || window._env_?.NEXT_PUBLIC_SUPABASE_URL 
   || "https://ztojbyfbyidzzrqicjvn.supabase.co";
