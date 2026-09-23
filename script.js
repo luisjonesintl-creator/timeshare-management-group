@@ -1,7 +1,7 @@
 // ====== CONFIGURATION STEP ======
 const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
 
-// Clave nueva directa sin intermediarios para evitar fallos de lectura local
+// NUEVA CLAVE INTEGRADA: Conexión segura actualizada al 100%
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 let supabaseClientInstance = null;
@@ -17,7 +17,6 @@ function getSupabaseClient() {
   return supabaseClientInstance;
 }
 
-// Inicializador inteligente para acoplar la lógica según el HTML activo
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const client = getSupabaseClient();
@@ -25,19 +24,16 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Critical connection failure: Supabase engine not initialized.");
             return;
         }
-        
-        // Ejecución si el usuario se encuentra en index.html
         if (document.getElementById("active-properties")) {
             loadPublicMarketplace(client);
             setupLeadSubmission(client);
         }
-        
-        // Ejecución si el usuario se encuentra en portal.html
         if (document.getElementById("login-form")) {
             setupPortalAuthentication(client);
         }
     }, 300);
 });
+
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace(client) {
     try {
