@@ -37,12 +37,15 @@ document.addEventListener("DOMContentLoaded", () => {
 // ====== FRONTEND PUBLIC CATALOG UTILITIES ======
 async function loadPublicMarketplace(client) {
     try {
-        const [activeResult, pastResult] = await Promise.all([
-            client.from('properties').select('*').eq('status', 'AVAILABLE'),
-            client.from('properties').select('*').in('status', ['SOLD', 'RENTED']).order('created_at', { ascending: false })
-        ]);
+        // ====== REEMPLAZA ESTE BLOQUE EXACTO EN TU SCRIPT.JS ======
+const slidesHTML = photos.map((url, imgIdx) => 
+    '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative bg-slate-950/90 flex items-center justify-center">' +
+        // CAMBIADO: Se cambió object-cover por object-contain y se añadió un fondo oscuro elegante
+        '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain transition-all duration-300">' +
+    '</div>'
+).join('');
 
-        const { data: activeList, error: err1 } = activeResult;
+      const { data: activeList, error: err1 } = activeResult;
         const { data: pastList, error: err2 } = pastResult;
 
         if (err1) throw err1;
