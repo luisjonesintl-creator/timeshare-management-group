@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Minute Timeshare Rentals | Timeshare Management Group</title>
+    <!-- Motor nativo oficial de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SDK de Supabase Universal -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Fuentes tipográficas modernas -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-500/20">
+
+    <!-- BARRA DE INFORMACIÓN CORPORATIVA (Números de Asistencia) -->
+    <div class="bg-slate-900 text-slate-300 text-[11px] font-bold py-2.5 px-6 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-4">
+                <span><span class="text-cyan-400">Toll Free:</span> <a href="tel:18778154227" class="hover:text-white transition">1-877-815-4227</a></span>
+                <span class="text-slate-600">|</span>
+                <span><span class="text-slate-400">International:</span> <a href="tel:16035160200" class="hover:text-white transition">1-603-516-0200</a></span>
+            </div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">
+                <span class="flex items-center"><span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> 100% Reservation Guarantee Active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center space-x-3 group cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="bg-gradient-to-tr from-blue-900 to-blue-950 text-white p-2.5 rounded-xl font-black tracking-wider text-xl">TMG</div>
+                <div>
+                    <span class="block text-sm font-extrabold tracking-tight text-slate-900 uppercase">Timeshare</span>
+                    <span class="block text-[10px] text-blue-600 font-black uppercase tracking-widest -mt-0.5">Management Group</span>
+                </div>
+            </div>
+            
+            <nav class="hidden lg:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider text-slate-600">
+                <a href="index.html#marketplace-section" class="hover:text-blue-950 transition-colors">Buy a Timeshare</a>
+                <a href="rentals.html" class="text-blue-900 transition-colors font-extrabold">Last Minute Rentals</a>
+                <a href="index.html#contact" class="hover:text-blue-950 transition-colors">Sell Your Timeshare</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <a href="portal.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-all">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ENCABEZADO DE LA SECCIÓN DE ÚLTIMO MINUTO -->
+    <section class="bg-gradient-to-r from-blue-950 to-slate-900 py-12 px-6 text-white">
+        <div class="max-w-7xl mx-auto space-y-3">
+            <div class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-cyan-400">
+                <span class="h-2 w-2 bg-red-500 rounded-full animate-ping"></span>
+                <span>Check-in dates within 60 days or less</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black tracking-tight">Last Minute Timeshare Rentals</h1>
+            <p class="text-slate-300 text-sm max-w-3xl leading-relaxed">
+                Save up to 70% off the best advertised rates elsewhere on the web. All last minute rental reservations listed on this page can be booked through our secure checkout with a 100% platform guarantee.
+            </p>
+        </div>
+    </section>
+
+    <!-- BARRA INTERACTIVA DE FILTROS ESTÉTICOS -->
+    <div class="bg-white border-b border-slate-200 py-4 px-6 sticky top-20 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-xs font-bold text-slate-600">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-slate-400 uppercase text-[10px] tracking-wider mr-2">Top Filters:</span>
+                <button class="px-3 py-1.5 border border-slate-200 rounded-lg hover:border-blue-900 transition bg-slate-50">Price Per Night</button>
+                <button class="px-3 py-1.5 border border-slate-200 rounded-lg hover:border-blue-900 transition bg-slate-50">Check-In Date</button>
+                <button class="px-3 py-1.5 border border-slate-200 rounded-lg hover:border-blue-900 transition bg-slate-50">Beds / Baths</button>
+                <button class="px-3 py-1.5 border border-slate-200 rounded-lg hover:border-blue-900 transition bg-slate-50">Sleeps Count</button>
+            </div>
+            <div class="text-slate-500 font-medium text-[13px]">
+                Showing <span class="font-bold text-blue-950" id="rentals-counter">0</span> Verified Rentals
+            </div>
+        </div>
+    </div>
+    <!-- CUADRÍCULA DE LISTADOS AVANZADOS DE RENTAS -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <!-- Banner Informativo de Confianza -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-center space-x-3 text-blue-950 font-semibold text-xs shadow-sm">
+            <svg class="h-5 w-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            <span><strong>100% Reservation Guarantee:</strong> This timeshare rental can be booked online using our secure platform escrow process, and TMG will guarantee your reservation at the resort.</span>
+        </div>
+
+        <!-- Contenedor Dinámico Principal -->
+        <div id="rentals-feed-container" class="space-y-6 max-w-5xl mx-auto">
+            <!-- Cargador visual animado mientras Supabase responde -->
+            <div class="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-sm">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900 mx-auto mb-3"></div>
+                <p class="text-slate-400 text-xs uppercase tracking-widest font-bold animate-pulse">Filtering premium last-minute rentals ledger...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- PIE DE PÁGINA CORPORATIVO -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800 mt-24">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-8">
+            <div class="space-y-4">
+                <span class="block text-white font-black tracking-wider text-sm uppercase">Timeshare Management Group</span>
+                <p class="text-slate-500 leading-relaxed font-medium">
+                    TMG specializes in for-sale-by-owner interval and point-based vacation clubs resales. Rentals listed are designated explicitly by individual verified deed holders.
+                </p>
+            </div>
+            <div class="space-y-2 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Corporate Offices</span>
+                <p class="text-slate-400">8545 Commodity Circle, Orlando, FL 32819</p>
+                <p class="text-slate-400">One Harbour Place, Portsmouth, NH 03801</p>
+            </div>
+            <div class="space-y-2 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Support</span>
+                <p class="text-slate-400">Toll Free: 1-877-815-4227</p>
+                <p class="text-slate-400">Email: <a href="mailto:support@tmgresales.com" class="text-cyan-400 hover:underline">support@tmgresales.com</a></p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-slate-800 text-center text-slate-500 font-semibold">
+            &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved.
+        </div>
+    </footer>
+    <!-- LÓGICA DE PROGRAMACIÓN LOCAL DEL RENTALS FEED -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(async () => {
+                const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+                
+                if (!client) {
+                    console.error("Connection failed: Rentals component could not inherit the Supabase configuration instance.");
+                    return;
+                }
+
+                try {
+                    const { data: rentalsList, error } = await client
+                        .from('properties')
+                        .select('*')
+                        .eq('listing_type', 'RENTAL')
+                        .eq('status', 'AVAILABLE')
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+
+                    const container = document.getElementById("rentals-feed-container");
+                    const counter = document.getElementById("rentals-counter");
+                    if (!container) return;
+
+                    if (rentalsList) {
+                        counter.textContent = rentalsList.length;
+                    }
+
+                    if (!rentalsList || rentalsList.length === 0) {
+                        container.innerHTML = `
+                            <div class="bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm">
+                                <p class="text-slate-600 font-bold text-sm">No last-minute rental intervals listed right now.</p>
+                                <p class="text-slate-400 text-xs mt-1">Check back later or register your unused week.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = rentalsList.map((prop, index) => {
+                        const image = prop.image_url || prop.image_url1 || 'https://unsplash.com';
+                        const week = prop.week_number || 'N/A';
+                        const price = Number(prop.asking_price || 0);
+                        const perNight = Math.round(price / 7);
+
+                        return `
+                            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col md:flex-row">
+                                <div class="md:w-1/3 h-48 md:h-auto bg-slate-100 relative shrink-0">
+                                    <img src="${image}" alt="${prop.resort_name || 'Resort'}" class="w-full h-full object-cover">
+                                    <span class="absolute top-3 left-3 bg-blue-900 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded shadow-sm">AD # TMG${prop.id || index}</span>
+                                </div>
+                                <div class="p-6 flex-1 flex flex-col justify-between gap-4 md:border-r border-slate-100">
+                                    <div>
+                                        <h3 class="text-base font-black text-slate-900 leading-snug">${prop.resort_name || 'Premium Vacation Resort'}</h3>
+                                        <p class="text-slate-400 text-xs font-semibold mt-0.5">${prop.location || 'Verified Destination'}</p>
+                                        <div class="grid grid-cols-2 gap-y-2 gap-x-4 mt-4 text-xs font-medium text-slate-600 border-t border-slate-50 pt-3">
+                                            <p class="flex items-center"><span class="text-slate-400 font-bold mr-1">Interval:</span> Week ${week}</p>
+                                            <p class="flex items-center"><span class="text-slate-400 font-bold mr-1">Unit Size:</span> ${prop.unit_size || 'Varies'}</p>
+                                            <p class="flex items-center"><span class="text-slate-400 font-bold mr-1">Sleeps:</span> ${prop.sleeps_count || 'Varies'}</p>
+                                            <p class="flex items-center"><span class="text-slate-400 font-bold mr-1">Verification:</span> <span class="text-emerald-600 font-bold">AD Verified</span></p>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-slate-400 font-medium italic">This timeshare rental can be booked online using our secure escrow transfer.</p>
+                                </div>
+                                <div class="p-6 md:w-52 bg-slate-50/50 flex flex-col justify-center items-center text-center shrink-0 border-t md:border-t-0 border-slate-100">
+                                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">FOR RENT</span>
+                                    <div class="mt-1 flex items-baseline text-slate-900">
+                                        <span class="text-xl font-bold">$</span>
+                                        <span class="text-4xl font-black tracking-tight">${perNight}</span>
+                                        <span class="text-xs font-semibold text-slate-400 ml-0.5">/ night</span>
+                                    </div>
+                                    <span class="block text-[11px] text-slate-500 font-bold mt-1">$${price.toLocaleString()} / 7 Night Stay</span>
+                                    <button onclick="window.location.href='index.html#contact'" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-lg mt-4 shadow-sm transition">
+                                        Book Online
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                } catch (err) {
+                    console.error("Critical failure rendering rentals feed:", err);
+                }
+            }, 500);
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
