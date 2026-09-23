@@ -130,3 +130,59 @@ async function loadPublicMarketplace(client) {
                 });
             }
         }
+            <!-- Formulario de Leads (Contacto con Escrow Broker) -->
+            <section id="contact" class="lg:col-span-7 bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/80 border border-slate-200/60 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 to-cyan-500"></div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Speak to a Licensed Broker</h2>
+                <p class="text-slate-400 text-xs font-medium mt-1 mb-6">Have questions regarding timeshare title transfer deed services or point value matching? Our agents are standing by.</p>
+                <form id="general-lead-form" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="lead-name" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Full Name</label>
+                            <input type="text" id="lead-name" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
+                        </div>
+                        <div>
+                            <label for="lead-email" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Email Address</label>
+                            <input type="email" id="lead-email" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="lead-message" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Inquiry Details</label>
+                        <textarea id="lead-message" rows="3" required placeholder="Specify your desired brand, complex location or questions regarding transfer title closing escrow..." class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all placeholder-slate-400 font-medium"></textarea>
+                    </div>
+                    <button type="submit" class="bg-gradient-to-r from-blue-900 to-blue-950 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-md shadow-blue-950/10 hover:shadow-cyan-500/20">
+                        Submit Broker Request
+                    </button>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <!-- 6. PIE DE PÁGINA CORPORATIVO -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-16 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-10">
+            <div class="space-y-4">
+                <span class="block text-white font-black tracking-wider text-sm uppercase">Timeshare Management Group</span>
+                <p class="text-slate-500 leading-relaxed font-medium">
+                    TMG is an independent secondary marketplace specializing in for-sale-by-owner interval and point-based vacation clubs resales. Prices are designated explicitly by individual deed holders.
+                </p>
+            </div>
+            <div class="space-y-3 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Resale Security & Escrow Trust</span>
+                <p class="flex items-center text-slate-400">• Official Escrow title transfer deed security processed</p>
+                <p class="flex items-center text-slate-400">• BBB A+ Accredited secondary market platform standards</p>
+            </div>
+            <div class="space-y-3 font-medium">
+                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Corporate Correspondence</span>
+                <p class="text-slate-400">8545 Commodity Circle, Orlando, FL 32819</p>
+                <p class="text-slate-400">Direct Support: <a href="mailto:support@tmgmarketplace.com" class="text-cyan-400 hover:underline">support@tmgresales.com</a></p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-800 text-center text-slate-500 font-semibold">
+            &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. Privacy Policy | Terms of Use.
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
