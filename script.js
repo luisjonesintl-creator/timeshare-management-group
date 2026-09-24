@@ -65,7 +65,6 @@ async function initPublicMarketplace(client) {
     }
 }
 
-// Función encargada de dibujar las tarjetas en el HTML
 function renderCatalogCards(listings) {
     const container = document.getElementById("active-properties");
     if (!container) return;
@@ -80,14 +79,14 @@ function renderCatalogCards(listings) {
     }
 
     container.innerHTML = listings.map((prop, index) => {
-        // Recopilación secuencial de imágenes adicionales almacenadas
+        // 1. Recopilación secuencial de imágenes adicionales almacenadas
         const photos = [];
         if (prop.image_url) photos.push(prop.image_url);
         for (let i = 1; i <= 10; i++) {
             if (prop['image_url' + i]) photos.push(prop['image_url' + i]);
         }
 
-        // Asignador automatizado de Badges de confianza según rango de valor
+        // 2. Asignador de Badges de confianza según rango de valor
         let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
         const price = Number(prop.asking_price || 0);
         if (price < 8000) {
@@ -103,11 +102,13 @@ function renderCatalogCards(listings) {
                     '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
                 '</div>';
         } else {
+            // Genera las diapositivas horizontales con ajuste object-contain
             const slidesHTML = photos.map((url, imgIdx) => 
                 '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative bg-slate-950 flex items-center justify-center">' +
                     '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain transition-all duration-500">' +
                 '</div>'
             ).join('');
+
             imageHeader = 
                 '<div class="h-56 w-full relative overflow-hidden group/gallery rounded-t-2xl bg-slate-100 shadow-inner">' +
                     '<div id="carousel-' + index + '" class="flex w-full h-full overflow-x-hidden snap-x snap-mandatory scroll-smooth no-scrollbar">' +
@@ -126,42 +127,42 @@ function renderCatalogCards(listings) {
                 '</div>';
         }
 
-        return `
-            <div class="group bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-xl hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between">
-                <div class="overflow-hidden relative">
-                    \${imageHeader}
-                    <div class="p-6">
-                        <div class="flex justify-between items-start">
-                            \${dealBadge}
-                            <span class="text-[10px] font-bold text-slate-400">AD #TMG\${prop.id}</span>
-                        </div>
-                        <h3 class="text-base font-black text-slate-900 tracking-tight leading-snug group-hover:text-blue-900 transition-colors duration-300">\${prop.resort_name || 'Unknown Resort'}</h3>
-                        <p class="text-slate-400 text-xs font-semibold mt-2 flex items-center">
-                            <svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            Assigned Schedule: Week \${prop.week_number || 'N/A'}
-                        </p>
-                    </div>
-                </div>
-                <div class="p-6 pt-0">
-                    <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-                        <div class="flex flex-col">
-                            <span class="text-[9px] uppercase tracking-widest font-black text-slate-400 leading-none">\${prop.listing_type || 'SALE'}</span>
-                            <span class="text-xl font-black text-blue-950 tracking-tight mt-0.5">\$\${price.toLocaleString()}</span>
-                        </div>
-                        <button data-id="\${prop.id}" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm">Inquire</button>
-                    </div>
-                </div>
-            </div>`;
+        // 3. Estructuración y concatenación HTML limpia unificada
+        return (
+            '<div class="group bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-xl hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between">' +
+                '<div class="overflow-hidden relative">' +
+                    imageHeader +
+                    '<div class="p-6">' +
+                        '<div class="flex justify-between items-start">' +
+                            dealBadge +
+                            '<span class="text-slate-400 font-bold text-[10px]">AD #TMG' + prop.id + '</span>' +
+                        '</div>' +
+                        '<h3 class="text-base font-black text-slate-900 tracking-tight leading-snug group-hover:text-blue-900 transition-colors duration-300">' + (prop.resort_name || 'Unknown Resort') + '</h3>' +
+                        '<p class="text-slate-400 text-xs font-semibold mt-2 flex items-center">' +
+                            '<svg class="h-3.5 w-3.5 mr-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' +
+                            'Assigned Schedule: Week ' + (prop.week_number || 'N/A') +
+                        '</p>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="p-6 pt-0">' +
+                    '<div class="flex justify-between items-center pt-4 border-t border-slate-100">' +
+                        '<div class="flex flex-col">' +
+                            '<span class="text-[9px] uppercase tracking-widest font-black text-slate-400 leading-none">' + (prop.listing_type || 'SALE') + '</span>' +
+                            '<span class="text-xl font-black text-blue-950 tracking-tight mt-0.5">$' + price.toLocaleString() + '</span>' +
+                        '</div>' +
+                        '<button data-id="' + prop.id + '" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm">Inquire</button>' +
+                    </div> +
+                '</div>' +
+            '</div>'
+        );
     }).join('');
-    // Re-vinculamos el scroll suave hacia el formulario de contacto público
+
     container.querySelectorAll('.inquire-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.getElementById("contact")?.scrollIntoView({ behavior: 'smooth' });
         });
     });
 }
-
-// ====== 5. MOTOR DE BÚSQUEDA PREDICTIVO EN TIEMPO REAL (LIVE SEARCH) ======
 function setupLiveSearchEngine() {
     // Buscamos el campo input de búsqueda dentro del Hero Banner
     const searchInput = document.querySelector("input[placeholder*='Search resorts']");
