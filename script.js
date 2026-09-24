@@ -3,7 +3,7 @@
 // =========================================================================
 
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
-const SUPABASE_URL = "https://supabase.co";
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 let supabaseClientInstance = null;
