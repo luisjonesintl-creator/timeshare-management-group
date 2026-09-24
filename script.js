@@ -1,13 +1,13 @@
 // =========================================================================
-// TIMESHARE MANAGEMENT GROUP — MASTER CORE ENGINE (PRODUCTION V2.0)
+// TIMESHARE MANAGEMENT GROUP — MASTER CORE ENGINE (PRODUCTION V2.5)
 // =========================================================================
 
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
+const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 let supabaseClientInstance = null;
-let globalActiveListings = []; // Caché local para búsquedas en tiempo real
+let globalActiveListings = []; // Memoria caché local para el motor de búsqueda en tiempo real
 
 // ====== 2. INICIALIZACIÓN DEL MOTOR DE BASE DE DATOS ======
 function getSupabaseClient() {
@@ -22,14 +22,20 @@ function getSupabaseClient() {
 
 // ====== 3. ENRUTADOR INTELIGENTE DE CICLO DE VIDA ======
 document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
+    setTimeout(async () => {
         const client = getSupabaseClient();
         if (!client) {
             console.error("Critical core failure: Supabase engine could not be initialized.");
             return;
         }
 
-        // Detecta qué componentes inyectar dependiendo de los IDs de la página actual
+        // Control de entorno seguro para la página admin.html
+        if (document.getElementById("admin-add-form")) {
+            console.log("Admin environment successfully routed.");
+            return; 
+        }
+
+        // Enrutamiento estándar de interfaces públicas y portal de usuario
         if (document.getElementById("active-properties")) {
             initPublicMarketplace(client);
             setupLeadSubmission(client);
@@ -39,10 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 300);
 });
-// ====== 4. CATÁLOGO PÚBLICO INTEGRADO (ALGORITMOS SMTN) ======
+
+// ====== 4. CATÁLOGO PÚBLICO INTEGRADO ======
 async function initPublicMarketplace(client) {
     try {
-        // Consulta unificada optimizada para traer el inventario disponible
         const { data: activeList, error: err } = await client
             .from('properties')
             .select('*')
@@ -51,20 +57,15 @@ async function initPublicMarketplace(client) {
 
         if (err) throw err;
 
-        // Guardamos en la memoria caché global para permitir filtrado instantáneo
         globalActiveListings = activeList || [];
-        
-        // Renderizado inicial con todos los registros encontrados
         renderCatalogCards(globalActiveListings);
-        
-        // Inicializamos el motor predictivo de búsqueda en el Hero
         setupLiveSearchEngine();
 
     } catch (error) {
         console.error("Critical failure during catalog synchronization:", error);
     }
 }
-
+// ====== 5. RENDERIZADOR MAESTRO DE TARJETAS DEL PORTAFOLIO ======
 function renderCatalogCards(listings) {
     const container = document.getElementById("active-properties");
     if (!container) return;
@@ -79,14 +80,14 @@ function renderCatalogCards(listings) {
     }
 
     container.innerHTML = listings.map((prop, index) => {
-        // 1. Recopilación secuencial de imágenes adicionales almacenadas
+        // Recopilación de imágenes adicionales guardadas en Supabase
         const photos = [];
         if (prop.image_url) photos.push(prop.image_url);
         for (let i = 1; i <= 10; i++) {
             if (prop['image_url' + i]) photos.push(prop['image_url' + i]);
         }
 
-        // 2. Asignador de Badges de confianza según rango de valor
+        // Asignador predictivo de etiquetas según el precio real de mercado
         let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
         const price = Number(prop.asking_price || 0);
         if (price < 8000) {
@@ -102,7 +103,7 @@ function renderCatalogCards(listings) {
                     '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
                 '</div>';
         } else {
-            // Genera las diapositivas horizontales con ajuste object-contain
+            // Mapeo seguro de diapositivas horizontales con object-contain nativo
             const slidesHTML = photos.map((url, imgIdx) => 
                 '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative bg-slate-950 flex items-center justify-center">' +
                     '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain transition-all duration-500">' +
@@ -126,8 +127,7 @@ function renderCatalogCards(listings) {
                         '</button>' : '') +
                 '</div>';
         }
-
-        // 3. Estructuración y concatenación HTML limpia unificada
+        // Concatenación HTML blindada sin comillas invertidas conflictivas
         return (
             '<div class="group bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-xl hover:border-cyan-500/20 transition-all duration-300 flex flex-col justify-between">' +
                 '<div class="overflow-hidden relative">' +
@@ -151,29 +151,30 @@ function renderCatalogCards(listings) {
                             '<span class="text-xl font-black text-blue-950 tracking-tight mt-0.5">$' + price.toLocaleString() + '</span>' +
                         '</div>' +
                         '<button data-id="' + prop.id + '" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm">Inquire</button>' +
-                    </div> +
+                    </div>' +
                 '</div>' +
             '</div>'
         );
     }).join('');
 
+    // Vinculamos el scroll suave en caliente hacia el formulario de captación
     container.querySelectorAll('.inquire-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.getElementById("contact")?.scrollIntoView({ behavior: 'smooth' });
+            const contactSection = document.getElementById("contact");
+            if (contactSection) contactSection.scrollIntoView({ behavior: 'smooth' });
         });
     });
 }
+
+// ====== 6. MOTOR DE BÚSQUEDA PREDICTIVO EN TIEMPO REAL (LIVE SEARCH) ======
 function setupLiveSearchEngine() {
-    // Buscamos el campo input de búsqueda dentro del Hero Banner
     const searchInput = document.querySelector("input[placeholder*='Search resorts']");
     if (!searchInput) return;
 
-    // Habilitamos el campo de forma segura removiendo el atributo inactivo
     searchInput.removeAttribute("disabled");
     searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
         
-        // Filtramos la caché local en tiempo de ejecución sin saturar a Supabase
         const filtered = globalActiveListings.filter(prop => 
             (prop.resort_name && prop.resort_name.toLowerCase().includes(query)) ||
             (prop.listing_type && prop.listing_type.toLowerCase().includes(query))
@@ -182,8 +183,7 @@ function setupLiveSearchEngine() {
         renderCatalogCards(filtered);
     });
 }
-
-// ====== 6. CAPTACIÓN ASÍNCRONA DE PROSPECTOS PÚBLICOS (LEADS) ======
+// ====== 7. CAPTACIÓN ASÍNCRONA DE PROSPECTOS PÚBLICOS (LEADS) ======
 function setupLeadSubmission(client) {
     const form = document.getElementById("general-lead-form");
     if (!form) return;
@@ -197,13 +197,13 @@ function setupLeadSubmission(client) {
         const submitBtn = form.querySelector("button[type='submit']");
 
         if (!nameInput || !emailInput || !messageInput) return;
+
         try {
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerText = "Sending Request...";
             }
 
-            // Inserción en caliente de leads
             const { error } = await client.from('leads').insert([
                 {
                     full_name: nameInput.value.trim(),
@@ -217,13 +217,13 @@ function setupLeadSubmission(client) {
 
             form.innerHTML = 
                 '<div class="p-6 bg-emerald-50 border border-emerald-200 text-center rounded-2xl">' +
-                    '<p class="text-emerald-900 font-bold text-base font-sans">Thank you, ' + nameInput.value.trim() + '!</p>' +
-                    '<p class="text-emerald-700 text-xs mt-1">Your broker request has been logged through escrow protection. An agent will contact you shortly.</p>' +
+                    '<p class="text-emerald-900 font-bold text-base">Thank you, ' + nameInput.value.trim() + '!</p>' +
+                    '<p class="text-emerald-700 text-xs mt-1">Your broker request has been logged successfully.</p>' +
                 '</div>';
 
         } catch (err) {
             console.error("Failed to submit broker lead:", err);
-            alert("We encountered an error processing your request. Please try again.");
+            alert("We encountered an error processing your request.");
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Broker Request";
@@ -232,7 +232,7 @@ function setupLeadSubmission(client) {
     });
 }
 
-// ====== 7. AUTENTICACIÓN Y CONSULTA DE PROPIETARIOS (PORTAL) ======
+// ====== 8. AUTENTICACIÓN Y CONSULTA DE PROPIETARIOS (PORTAL USER) ======
 function setupPortalAuthentication(client) {
     const loginForm = document.getElementById("login-form");
     if (!loginForm) return;
@@ -247,7 +247,6 @@ function setupPortalAuthentication(client) {
         const dashboard = document.getElementById("portal-dashboard");
 
         if (!emailInput || !passwordInput || !loginCard || !dashboard) return;
-
         try {
             if (errorAlert) errorAlert.classList.add("hidden");
 
@@ -271,7 +270,7 @@ function setupPortalAuthentication(client) {
         }
     });
 }
-// Carga las métricas y la tabla de ofertas vinculadas al ID del usuario autenticado
+
 async function loadOwnerAssetDashboard(client, userId) {
     try {
         const { data: ownerAsset, error: propErr } = await client
@@ -284,8 +283,8 @@ async function loadOwnerAssetDashboard(client, userId) {
 
         if (ownerAsset) {
             document.getElementById("detail-resort").innerText = ownerAsset.resort_name || "Premium Resort Asset";
-            document.getElementById("detail-price").innerText = ownerAsset.asking_price ? `$${Number(ownerAsset.asking_price).toLocaleString()}` : "N/A";
-            document.getElementById("detail-week").innerText = ownerAsset.week_number ? `Week ${ownerAsset.week_number}` : "N/A";
+            document.getElementById("detail-price").innerText = ownerAsset.asking_price ? "$" + Number(ownerAsset.asking_price).toLocaleString() : "N/A";
+            document.getElementById("detail-week").innerText = ownerAsset.week_number ? "Week " + ownerAsset.week_number : "N/A";
             document.getElementById("detail-type").innerText = ownerAsset.listing_type || "N/A";
             document.getElementById("metric-views").innerText = ownerAsset.views_count ? Number(ownerAsset.views_count).toLocaleString() : "0";
 
@@ -306,19 +305,20 @@ async function loadOwnerAssetDashboard(client, userId) {
 
                 offersBody.innerHTML = offers.map(off => {
                     const dateFormatted = off.created_at ? new Date(off.created_at).toLocaleDateString() : 'N/A';
-                    return `
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="p-4 font-medium text-gray-900">${dateFormatted}</td>
-                            <td class="p-4">${off.offer_type || 'Purchase Offer'}</td>
-                            <td class="p-4 font-extrabold text-blue-950">$${Number(off.amount || 0).toLocaleString()}</td>
-                            <td class="p-4 text-center">
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                                    off.status === 'APPROVED' ? 'bg-green-50 text-green-700 border border-green-200' :
-                                    off.status === 'REJECTED' ? 'bg-red-50 text-red-700 border border-red-200' :
-                                    'bg-amber-50 text-amber-700 border border-amber-200'
-                                }">${off.status || 'PENDING'}</span>
-                            </td>
-                        </tr>`;
+                    return (
+                        '<tr class="hover:bg-gray-50 transition-colors">' +
+                            '<td class="p-4 font-medium text-gray-900">' + dateFormatted + '</td>' +
+                            '<td class="p-4">' + (off.offer_type || 'Purchase Offer') + '</td>' +
+                            '<td class="p-4 font-extrabold text-blue-950">$' + Number(off.amount || 0).toLocaleString() + '</td>' +
+                            '<td class="p-4 text-center">' +
+                                '<span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ' +
+                                    (off.status === 'APPROVED' ? 'bg-green-50 text-green-700 border border-green-200' :
+                                     off.status === 'REJECTED' ? 'bg-red-50 text-red-700 border border-red-200' :
+                                     'bg-amber-50 text-amber-700 border border-amber-200') +
+                                '">' + (off.status || 'PENDING') + '</span>' +
+                            '</td>' +
+                        '</tr>'
+                    );
                 }).join('');
             }
         }
@@ -327,10 +327,10 @@ async function loadOwnerAssetDashboard(client, userId) {
     }
 }
 
-// ====== 8. INTERACTIVE CAROUSEL CONTROLLER ======
+// ====== 9. INTERACTIVE CAROUSEL CONTROLLER ======
 function navigateCarousel(carouselIdx, direction, totalPhotos) {
-    const carousel = document.getElementById(`carousel-${carouselIdx}`);
-    const counter = document.getElementById(`counter-${carouselIdx}`);
+    const carousel = document.getElementById("carousel-" + carouselIdx);
+    const counter = document.getElementById("counter-" + carouselIdx);
     if (!carousel || !counter) return;
 
     const width = carousel.offsetWidth;
@@ -348,58 +348,68 @@ function navigateCarousel(carouselIdx, direction, totalPhotos) {
 
     counter.textContent = currentIdx + 1;
 }
-
-// ====== 9. CONTROLADORES AUTOMATIZADOS PANEL ADMIN MASTER ======
+// ====== 10. VALIDADOR DE CONTRASEÑA Y OPERACIONES ADMIN ======
 document.addEventListener("DOMContentLoaded", () => {
-    const addForm = document.getElementById("admin-add-form");
-    if (!addForm) return; 
+    const loginForm = document.getElementById("admin-login-form");
+    if (!loginForm) return;
 
+    const MASTER_SECRET_TOKEN = "TMGAdmin2026";
     const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
-    if (!client) {
-        console.error("Master Connection Failed: Admin panel cannot hook the active Supabase client.");
-        return;
-    }
-    // --- ACCIÓN A: CREAR / ALTA DE NUEVO RESORT ---
-    addForm.addEventListener("submit", async (e) => {
+
+    loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
+        const passwordInput = document.getElementById("admin-secret-pass");
+        const errorAlert = document.getElementById("admin-auth-error");
+        const authCard = document.getElementById("admin-auth-card");
+        const mainDashboard = document.getElementById("admin-main-dashboard");
+
+        if (passwordInput.value === MASTER_SECRET_TOKEN) {
+            if (errorAlert) errorAlert.classList.add("hidden");
+            authCard.classList.add("hidden");
+            mainDashboard.classList.remove("hidden");
+        } else {
+            if (errorAlert) errorAlert.classList.remove("hidden");
+            passwordInput.value = "";
+            passwordInput.focus();
+        }
+    });
+
+    if (!client) return;
+
+    // --- ACCIÓN: CREAR / ALTA ---
+    const addForm = document.getElementById("admin-add-form");
+    addForm?.addEventListener("submit", async (ev) => {
+        ev.preventDefault();
         const submitBtn = addForm.querySelector("button[type='submit']");
         
-        const nameVal = document.getElementById("add-resort-name").value.trim();
-        const priceVal = document.getElementById("add-price").value;
-        const weekVal = document.getElementById("add-week").value;
-        const typeVal = document.getElementById("add-type").value;
-        const statusVal = document.getElementById("add-status").value;
-        const imageVal = document.getElementById("add-image").value.trim();
-
         try {
             submitBtn.disabled = true;
-            submitBtn.innerText = "Deploying Cluster Data...";
+            submitBtn.innerText = "Deploying...";
 
             const { error } = await client.from('properties').insert([
                 {
-                    resort_name: nameVal,
-                    asking_price: Number(priceVal),
-                    week_number: Number(weekVal),
-                    listing_type: typeVal,
-                    status: statusVal,
-                    image_url: imageVal,
+                    resort_name: document.getElementById("add-resort-name").value.trim(),
+                    asking_price: Number(document.getElementById("add-price").value),
+                    week_number: Number(document.getElementById("add-week").value),
+                    listing_type: document.getElementById("add-type").value,
+                    status: document.getElementById("add-status").value,
+                    image_url: document.getElementById("add-image").value.trim(),
                     created_at: new Date().toISOString()
                 }
             ]);
 
             if (error) throw error;
-            alert("¡Resort publicado exitosamente en el catálogo público!");
+            alert("¡Resort publicado exitosamente!");
             addForm.reset();
-
         } catch (err) {
-            alert("Error al inyectar propiedad: " + err.message);
+            alert("Error: " + err.message);
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerText = "Publish Asset To Marketplace";
         }
     });
 
-    // --- ACCIÓN B: EDITAR / MODIFICAR PROPIEDAD EXISTENTE ---
+    // --- ACCIÓN: EDITAR / MODIFICAR ---
     const updateBtn = document.getElementById("admin-update-btn");
     updateBtn?.addEventListener("click", async () => {
         const idVal = document.getElementById("admin-edit-id").value;
@@ -408,25 +418,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const weekVal = document.getElementById("admin-edit-week").value;
 
         if (!idVal) {
-            alert("Por favor introduce el Target ID numérico del resort que deseas modificar.");
+            alert("Introduce el ID numérico.");
             return;
         }
 
         try {
             updateBtn.disabled = true;
-            updateBtn.innerText = "Synchronizing schema...";
-
-            const updateData = {};
+            const updateData = { created_at: new Date().toISOString() };
             if (nameVal) updateData.resort_name = nameVal;
             if (priceVal) updateData.asking_price = Number(priceVal);
             if (weekVal) updateData.week_number = Number(weekVal);
-            updateData.created_at = new Date().toISOString();
 
-            const { error } = await client
-                .from('properties')
-                .update(updateData)
-                .eq('id', Number(idVal));
-
+            const { error } = await client.from('properties').update(updateData).eq('id', Number(idVal));
             if (error) throw error;
             alert("¡Registro ID #" + idVal + " modificado con éxito!");
             
@@ -434,139 +437,69 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("admin-edit-name").value = "";
             document.getElementById("admin-edit-price").value = "";
             document.getElementById("admin-edit-week").value = "";
-
         } catch (err) {
-            alert("Fallo al actualizar registro: " + err.message);
+            alert("Error: " + err.message);
         } finally {
             updateBtn.disabled = false;
             updateBtn.innerText = "Save Changes via UI";
         }
     });
-
-    // --- ACCIÓN C: CLONAR / DUPLICAR PROPIEDAD EXISTENTE ---
+    // --- ACCIÓN: CLONAR / DUPLICAR ---
     const cloneBtn = document.getElementById("admin-clone-btn");
     cloneBtn?.addEventListener("click", async () => {
         const sourceId = document.getElementById("admin-clone-source-id").value;
-
         if (!sourceId) {
-            alert("Por favor, introduce el ID del resort base que deseas clonar.");
+            alert("Introduce el ID base.");
             return;
         }
 
         try {
             cloneBtn.disabled = true;
-            cloneBtn.innerText = "Extracting source record...";
-
-            const { data: sourceProperty, error: fetchErr } = await client
-                .from('properties')
-                .select('*')
-                .eq('id', Number(sourceId))
-                .single();
-
+            const { data: src, error: fetchErr } = await client.from('properties').select('*').eq('id', Number(sourceId)).single();
             if (fetchErr) throw fetchErr;
-            if (!sourceProperty) {
-                alert("No se encontró ningún resort con el ID especificado.");
-                return;
-            }
 
-            cloneBtn.innerText = "Deploying duplicate listing...";
-
-            const { error: insertErr } = await client.from('properties').insert([
+            const { error: insErr } = await client.from('properties').insert([
                 {
-                    resort_name: sourceProperty.resort_name,
-                    asking_price: sourceProperty.asking_price,
-                    week_number: sourceProperty.week_number,
-                    listing_type: sourceProperty.listing_type,
-                    status: sourceProperty.status,
-                    image_url: sourceProperty.image_url,
+                    resort_name: src.resort_name,
+                    asking_price: src.asking_price,
+                    week_number: src.week_number,
+                    listing_type: src.listing_type,
+                    status: src.status,
+                    image_url: src.image_url,
                     created_at: new Date().toISOString()
                 }
             ]);
 
-            if (insertErr) throw insertErr;
-            alert("¡Listado clonado con éxito! Ya puedes modificar su precio o semana de forma independiente con el panel de edición.");
+            if (insErr) throw insErr;
+            alert("¡Listado clonado y desplegado exitosamente!");
             document.getElementById("admin-clone-source-id").value = "";
-
         } catch (err) {
-            alert("Error durante el proceso de clonación: " + err.message);
+            alert("Error: " + err.message);
         } finally {
             cloneBtn.disabled = false;
             cloneBtn.innerText = "Clone & Deploy Duplicate Listing";
         }
     });
 
-    // --- ACCIÓN D: ELIMINACIÓN DE INVENTARIO AL INSTANTE ---
+    // --- ACCIÓN: ELIMINAR ---
     const deleteBtn = document.getElementById("admin-delete-btn");
     deleteBtn?.addEventListener("click", async () => {
         const deleteId = document.getElementById("admin-delete-id").value;
+        if (!deleteId) return;
 
-        if (!deleteId) {
-            alert("Por favor introduce el ID numérico exacto que deseas eliminar.");
-            return;
-        }
-
-        const confirmWipe = confirm("¿Estás seguro de eliminar permanentemente este registro de la base de datos?");
-        if (!confirmWipe) return;
+        if (!confirm("¿Eliminar permanentemente este registro?")) return;
 
         try {
             deleteBtn.disabled = true;
-            deleteBtn.innerText = "Wiping data stream...";
-
-            const { error } = await client
-                .from('properties')
-                .delete()
-                .eq('id', Number(deleteId));
-
+            const { error } = await client.from('properties').delete().eq('id', Number(deleteId));
             if (error) throw error;
             alert("¡Registro ID #" + deleteId + " borrado definitivamente!");
             document.getElementById("admin-delete-id").value = "";
-
         } catch (err) {
-            alert("Fallo crítico de borrado: " + err.message);
+            alert("Error: " + err.message);
         } finally {
             deleteBtn.disabled = false;
             deleteBtn.innerText = "Permanently Wipe Record";
         }
     });
 });
-// ====== VALIDADOR DE ACCESO PROTEGIDO CON CONTRASEÑA MAESTRA ======
-document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.getElementById("admin-login-form");
-    if (!loginForm) return; // Si no es la página de admin, abortamos de forma segura
-
-    // CONTRASEÑA MAESTRA: Modifica este texto si deseas poner una clave distinta
-    const MASTER_SECRET_TOKEN = "TMGAdmin2026";
-
-    loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const passwordInput = document.getElementById("admin-secret-pass");
-        const errorAlert = document.getElementById("admin-auth-error");
-        const authCard = document.getElementById("admin-auth-card");
-        const mainDashboard = document.getElementById("admin-main-dashboard");
-
-        if (!passwordInput || !authCard || !mainDashboard) return;
-
-        // Comprobamos si la contraseña ingresada coincide de forma exacta
-        if (passwordInput.value === MASTER_SECRET_TOKEN) {
-            if (errorAlert) errorAlert.classList.add("hidden");
-            
-            // Efecto de desvanecimiento visual: Removemos el bloqueo y abrimos los paneles
-            authCard.classList.add("hidden");
-            mainDashboard.classList.remove("hidden");
-            
-            alert("¡Autorización concedida! Accediendo al Master Control Room.");
-        } else {
-            // Si falla, mostramos la advertencia roja y limpiamos el campo
-            if (errorAlert) errorAlert.classList.remove("hidden");
-            passwordInput.value = "";
-            passwordInput.focus();
-        }
-    });
-});
-
-
-
-
-
-                          
