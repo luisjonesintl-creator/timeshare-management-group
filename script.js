@@ -78,6 +78,7 @@ function renderCatalogCards(listings) {
             '</div>';
         return;
     }
+
     container.innerHTML = listings.map((prop, index) => {
         // Recopilación secuencial de imágenes adicionales almacenadas
         const photos = [];
@@ -86,7 +87,7 @@ function renderCatalogCards(listings) {
             if (prop['image_url' + i]) photos.push(prop['image_url' + i]);
         }
 
-        // Asignador automatizado de Badges de confianza según rango de valor SMTN
+        // Asignador automatizado de Badges de confianza según rango de valor
         let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
         const price = Number(prop.asking_price || 0);
         if (price < 8000) {
@@ -102,7 +103,6 @@ function renderCatalogCards(listings) {
                     '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
                 '</div>';
         } else {
-            // Mapeo adaptativo: Genera las diapositivas horizontales
             const slidesHTML = photos.map((url, imgIdx) => 
                 '<div id="slide-' + index + '-' + imgIdx + '" class="w-full h-full flex-shrink-0 snap-start relative bg-slate-950 flex items-center justify-center">' +
                     '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain transition-all duration-500">' +
