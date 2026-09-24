@@ -1,9 +1,9 @@
 // =========================================================================
-// TIMESHARE MANAGEMENT GROUP — MASTER ENGINE (SECURED & OPTIMIZED V3.1)
+// TIMESHARE MANAGEMENT GROUP — MASTER ENGINE (SECURED & OPTIMIZED V3.2)
 // =========================================================================
 
 // ====== 1. GLOBAL CONFIGURATION & ENVIRONMENT INITIALIZATION ======
-const SUPABASE_URL = window.env?.SUPABASE_URL || "https://supabase.co";
+const SUPABASE_URL = window.env?.SUPABASE_URL || "https://ztojbyfbyidzzrqicjvn.supabase.co";
 const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 let supabaseClientInstance = null;
@@ -286,6 +286,9 @@ async function loadOwnerAssetDashboard(client, userId) {
             document.getElementById("detail-type").innerText = ownerAsset.listing_type || "N/A";
             document.getElementById("metric-views").innerText = ownerAsset.views_count ? Number(ownerAsset.views_count).toLocaleString() : "0";
 
+            // Bootstrapping interactive portal data editor dynamically
+            setupClientInventoryEditor(client, ownerAsset.id);
+
             const { data: offers, error: offErr } = await client
                 .from('offers')
                 .select('*')
@@ -323,6 +326,64 @@ async function loadOwnerAssetDashboard(client, userId) {
         console.error("Error retrieving owner metrics data:", err);
     }
 }
+// ====== 8b. CLIENT INVENTORY VISUAL EDITOR (MAPPED TO PORTAL) ======
+function setupClientInventoryEditor(client, ownerPropertyId) {
+    const editorForm = document.querySelector("form button[id*='Changes'], button:-webkit-any(:contains('Aplicar Cambios'))")?.closest("form") 
+                       || document.querySelector("form h3:-webkit-any(:contains('Editor Visual'))")?.closest("form")
+                       || document.querySelector("form");
+                       
+    if (!editorForm) return;
+
+    const idInput = editorForm.querySelector("input[placeholder*='ID'], input[placeholder*='Supabase']");
+    if (idInput && ownerPropertyId) {
+        idInput.value = ownerPropertyId;
+        idInput.setAttribute("readonly", "true");
+        idInput.classList.add("bg-gray-100", "cursor-not-allowed", "text-gray-400");
+    }
+
+    editorForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const nameInput = editorForm.querySelector("input[placeholder*='Nombre'], input[placeholder*='Resort']");
+        const priceInput = editorForm.querySelector("input[placeholder*='Precio']");
+        const weekInput = editorForm.querySelector("input[placeholder*='Semana'], input[placeholder*='Número']");
+        const submitBtn = editorForm.querySelector("button");
+
+        if (!idInput || !idInput.value) {
+            alert("Error de validación: Falta la referencia de la propiedad.");
+            return;
+        }
+
+        try {
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Procesando..."; }
+
+            const updatePayload = { created_at: new Date().toISOString() };
+            let hasChanges = false;
+
+            if (nameInput && nameInput.value.trim()) { updatePayload.resort_name = nameInput.value.trim(); hasChanges = true; }
+            if (priceInput && priceInput.value.trim()) { updatePayload.asking_price = Number(priceInput.value.replace(/[^0-9.-]+/g,"")); hasChanges = true; }
+            if (weekInput && weekInput.value.trim()) { updatePayload.week_number = Number(weekInput.value); hasChanges = true; }
+
+            if (!hasChanges) { alert("Por favor, introduce cambios antes de aplicar."); return; }
+
+            const { error } = await client.from('properties').update(updatePayload).eq('id', Number(idInput.value));
+            if (error) throw error;
+
+            alert("¡Cambios aplicados con éxito!");
+            
+            if (nameInput && nameInput.value.trim()) document.getElementById("detail-resort").innerText = nameInput.value.trim();
+            if (priceInput && priceInput.value.trim()) document.getElementById("detail-price").innerText = "$" + Number(priceInput.value).toLocaleString();
+            if (weekInput && weekInput.value.trim()) document.getElementById("detail-week").innerText = "Week " + weekInput.value;
+
+            if (nameInput) nameInput.value = "";
+            if (priceInput) priceInput.value = "";
+            if (weekInput) weekInput.value = "";
+
+        } catch (err) { alert("Error al actualizar la base de datos: " + err.message); }
+        finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Aplicar Cambios en Vivo"; } }
+    });
+}
+
 // ====== 9. SECURED ADMIN OPERATIONS CONTROLLER ======
 function setupAdminOperations(client) {
     const loginForm = document.getElementById("admin-login-form");
@@ -342,10 +403,7 @@ function setupAdminOperations(client) {
                 if (mainDashboard) mainDashboard.classList.remove("hidden");
             } else {
                 if (errorAlert) errorAlert.classList.remove("hidden");
-                if (passwordInput) {
-                    passwordInput.value = "";
-                    passwordInput.focus();
-                }
+                if (passwordInput) { passwordInput.value = ""; passwordInput.focus(); }
             }
         });
     }
