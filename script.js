@@ -1,15 +1,15 @@
 // =========================================================================
-// TIMESHARE MANAGEMENT GROUP — MASTER ENGINE WITH SWIPER.JS (V3.0)
+// TIMESHARE MANAGEMENT GROUP — MASTER ENGINE (SECURED & OPTIMIZED V3.1)
 // =========================================================================
 
-// ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
+// ====== 1. GLOBAL CONFIGURATION & ENVIRONMENT INITIALIZATION ======
+const SUPABASE_URL = window.env?.SUPABASE_URL || "https://supabase.co";
+const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 let supabaseClientInstance = null;
 let globalActiveListings = []; 
 
-// ====== 2. INICIALIZACIÓN DEL MOTOR DE BASE DE DATOS ======
+// ====== 2. DATABASE ENGINE INITIALIZATION ======
 function getSupabaseClient() {
     if (!supabaseClientInstance) {
         const creator = window.supabase?.createClient || window.createClient || (typeof createClient !== 'undefined' ? createClient : null);
@@ -20,7 +20,7 @@ function getSupabaseClient() {
     return supabaseClientInstance;
 }
 
-// ====== 3. ENRUTADOR INTELIGENTE DE CICLO DE VIDA ======
+// ====== 3. CENTRALIZED LIFECYCLE ROUTER ======
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(async () => {
         const client = getSupabaseClient();
@@ -29,24 +29,26 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Control de entorno seguro para la página admin.html
+        // --- ADMIN PORTAL ROUTE ---
         if (document.getElementById("admin-add-form")) {
             console.log("Admin environment successfully routed.");
+            setupAdminOperations(client);
             return; 
         }
 
-        // Enrutamiento estándar de interfaces públicas y portal de usuario
+        // --- PUBLIC MARKETPLACE ROUTE ---
         if (document.getElementById("active-properties")) {
             initPublicMarketplace(client);
             setupLeadSubmission(client);
         }
+
+        // --- CLIENT PORTAL ROUTE ---
         if (document.getElementById("login-form")) {
             setupPortalAuthentication(client);
         }
     }, 300);
 });
-
-// ====== 4. CATÁLOGO PÚBLICO INTEGRADO ======
+// ====== 4. INTEGRATED PUBLIC CATALOG ======
 async function initPublicMarketplace(client) {
     try {
         const { data: activeList, error: err } = await client
@@ -65,7 +67,8 @@ async function initPublicMarketplace(client) {
         console.error("Critical failure during catalog synchronization:", error);
     }
 }
-// ====== 5. RENDERIZADOR MAESTRO DE TARJETAS MODERNO (SWIPER.JS) ======
+
+// ====== 5. CARD RENDERER ENGINE (SWIPER.JS) ======
 function renderCatalogCards(listings) {
     const container = document.getElementById("active-properties");
     if (!container) return;
@@ -79,15 +82,13 @@ function renderCatalogCards(listings) {
         return;
     }
 
-    container.innerHTML = listings.map((prop, index) => {
-        // Recopilación secuencial de imágenes guardadas en Supabase
+    container.innerHTML = listings.map((prop) => {
         const photos = [];
         if (prop.image_url) photos.push(prop.image_url);
         for (let i = 1; i <= 10; i++) {
             if (prop['image_url' + i]) photos.push(prop['image_url' + i]);
         }
 
-        // Asignador predictivo de etiquetas según el precio real
         let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
         const price = Number(prop.asking_price || 0);
         if (price < 8000) {
@@ -103,7 +104,6 @@ function renderCatalogCards(listings) {
                     <span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>
                 </div>`;
         } else {
-            // Generamos las diapositivas con la sintaxis nativa de Swiper
             const slidesHTML = photos.map(url => `
                 <div class="swiper-slide bg-slate-950 flex items-center justify-center">
                     <img src="${url}" alt="${prop.resort_name || 'Resort'}" class="max-h-full max-w-full object-contain">
@@ -115,7 +115,6 @@ function renderCatalogCards(listings) {
                     <div class="swiper-wrapper">
                         ${slidesHTML}
                     </div>
-                    <!-- Controles Modernos Flotantes de Swiper -->
                     <div class="swiper-pagination !text-[10px] !bottom-3"></div>
                     <div class="swiper-button-next !text-white !scale-50 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"></div>
                     <div class="swiper-button-prev !text-white !scale-50 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"></div>
@@ -150,23 +149,24 @@ function renderCatalogCards(listings) {
             </div>`;
     }).join('');
 
-    // Inicializamos Swiper en caliente en todas las tarjetas renderizadas
     setTimeout(() => {
-        new Swiper(".mySwiper", {
-            loop: true,
-            pagination: { el: ".swiper-pagination", clickable: true },
-            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
-        });
+        if (typeof Swiper !== 'undefined') {
+            new Swiper(".mySwiper", {
+                loop: true,
+                pagination: { el: ".swiper-pagination", clickable: true },
+                navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+            });
+        }
     }, 50);
 
-    // Vinculamos el scroll suave hacia el formulario de contacto público
     container.querySelectorAll('.inquire-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.getElementById("contact")?.scrollIntoView({ behavior: 'smooth' });
         });
     });
 }
-// ====== 6. MOTOR DE BÚSQUEDA PREDICTIVO EN TIEMPO REAL (LIVE SEARCH) ======
+
+// ====== 6. PREDICTIVE LIVE SEARCH ENGINE ======
 function setupLiveSearchEngine() {
     const searchInput = document.querySelector("input[placeholder*='Search resorts']");
     if (!searchInput) return;
@@ -174,18 +174,15 @@ function setupLiveSearchEngine() {
     searchInput.removeAttribute("disabled");
     searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
-        
-        // Filtramos la caché local instantáneamente sin llamadas repetidas a Supabase
         const filtered = globalActiveListings.filter(prop => 
             (prop.resort_name && prop.resort_name.toLowerCase().includes(query)) ||
             (prop.listing_type && prop.listing_type.toLowerCase().includes(query))
         );
-        
         renderCatalogCards(filtered);
     });
 }
 
-// ====== 7. CAPTACIÓN ASÍNCRONA DE PROSPECTOS PÚBLICOS (LEADS) ======
+// ====== 7. ASYNCHRONOUS LEAD CAPTURE ======
 function setupLeadSubmission(client) {
     const form = document.getElementById("general-lead-form");
     if (!form) return;
@@ -233,8 +230,7 @@ function setupLeadSubmission(client) {
         }
     });
 }
-
-// ====== 8. AUTENTICACIÓN Y PORTAL DE USUARIO PROPIETARIO ======
+// ====== 8. OWNER PORTAL SYSTEM ======
 function setupPortalAuthentication(client) {
     const loginForm = document.getElementById("login-form");
     if (!loginForm) return;
@@ -276,7 +272,7 @@ function setupPortalAuthentication(client) {
 async function loadOwnerAssetDashboard(client, userId) {
     try {
         const { data: ownerAsset, error: propErr } = await client
-            .from('Owners')
+            .from('owners') 
             .select('*')
             .eq('owner_id', userId)
             .single();
@@ -327,11 +323,10 @@ async function loadOwnerAssetDashboard(client, userId) {
         console.error("Error retrieving owner metrics data:", err);
     }
 }
-// ====== 10. VALIDADOR DE CONTRASEÑA Y OPERACIONES ADMIN ======
-document.addEventListener("DOMContentLoaded", () => {
+// ====== 9. SECURED ADMIN OPERATIONS CONTROLLER ======
+function setupAdminOperations(client) {
     const loginForm = document.getElementById("admin-login-form");
-    const MASTER_SECRET_TOKEN = "TMGAdmin2026";
-    const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+    const MASTER_SECRET_TOKEN = window.env?.MASTER_SECRET_TOKEN || "TMGAdmin2026";
 
     if (loginForm) {
         loginForm.addEventListener("submit", (e) => {
@@ -355,146 +350,80 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (!client) return;
-
-    // --- ACCIÓN A: CREAR / ALTA DE RESORT ---
+    // --- ACCIÓN A: CREAR ---
     const addForm = document.getElementById("admin-add-form");
     addForm?.addEventListener("submit", async (ev) => {
         ev.preventDefault();
         const submitBtn = addForm.querySelector("button[type='submit']");
-        
         try {
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "Deploying...";
-            }
-
-            const { error } = await client.from('properties').insert([
-                {
-                    resort_name: document.getElementById("add-resort-name").value.trim(),
-                    asking_price: Number(document.getElementById("add-price").value),
-                    week_number: Number(document.getElementById("add-week").value),
-                    listing_type: document.getElementById("add-type").value,
-                    status: document.getElementById("add-status").value,
-                    image_url: document.getElementById("add-image").value.trim(),
-                    created_at: new Date().toISOString()
-                }
-            ]);
-
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Deploying..."; }
+            const { error } = await client.from('properties').insert([{
+                resort_name: document.getElementById("add-resort-name").value.trim(),
+                asking_price: Number(document.getElementById("add-price").value),
+                week_number: Number(document.getElementById("add-week").value),
+                listing_type: document.getElementById("add-type").value,
+                status: document.getElementById("add-status").value,
+                image_url: document.getElementById("add-image").value.trim(),
+                created_at: new Date().toISOString()
+            }]);
             if (error) throw error;
-            alert("¡Resort publicado exitosamente en el catálogo!");
+            alert("¡Resort publicado exitosamente!");
             addForm.reset();
-        } catch (err) {
-            alert("Error al inyectar propiedad: " + err.message);
-        } finally {
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Publish Asset To Marketplace";
-            }
-        }
+        } catch (err) { alert("Error: " + err.message); }
+        finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Publish Asset To Marketplace"; } }
     });
 
-    // --- ACCIÓN B: EDITAR / MODIFICAR ---
+    // --- ACCIÓN B: EDITAR ---
     const updateBtn = document.getElementById("admin-update-btn");
     updateBtn?.addEventListener("click", async () => {
         const idVal = document.getElementById("admin-edit-id").value;
         const nameVal = document.getElementById("admin-edit-name").value.trim();
         const priceVal = document.getElementById("admin-edit-price").value;
         const weekVal = document.getElementById("admin-edit-week").value;
-
-        if (!idVal) {
-            alert("Por favor introduce el ID del resort.");
-            return;
-        }
-
+        if (!idVal) { alert("Por favor introduce el ID del resort."); return; }
         try {
             if (updateBtn) updateBtn.disabled = true;
             const updateData = { created_at: new Date().toISOString() };
             if (nameVal) updateData.resort_name = nameVal;
             if (priceVal) updateData.asking_price = Number(priceVal);
             if (weekVal) updateData.week_number = Number(weekVal);
-
             const { error } = await client.from('properties').update(updateData).eq('id', Number(idVal));
             if (error) throw error;
             alert("¡Registro ID #" + idVal + " modificado con éxito!");
-            
-            document.getElementById("admin-edit-id").value = "";
-            document.getElementById("admin-edit-name").value = "";
-            document.getElementById("admin-edit-price").value = "";
-            document.getElementById("admin-edit-week").value = "";
-        } catch (err) {
-            alert("Error al modificar: " + err.message);
-        } finally {
-            if (updateBtn) {
-                updateBtn.disabled = false;
-                updateBtn.innerText = "Save Changes via UI";
-            }
-        }
+        } catch (err) { alert("Error: " + err.message); }
+        finally { if (updateBtn) { updateBtn.disabled = false; updateBtn.innerText = "Save Changes via UI"; } }
     });
 
-    // --- ACCIÓN C: CLONAR / DUPLICAR ---
+    // --- ACCIÓN C: CLONAR ---
     const cloneBtn = document.getElementById("admin-clone-btn");
     cloneBtn?.addEventListener("click", async () => {
         const sourceId = document.getElementById("admin-clone-source-id").value;
-        if (!sourceId) {
-            alert("Por favor introduce el ID del resort base.");
-            return;
-        }
-
+        if (!sourceId) { alert("Por favor introduce el ID del resort base."); return; }
         try {
-            if (cloneBtn) {
-                cloneBtn.disabled = true;
-                cloneBtn.innerText = "Extracting...";
-            }
+            if (cloneBtn) { cloneBtn.disabled = true; cloneBtn.innerText = "Extracting..."; }
             const { data: src, error: fetchErr } = await client.from('properties').select('*').eq('id', Number(sourceId)).single();
             if (fetchErr) throw fetchErr;
-
-            const { error: insErr } = await client.from('properties').insert([
-                {
-                    resort_name: src.resort_name,
-                    asking_price: src.asking_price,
-                    week_number: src.week_number,
-                    listing_type: src.listing_type,
-                    status: src.status,
-                    image_url: src.image_url,
-                    created_at: new Date().toISOString()
-                }
-            ]);
-
+            const { error: insErr } = await client.from('properties').insert([{
+                resort_name: src.resort_name, asking_price: src.asking_price, week_number: src.week_number,
+                listing_type: src.listing_type, status: src.status, image_url: src.image_url, created_at: new Date().toISOString()
+            }]);
             if (insErr) throw insErr;
-            alert("¡Listado clonado y desplegado exitosamente!");
-            document.getElementById("admin-clone-source-id").value = "";
-        } catch (err) {
-            alert("Error en la clonación: " + err.message);
-        } finally {
-            if (cloneBtn) {
-                cloneBtn.disabled = false;
-                cloneBtn.innerText = "Clone & Deploy Duplicate Listing";
-            }
-        }
+            alert("¡Listado clonado exitosamente!");
+        } catch (err) { alert("Error en clonación: " + err.message); }
+        finally { if (cloneBtn) { cloneBtn.disabled = false; cloneBtn.innerText = "Clone & Deploy Duplicate Listing"; } }
     });
 
-    // --- ACCIÓN D: ELIMINAR / BAJA DEFINTIVA ---
+    // --- ACCIÓN D: ELIMINAR ---
     const deleteBtn = document.getElementById("admin-delete-btn");
     deleteBtn?.addEventListener("click", async () => {
         const deleteId = document.getElementById("admin-delete-id").value;
-        if (!deleteId) return;
-
-        if (!confirm("¿Eliminar permanentemente este registro del servidor de Supabase?")) return;
-
+        if (!deleteId || !confirm("¿Eliminar permanentemente este registro de Supabase?")) return;
         try {
             if (deleteBtn) deleteBtn.disabled = true;
             const { error } = await client.from('properties').delete().eq('id', Number(deleteId));
             if (error) throw error;
-            alert("¡Registro ID #" + deleteId + " borrado definitivamente de Supabase!");
-            document.getElementById("admin-delete-id").value = "";
-        } catch (err) {
-            alert("Error al borrar: " + err.message);
-        } finally {
-            if (deleteBtn) {
-                deleteBtn.disabled = false;
-                deleteBtn.innerText = "Permanently Wipe Record";
-            }
-        }
+            alert("¡Registro ID #" + deleteId + " borrado!");
+        } catch (err) { alert("Error: " + err.message); }
+        finally { if (deleteBtn) { deleteBtn.disabled = false; deleteBtn.innerText = "Permanently Wipe Record"; } }
     });
-});
+}
