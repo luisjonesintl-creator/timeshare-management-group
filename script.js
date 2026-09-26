@@ -332,3 +332,174 @@ async function loadOwnerAssetDashboard(client, userId) {
         console.error("Error retrieving owner metrics data:", err);
     }
 }
+// ====== 9. VALIDADOR DE CONTRASEÑA Y OPERACIONES ADMIN ======
+document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById("admin-login-form");
+    const MASTER_SECRET_TOKEN = "TMGAdmin2026";
+    const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+
+    if (loginForm) {
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const passwordInput = document.getElementById("admin-secret-pass");
+            const errorAlert = document.getElementById("admin-auth-error");
+            const authCard = document.getElementById("admin-auth-card");
+            const mainDashboard = document.getElementById("admin-main-dashboard");
+
+            if (passwordInput && passwordInput.value === MASTER_SECRET_TOKEN) {
+                if (errorAlert) errorAlert.classList.add("hidden");
+                if (authCard) authCard.classList.add("hidden");
+                if (mainDashboard) mainDashboard.classList.remove("hidden");
+            } else {
+                if (errorAlert) errorAlert.classList.remove("hidden");
+                if (passwordInput) {
+                    passwordInput.value = "";
+                    passwordInput.focus();
+                }
+            }
+        });
+    }
+
+    if (!client) return;
+
+    // --- ACCIÓN A: CREAR / ALTA DE RESORT ---
+    const addForm = document.getElementById("admin-add-form");
+    addForm?.addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const submitBtn = addForm.querySelector("button[type='submit']");
+        
+        try {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Deploying...";
+            }
+
+            const { error } = await client.from('properties').insert([
+                {
+                    resort_name: document.getElementById("add-resort-name").value.trim(),
+                    asking_price: Number(document.getElementById("add-price").value),
+                    week_number: Number(document.getElementById("add-week").value),
+                    listing_type: document.getElementById("add-type").value,
+                    status: document.getElementById("add-status").value,
+                    image_url: document.getElementById("add-image").value.trim(),
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+            if (error) throw error;
+            alert("¡Resort publicado exitosamente en el catálogo!");
+            addForm.reset();
+        } catch (err) {
+            alert("Error al inyectar propiedad: " + err.message);
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Publish Asset To Marketplace";
+            }
+        }
+    });
+
+    // --- ACCIÓN B: EDITAR / MODIFICAR ---
+    const updateBtn = document.getElementById("admin-update-btn");
+    updateBtn?.addEventListener("click", async () => {
+        const idVal = document.getElementById("admin-edit-id").value;
+        const nameVal = document.getElementById("admin-edit-name").value.trim();
+        const priceVal = document.getElementById("admin-edit-price").value;
+        const weekVal = document.getElementById("admin-edit-week").value;
+
+        if (!idVal) {
+            alert("Por favor introduce el ID del resort.");
+            return;
+        }
+
+        try {
+            if (updateBtn) updateBtn.disabled = true;
+            const updateData = { created_at: new Date().toISOString() };
+            if (nameVal) updateData.resort_name = nameVal;
+            if (priceVal) updateData.asking_price = Number(priceVal);
+            if (weekVal) updateData.week_number = Number(weekVal);
+
+            const { error } = await client.from('properties').update(updateData).eq('id', Number(idVal));
+            if (error) throw error;
+            alert("¡Registro ID #" + idVal + " modificado con éxito!");
+            
+            document.getElementById("admin-edit-id").value = "";
+            document.getElementById("admin-edit-name").value = "";
+            document.getElementById("admin-edit-price").value = "";
+            document.getElementById("admin-edit-week").value = "";
+        } catch (err) {
+            alert("Error al modificar: " + err.message);
+        } finally {
+            if (updateBtn) {
+                updateBtn.disabled = false;
+                updateBtn.innerText = "Save Changes via UI";
+            }
+        }
+    });
+
+    // --- ACCIÓN C: CLONAR / DUPLICAR ---
+    const cloneBtn = document.getElementById("admin-clone-btn");
+    cloneBtn?.addEventListener("click", async () => {
+        const sourceId = document.getElementById("admin-clone-source-id").value;
+        if (!sourceId) {
+            alert("Por favor introduce el ID del resort base.");
+            return;
+        }
+
+        try {
+            if (cloneBtn) {
+                cloneBtn.disabled = true;
+                cloneBtn.innerText = "Extracting...";
+            }
+            const { data: src, error: fetchErr } = await client.from('properties').select('*').eq('id', Number(sourceId)).single();
+            if (fetchErr) throw fetchErr;
+
+            const { error: insErr } = await client.from('properties').insert([
+                {
+                    resort_name: src.resort_name,
+                    asking_price: src.asking_price,
+                    week_number: src.week_number,
+                    listing_type: src.listing_type,
+                    status: src.status,
+                    image_url: src.image_url,
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+            if (insErr) throw insErr;
+            alert("¡Listado clonado y desplegado exitosamente!");
+            document.getElementById("admin-clone-source-id").value = "";
+        } catch (err) {
+            alert("Error en la clonación: " + err.message);
+        } finally {
+            if (cloneBtn) {
+                cloneBtn.disabled = false;
+                cloneBtn.innerText = "Clone & Deploy Duplicate Listing";
+            }
+        }
+    });
+
+    // --- ACCIÓN D: ELIMINAR / BAJA DEFINTIVA ---
+    const deleteBtn = document.getElementById("admin-delete-btn");
+    deleteBtn?.addEventListener("click", async () => {
+        const deleteId = document.getElementById("admin-delete-id").value;
+        if (!deleteId) return;
+
+        if (!confirm("¿Eliminar permanentemente este registro del servidor de Supabase?")) return;
+
+        try {
+            if (deleteBtn) deleteBtn.disabled = true;
+            const { error } = await client.from('properties').delete().eq('id', Number(deleteId));
+            if (error) throw error;
+            alert("¡Registro ID #" + deleteId + " borrado definitivamente de Supabase!");
+            document.getElementById("admin-delete-id").value = "";
+        } catch (err) {
+            alert("Error al borrar: " + err.message);
+        } finally {
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.innerText = "Permanently Wipe Record";
+            }
+        }
+    });
+});
