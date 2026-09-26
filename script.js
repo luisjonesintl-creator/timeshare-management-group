@@ -104,11 +104,13 @@ function renderCatalogCards(listings) {
                 '</div>';
         } else {
             // Generamos las diapositivas horizontales con la estructura nativa de Swiper
-            const slidesHTML = photos.map(url => 
-                '<div class="swiper-slide bg-slate-950 flex items-center justify-center">' +
-                    '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain">' +
-                '</div>'
-            ).join('');
+           // Forzar que la variable 'url' se interprete estrictamente como una cadena de texto URL de internet
+const slidesHTML = photos.map(url => {
+    const cleanUrl = String(url).trim();
+    return '<div class="swiper-slide bg-slate-950 flex items-center justify-center">' +
+               '<img src="' + cleanUrl + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain">' +
+           '</div>';
+}).join('');
 
             imageHeader = 
                 '<div class="swiper mySwiper h-56 w-full relative overflow-hidden rounded-t-2xl bg-slate-100 shadow-inner">' +
