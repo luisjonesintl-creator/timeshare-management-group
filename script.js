@@ -1,16 +1,21 @@
-// ====== CONFIGURATION STEP ======
-const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
+// =========================================================================
+// TIMESHARE MANAGEMENT GROUP — MASTER ENGINE WITH SWIPER.JS (V4.5)
+// =========================================================================
+
+// ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
+const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
-// ====== INITIALIZATION ROUTINE ======
+// ====== 2. INICIALIZACIÓN DEL MOTOR DE BASE DE DATOS ======
+// Inicializamos el cliente de Supabase de manera global y correcta
 const supabaseClientInstance = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Función asíncrona para consultar la base de datos y pintar el catálogo con método blindado
+// ====== 3. FUNCIÓN MAESTRA DE CONSULTA Y RENDERIZADO ======
 async function fetchAndRenderProperties() {
     const container = document.getElementById("active-properties");
     if (!container) return;
 
     try {
+        // Consultamos la tabla 'properties' filtrando únicamente los registros activos
         const { data: properties, error } = await supabaseClientInstance
             .from('properties')
             .select('*')
@@ -19,6 +24,7 @@ async function fetchAndRenderProperties() {
 
         if (error) throw error;
 
+        // Si no existen resorts disponibles en el servidor, desplegamos un aviso limpio
         if (!properties || properties.length === 0) {
             container.innerHTML = `
                 <div class="col-span-full text-center py-12 text-slate-400 font-medium">
@@ -27,18 +33,17 @@ async function fetchAndRenderProperties() {
             return;
         }
 
-        // Limpiamos el indicador de carga
+        // Removemos de la interfaz el mensaje animado de sincronización
         container.innerHTML = "";
 
-        // Recorremos cada propiedad devuelta por Supabase para renderizar su diseño
+        // Procesamos uno a uno los resorts devueltos por la base de datos
         properties.forEach((item, index) => {
-            // Recopilamos de forma segura hasta 10 fotos por registro para alimentar el carrusel de Swiper
+            // Mapeo e interpretación estricta de las variables URL de Supabase como texto plano
             const photos = [];
             if (item.image_url) photos.push(String(item.image_url).trim());
             for (let i = 1; i <= 10; i++) {
                 if (item['image_url' + i]) photos.push(String(item['image_url' + i]).trim());
             }
-
             // Construcción del contenedor de fotos (Carrusel dinámico vs Imagen única)
             let imageHeaderHtml = "";
             if (photos.length === 0) {
@@ -63,11 +68,20 @@ async function fetchAndRenderProperties() {
                         <div class="swiper-button-prev swiper-button-prev-${index} !text-white !scale-50 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
                     </div>`;
             }
+
+            // Asignador predictivo de etiquetas comerciales según el precio real de mercado
+            let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
+            const price = Number(item.asking_price || 0);
+            if (price < 8000) {
+                dealBadge = '<span class="bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Best Value Deal</span>';
+            } else if (price > 16000) {
+                dealBadge = '<span class="bg-amber-50 text-amber-700 border border-amber-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">High Demand Asset</span>';
+            }
             // Definimos el color de la etiqueta según el tipo de oferta
             const isSale = item.listing_type === 'SALE';
             const badgeBg = isSale ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-cyan-50 text-cyan-800 border-cyan-200';
 
-            // Estructura HTML de la tarjeta inyectando los datos de tu tabla
+            // Estructura HTML de la tarjeta con inyección de datos limpia
             const cardHtml = `
                 <div class="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col group">
                     <!-- Contenedor del Carrusel Moderno -->
@@ -84,6 +98,10 @@ async function fetchAndRenderProperties() {
                     <!-- Cuerpo informativo -->
                     <div class="p-6 flex flex-col flex-grow justify-between">
                         <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                ${dealBadge}
+                                <span class="text-slate-400 font-bold text-[10px]">ID #TMG${item.id}</span>
+                            </div>
                             <h4 class="text-base font-black text-slate-900 tracking-tight leading-snug line-clamp-2 min-h-[3rem]">
                                 ${item.resort_name || 'Premium Vacation Resort'}
                             </h4>
@@ -97,7 +115,7 @@ async function fetchAndRenderProperties() {
                         <div class="pt-5 mt-4 border-t border-slate-100 flex items-center justify-between">
                             <div>
                                 <span class="block text-[9px] uppercase tracking-widest font-bold text-slate-400">Asking Price</span>
-                                <span class="text-xl font-black text-slate-900">$${Number(item.asking_price || 0).toLocaleString()}</span>
+                                <span class="text-xl font-black text-slate-900">$${price.toLocaleString()}</span>
                             </div>
                             <button onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})" class="bg-blue-900 hover:bg-blue-950 text-white text-[11px] font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl transition shadow-sm">
                                 Make Offer
@@ -109,7 +127,6 @@ async function fetchAndRenderProperties() {
             
             // Adjuntamos la nueva tarjeta dentro de la grilla contenedora
             container.innerHTML += cardHtml;
-
             // Despertamos el motor Swiper de forma instantánea y aislada para esta propiedad específica
             if (photos.length > 0 && typeof Swiper !== 'undefined') {
                 setTimeout(() => {
