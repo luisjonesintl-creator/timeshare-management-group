@@ -16,11 +16,11 @@ async function fetchAndRenderProperties() {
 
     try {
         // Consultamos la tabla 'properties' filtrando únicamente los registros activos
-        const { data: properties, error } = await supabaseClientInstance
-            .from('properties')
-            .select('*')
-            .eq('status', 'AVAILABLE')
-            .order('created_at', { ascending: false });
+       // ====== CÓDIGO REPARADO (CONEXIÓN SEGURA DIRECTA) ======
+const { data: properties, error } = await supabaseClientInstance
+    .from('properties')
+    .select('*')
+    .eq('status', 'AVAILABLE'); // Consulta limpia sin forzar ordenamiento de columnas faltantes
 
         if (error) throw error;
 
