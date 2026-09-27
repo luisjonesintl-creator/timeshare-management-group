@@ -80,11 +80,11 @@ function renderCatalogCards(listings) {
     }
 
     container.innerHTML = listings.map((prop, index) => {
-        // Recopilación secuencial de imágenes guardadas en el registro de Supabase
+        // Recopilación y formateo estricto de URLs de imágenes para evitar datos binarios corruptos
         const photos = [];
-        if (prop.image_url) photos.push(prop.image_url);
+        if (prop.image_url) photos.push(String(prop.image_url).trim());
         for (let i = 1; i <= 10; i++) {
-            if (prop['image_url' + i]) photos.push(prop['image_url' + i]);
+            if (prop['image_url' + i]) photos.push(String(prop['image_url' + i]).trim());
         }
 
         // Asignador predictivo de etiquetas según el precio real de mercado
@@ -95,7 +95,6 @@ function renderCatalogCards(listings) {
         } else if (price > 16000) {
             dealBadge = '<span class="bg-amber-50 text-amber-700 border border-amber-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">High Demand Asset</span>';
         }
-
         let imageHeader = "";
         if (photos.length === 0) {
             imageHeader = 
@@ -103,14 +102,12 @@ function renderCatalogCards(listings) {
                     '<span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>' +
                 '</div>';
         } else {
-            // Generamos las diapositivas horizontales con la estructura nativa de Swiper
-           // Forzar que la variable 'url' se interprete estrictamente como una cadena de texto URL de internet
-const slidesHTML = photos.map(url => {
-    const cleanUrl = String(url).trim();
-    return '<div class="swiper-slide bg-slate-950 flex items-center justify-center">' +
-               '<img src="' + cleanUrl + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain">' +
-           '</div>';
-}).join('');
+            // Generamos las diapositivas horizontales con la estructura oficial de Swiper
+            const slidesHTML = photos.map(url => 
+                '<div class="swiper-slide bg-slate-950 flex items-center justify-center">' +
+                    '<img src="' + url + '" alt="' + (prop.resort_name || 'Resort') + '" class="max-h-full max-w-full object-contain">' +
+                '</div>'
+            ).join('');
 
             imageHeader = 
                 '<div class="swiper mySwiper h-56 w-full relative overflow-hidden rounded-t-2xl bg-slate-100 shadow-inner">' +
@@ -143,7 +140,7 @@ const slidesHTML = photos.map(url => {
                     '<div class="flex justify-between items-center pt-4 border-t border-slate-100">' +
                         '<div class="flex flex-col">' +
                             '<span class="text-[9px] uppercase tracking-widest font-black text-slate-400 leading-none">' + (prop.listing_type || 'SALE') + '</span>' +
-                            '<span class="text-xl font-black text-blue-950 tracking-tight mt-0.5">$' + price.toLocaleString() + '</span>' +
+                            '<span class="text-xl font-black text-blue-950 tracking-tight mt-0.5">$' + Number(prop.asking_price || 0).toLocaleString() + '</span>' +
                         '</div>' +
                         '<button data-id="' + prop.id + '" class="inquire-btn bg-gradient-to-r from-blue-900 to-blue-950 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300 shadow-sm">Inquire</button>' +
                     </div>' +
@@ -152,7 +149,7 @@ const slidesHTML = photos.map(url => {
         );
     }).join('');
 
-    // Inicializamos Swiper en caliente usando el API moderno oficial
+    // Inicializamos Swiper con la API oficial
     setTimeout(() => {
         if (typeof Swiper !== 'undefined') {
             new Swiper(".mySwiper", {
@@ -163,7 +160,6 @@ const slidesHTML = photos.map(url => {
         }
     }, 50);
 
-    // Vinculamos el scroll suave hacia el formulario de contacto público
     container.querySelectorAll('.inquire-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const contactSection = document.getElementById("contact");
@@ -181,7 +177,6 @@ function setupLiveSearchEngine() {
     searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
         
-        // Filtrado instantáneo en memoria local libre de llamadas redundantes a Supabase
         const filtered = globalActiveListings.filter(prop => 
             (prop.resort_name && prop.resort_name.toLowerCase().includes(query)) ||
             (prop.listing_type && prop.listing_type.toLowerCase().includes(query))
