@@ -3,24 +3,23 @@
 // =========================================================================
 
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
-const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co"; // URL REAL CORREGIDA
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 // ====== 2. INICIALIZACIÓN DEL MOTOR DE BASE DE DATOS ======
-// Inicializamos el cliente de Supabase de manera global y correcta
 const supabaseClientInstance = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // ====== 3. FUNCIÓN MAESTRA DE CONSULTA Y RENDERIZADO ======
 async function fetchAndRenderProperties() {
     const container = document.getElementById("active-properties");
     if (!container) return;
 
     try {
-        // Consultamos la tabla 'properties' filtrando únicamente los registros activos
-       // ====== CÓDIGO REPARADO (CONEXIÓN SEGURA DIRECTA) ======
-const { data: properties, error } = await supabaseClientInstance
-    .from('properties')
-    .select('*')
-    .eq('status', 'AVAILABLE'); // Consulta limpia sin forzar ordenamiento de columnas faltantes
+        // Consulta limpia a la tabla sin forzar ordenamiento de columnas faltantes
+        const { data: properties, error } = await supabaseClientInstance
+            .from('properties')
+            .select('*')
+            .eq('status', 'AVAILABLE');
 
         if (error) throw error;
 
@@ -33,17 +32,16 @@ const { data: properties, error } = await supabaseClientInstance
             return;
         }
 
-        // Removemos de la interfaz el mensaje animado de sincronización
         container.innerHTML = "";
 
         // Procesamos uno a uno los resorts devueltos por la base de datos
         properties.forEach((item, index) => {
-            // Mapeo e interpretación estricta de las variables URL de Supabase como texto plano
             const photos = [];
             if (item.image_url) photos.push(String(item.image_url).trim());
             for (let i = 1; i <= 10; i++) {
                 if (item['image_url' + i]) photos.push(String(item['image_url' + i]).trim());
             }
+
             // Construcción del contenedor de fotos (Carrusel dinámico vs Imagen única)
             let imageHeaderHtml = "";
             if (photos.length === 0) {
@@ -127,6 +125,7 @@ const { data: properties, error } = await supabaseClientInstance
             
             // Adjuntamos la nueva tarjeta dentro de la grilla contenedora
             container.innerHTML += cardHtml;
+
             // Despertamos el motor Swiper de forma instantánea y aislada para esta propiedad específica
             if (photos.length > 0 && typeof Swiper !== 'undefined') {
                 setTimeout(() => {
