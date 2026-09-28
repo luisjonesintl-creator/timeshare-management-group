@@ -1,4 +1,100 @@
-        const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Minute Rentals | Timeshare Management Group</title>
+    
+    <!-- Icono oficial de la pestaña del navegador (Favicon) -->
+    <link class="rounded-xl" rel="icon" type="image/png" href="favicon.png" />
+    
+    <!-- Motor nativo oficial de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-500/20">
+
+    <!-- BARRA DE INFORMACIÓN CORPORATIVA -->
+    <div class="bg-slate-900 text-slate-300 text-[11px] font-bold py-2.5 px-6 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-4">
+                <span><span class="text-cyan-400">Toll Free:</span> <a href="tel:18778154227" class="hover:text-white transition">1-877-815-4227</a></span>
+                <span class="text-slate-600">|</span>
+                <span><span class="text-slate-400">International:</span> <a href="tel:16035160200" class="hover:text-white transition">1-603-516-0200</a></span>
+            </div>
+            <div class="flex items-center space-x-4 text-[10px] uppercase tracking-wider text-slate-400">
+                <span class="flex items-center"><span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> BBB A+ ACCREDITED MARKETPLACE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center space-x-3 group cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="bg-gradient-to-tr from-blue-900 via-blue-950 to-blue-800 text-white p-2.5 rounded-xl font-black tracking-wider text-xl shadow-md">TMG</div>
+                <div>
+                    <span class="block text-sm font-extrabold tracking-tight text-slate-900 uppercase">Timeshare</span>
+                    <span class="block text-[10px] text-blue-600 font-black uppercase tracking-widest -mt-0.5">Management Group</span>
+                </div>
+            </div>
+            <nav class="hidden lg:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider text-slate-600">
+                <a href="listings.html" class="hover:text-blue-950 transition-colors">Timeshares For Sale</a>
+                <a href="rentals.html" class="text-cyan-700 border-b-2 border-cyan-600 py-1 transition-colors">Last Minute Rentals</a>
+                <a href="index.html#contact" class="hover:text-blue-950 transition-colors">Sell My Timeshare</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <a href="portal.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-all">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- CABECERA DE SECCIÓN -->
+    <section class="bg-gradient-to-b from-slate-950 to-cyan-950 py-16 px-6 text-center text-white">
+        <div class="max-w-4xl mx-auto space-y-4">
+            <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white">Last Minute <span class="text-cyan-400">Rentals</span></h1>
+            <p class="text-slate-300 text-sm max-w-xl mx-auto">Book direct resort rental weeks from verified owners. Secure steep wholesale discounts below box office rates.</p>
+        </div>
+    </section>
+    <!-- CONTENEDOR DEL CATÁLOGO DE PROPIEDADES EN RENTA -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="border-b border-slate-200 pb-4 mb-8">
+            <h2 class="text-xl font-black text-slate-900 tracking-tight">Active Rental Portfolio</h2>
+            <p class="text-slate-500 text-xs font-medium mt-0.5">Verified wholesale vacation weeks open for immediate rental booking offers.</p>
+        </div>
+        
+        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <!-- JavaScript inyectará las tarjetas de renta aquí de forma nativa -->
+            <div class="col-span-full text-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-700 mx-auto mb-3"></div>
+                <p class="text-slate-400 text-xs uppercase tracking-widest font-bold animate-pulse">Filtering live rental feed...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- SECCIÓN DE ASISTENCIA Y CONTACTO -->
+    <div id="contact" class="bg-slate-100 py-16 px-6 border-t border-slate-200">
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-md border border-slate-200">
+            <h3 class="text-xl font-black text-slate-900 mb-2">Book a Rental Week</h3>
+            <p class="text-slate-500 text-xs mb-6">Lock in wholesale resort pricing. Our licensed escrow team ensures safe check-in credentials verification.</p>
+            <form id="general-lead-form" class="space-y-4">
+                <input type="text" placeholder="Full Name" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none">
+                <button type="submit" class="bg-cyan-700 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:bg-cyan-800 transition-all">Request Rental Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-10 text-center border-t border-slate-800">
+        &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved.
+    </footer>
+
+    <!-- INYECCIÓN ASÍNCRONA — MOTOR DE INTEGRACIÓN DE SUPABASE Y WIKIPEDIA -->
+    <script src="https://jsdelivr.net"></script>
+    <script>
+        const SUPABASE_URL = "https://supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
         const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -25,14 +121,14 @@
             if (!container) return;
 
             try {
-                // Descargamos las propiedades globales para evitar fallos por RLS o columnas inexistentes
+                // Consulta limpia masiva para evitar caídas por columnas inexistentes en filtros
                 const { data: properties, error } = await supabaseClientInstance
                     .from('properties')
                     .select('*');
 
                 if (error) throw error;
 
-                // Filtramos programáticamente en el cliente solo las catalogadas como RENT
+                // Filtramos programáticamente en el cliente solo las de tipo RENT
                 const rentalProperties = properties ? properties.filter(item => item.listing_type === 'RENT') : [];
 
                 if (rentalProperties.length === 0) {
@@ -42,17 +138,17 @@
 
                 container.innerHTML = "";
 
-                // Resolvemos secuencialmente las fotos de las rentas con Wikipedia en vivo
+                // Renderizamos resolviendo las imágenes secuencialmente en vivo desde Wikipedia
                 for (const item of rentalProperties) {
                     let wikiImg = await getWikipediaImage(item.resort_name);
                     
                     let finalImageUrl = "";
                     if (wikiImg) {
-                        finalImageUrl = wikiImg; // Wikipedia Oficial
+                        finalImageUrl = wikiImg;
                     } else if (item.image_url && String(item.image_url).startsWith('http')) {
-                        finalImageUrl = item.image_url; // Respaldo manual de Supabase
+                        finalImageUrl = item.image_url;
                     } else {
-                        finalImageUrl = "https://unsplash.com"; // Respaldo de seguridad
+                        finalImageUrl = "https://unsplash.com";
                     }
 
                     const cardHtml = `
@@ -88,3 +184,6 @@
         document.addEventListener("DOMContentLoaded", () => {
             fetchAndRenderRentals();
         });
+    </script>
+</body>
+</html>
