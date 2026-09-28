@@ -42,6 +42,27 @@
             </button>
         </div>
 
+        <!-- REJILLA DE MÉTRICAS RÁPIDAS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Live Inventory Listings</span>
+                <span id="stat-properties" class="text-3xl font-black text-white mt-2">...</span>
+                <span class="text-[9px] text-cyan-400 font-semibold mt-1">Active items inside properties table</span>
+            </div>
+            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Form Prospects</span>
+                <span id="stat-leads" class="text-3xl font-black text-emerald-400 mt-2">...</span>
+                <span class="text-[9px] text-slate-500 font-semibold mt-1">Synchronized client records captured</span>
+            </div>
+            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-r from-blue-950/20 to-slate-950/40 border-blue-900/30">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Database Connection</span>
+                <span class="text-lg font-black text-white mt-3 flex items-center">
+                    <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2"></span> ONLINE 200 OK
+                </span>
+                <span class="text-[9px] text-slate-500 font-semibold mt-1">Supabase production client handshake</span>
+            </div>
+        </div>
+
         <!-- ==================== CONTROL DE PESTAÑAS (TAB BAR) ==================== -->
         <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-px">
             <button onclick="window.switchAdminTab('properties-tab')" id="btn-properties-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all border-b-2 border-cyan-500 bg-slate-800 text-white">
@@ -57,10 +78,10 @@
                 💰 public.offers
             </button>
         </div>
+
         <!-- ==================== CONTENIDO DE LAS PESTAÑAS (TAB CONTENT) ==================== -->
         <div id="admin-tabs-container" class="space-y-8">
-            
-            <!-- 🏢 PESTAÑA: PROPERTIES -->
+            <!-- 🏢 PESTAÑA CONTAINER: PROPERTIES -->
             <div id="properties-tab" class="tab-content space-y-6">
                 <section class="bg-slate-950/50 border border-slate-800 rounded-3xl p-6 relative overflow-hidden">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-cyan-500"></div>
@@ -110,12 +131,14 @@
                                 <th class="p-4 text-center w-32">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-inventory-table" class="divide-y divide-slate-800/60 font-medium"></tbody>
+                        <tbody id="admin-inventory-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="6" class="text-center py-6 text-slate-500">Connecting inventory cluster...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- ✉️ PESTAÑA: LEADS -->
+            <!-- ✉️ PESTAÑA CONTAINER: LEADS -->
             <div id="leads-tab" class="tab-content hidden space-y-4">
                 <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
                     <table class="w-full text-left border-collapse text-xs">
@@ -128,27 +151,31 @@
                                 <th class="p-4 text-center w-24">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-leads-table" class="divide-y divide-slate-800/60 font-medium"></tbody>
+                        <tbody id="admin-leads-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="5" class="text-center py-6 text-slate-500">Connecting leads cluster...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
-
-            <!-- 👥 PESTAÑA: OWNERS -->
+            <!-- 👥 PESTAÑA CONTAINER: OWNERS -->
             <div id="owners-tab" class="tab-content hidden space-y-6">
                 <section class="bg-slate-950/40 border border-slate-800 rounded-3xl p-6">
-                    <div class="border-b border-slate-800 pb-3 mb-4"><h3 class="text-sm font-black text-white">Insert New Owner Record</h3></div>
+                    <div class="border-b border-slate-800 pb-3 mb-4">
+                        <h3 class="text-sm font-black text-white">Insert New Owner Record</h3>
+                    </div>
                     <form id="admin-add-owner-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Owner Full Name</label>
-                            <input type="text" id="new-owner-name" required placeholder="John Doe" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none">
+                            <input type="text" id="new-owner-name" required placeholder="John Doe" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Contact Email</label>
-                            <input type="email" id="new-owner-email" required placeholder="john@example.com" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none">
+                            <input type="email" id="new-owner-email" required placeholder="john@example.com" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
                         </div>
                         <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">Add to public.Owners</button>
                     </form>
                 </section>
+                
                 <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
@@ -159,12 +186,14 @@
                                 <th class="p-4 text-center w-32">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-owners-table" class="divide-y divide-slate-800/60 font-medium"></tbody>
+                        <tbody id="admin-owners-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="4" class="text-center py-6 text-slate-500">Connecting owner cluster...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- 💰 PESTAÑA: OFFERS -->
+            <!-- 💰 PESTAÑA CONTAINER: OFFERS -->
             <div id="offers-tab" class="tab-content hidden space-y-6">
                 <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
                     <table class="w-full text-left border-collapse text-xs">
@@ -178,7 +207,9 @@
                                 <th class="p-4 text-center w-32">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-offers-table" class="divide-y divide-slate-800/60 font-medium"></tbody>
+                        <tbody id="admin-offers-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="6" class="text-center py-6 text-slate-500">Connecting transaction cluster...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -233,8 +264,6 @@
                 // Actualizamos contadores superiores en la interfaz
                 document.getElementById("stat-properties").innerText = resProps.data ? resProps.data.length : "0";
                 document.getElementById("stat-leads").innerText = resLeads.data ? resLeads.data.length : "0";
-                const leadsCountBadge = document.getElementById("leads-count-badge");
-                if (leadsCountBadge) leadsCountBadge.innerText = `${resLeads.data ? resLeads.data.length : 0} TOTAL`;
 
                 // --- RENDERING public.properties ---
                 const tableProps = document.getElementById("admin-inventory-table");
@@ -345,10 +374,10 @@
                 asking_price: parseFloat(document.getElementById(`prop-price-${id}`).value)
             };
             const { error } = await supabaseClientInstance.from('properties').update(payload).eq('id', id);
-            if (!error) { alert("🏢 Property overwrited!"); runGlobalTableSynchronizer(); }
+            if (!error) { alert("🏢 Property updated!"); runGlobalTableSynchronizer(); }
         };
         window.deletePropertyCRUD = async function(id) {
-            if (confirm("Delete property?")) {
+            if (confirm("Delete property permanently?")) {
                 await supabaseClientInstance.from('properties').delete().eq('id', id);
                 document.getElementById(`prop-row-${id}`).remove();
                 runGlobalTableSynchronizer();
