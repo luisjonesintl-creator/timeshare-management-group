@@ -163,3 +163,57 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchAndRenderProperties();
 });
 
+// ====== 4. CAPTACIÓN ASÍNCRONA DE LEADS DIRECTO A SUPABASE ======
+document.addEventListener("DOMContentLoaded", () => {
+    const leadForm = document.getElementById("general-lead-form");
+    if (!leadForm) return;
+
+    leadForm.addEventListener("submit", async (e) => {
+        // Evitamos que la página se refresque por defecto
+        e.preventDefault();
+
+        // Localizamos los campos físicos dentro del HTML
+        const nameInput = document.getElementById("lead-name");
+        const emailInput = document.getElementById("lead-email");
+        const messageInput = document.getElementById("lead-message");
+
+        // Extraemos sus valores limpios de texto plano
+        const leadData = {
+            name: nameInput ? nameInput.value.trim() : "Anonymous Portfolio Lead",
+            email: emailInput ? emailInput.value.trim() : "no-email@tmgresales.com",
+            message: messageInput ? messageInput.value.trim() : "Broker Information Request"
+        };
+
+        // Cambiamos el texto del botón temporalmente como indicador visual de red
+        const submitBtn = leadForm.querySelector("button[type='submit']");
+        const originalBtnText = submitBtn ? submitBtn.innerText : "Submit Request";
+        if (submitBtn) {
+            submitBtn.innerText = "Transmitting Secured Lead...";
+            submitBtn.disabled = true;
+        }
+
+        try {
+            // Inyectamos de forma directa los datos en tu nueva tabla de Supabase
+            const { error } = await supabaseClientInstance
+                .from('leads')
+                .insert([leadData]);
+
+            if (error) throw error;
+
+            // Si la inserción es exitosa, notificamos al usuario y limpiamos el formulario
+            alert("✉️ Broker Request Transmitted. An escrow agent will contact you shortly.");
+            leadForm.reset();
+
+        } catch (err) {
+            console.error("Error transmitiendo lead:", err);
+            alert("⚠️ Lead transmission stalled. Please check your network connection.");
+        } finally {
+            // Restablecemos el estado original del botón
+            if (submitBtn) {
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        }
+    });
+});
+
