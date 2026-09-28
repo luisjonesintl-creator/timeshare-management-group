@@ -1,12 +1,11 @@
-// =========================================================================
-// TIMESHARE MANAGEMENT GROUP — WIKIPEDIA AUTO-IMAGE ENGINE (V6.0)
-// =========================================================================
-// ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
-const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
-const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
+// ====== 1. CONFIGURACIÓN Y CREDENCIALES REALES ======
+const SUPABASE_URL = "https://supabase.co"; // URL real de tu proyecto
+const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f"; // Tu llave pública
 
-// ====== 2. INICIALIZACIÓN CON CONECTOR GLOBAL DEL NAVEGADOR ======
+// ====== 2. INICIALIZACIÓN MÁSTER DEL CONECTOR ======
+// Forzamos al navegador a crear el cliente usando tus servidores reales
 const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
 // ====== 3. FUNCIÓN AUXILIAR: BUSCADOR ASÍNCRONO EN LA API DE WIKIPEDIA ======
 async function getWikipediaImage(resortName) {
