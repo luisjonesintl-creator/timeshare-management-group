@@ -1,3 +1,91 @@
+// =========================================================================
+// TIMESHARE MANAGEMENT GROUP — MASTER ENGINE WITH SWIPER.JS (V4.5)
+// =========================================================================
+
+// ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
+const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co"; // URL REAL CORREGIDA
+const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
+
+// ====== 2. INICIALIZACIÓN DEL MOTOR DE BASE DE DATOS ======
+// Inicializamos el conector usando el constructor global del navegador
+const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ====== 3. FUNCIÓN MAESTRA DE CONSULTA Y RENDERIZADO ======
+async function fetchAndRenderProperties() {
+    const container = document.getElementById("active-properties");
+    if (!container) return;
+
+    try {
+        // Consulta directa a la tabla properties sin forzar columnas restrictivas
+        const { data: properties, error } = await supabaseClientInstance
+            .from('properties')
+            .select('*');
+
+        if (error) throw error;
+
+        // Si no existen resorts en tu servidor, desplegamos un aviso limpio
+        if (!properties || properties.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12 text-slate-400 font-medium">
+                    No active properties available at the moment.
+                </div>`;
+            return;
+        }
+
+        // Removemos de la interfaz el indicador animado de sincronización
+        container.innerHTML = "";
+
+        // Procesamos uno a uno los resorts devueltos por la base de datos
+        properties.forEach((item, index) => {
+            const photos = [];
+            // Mapeo dinámico de imágenes desde las columnas de tu tabla
+            if (item.image_url) photos.push(String(item.image_url).trim());
+            for (let i = 1; i <= 5; i++) {
+                if (item['image_url' + i]) photos.push(String(item['image_url' + i]).trim());
+            }
+
+            let carouselHtml = "";
+            if (photos.length === 0) {
+                carouselHtml = `
+                    <div class="h-48 w-full bg-gradient-to-tr from-slate-900 via-blue-950 to-cyan-900 flex items-center justify-center relative">
+                        <span class="text-white/40 text-[10px] font-black tracking-widest uppercase">TMG Luxury Portfolio</span>
+                    </div>`;
+            } else {
+                // Estructuramos las diapositivas de forma nativa ocultando las secundarias
+                const slidesHtml = photos.map((url, idx) => `
+                    <div class="slide-item w-full h-full relative transition-all duration-300 ${idx === 0 ? '' : 'hidden'}">
+                        <img src="${url}" alt="${item.resort_name}" class="w-full h-full object-cover">
+                    </div>
+                `).join('');
+
+                carouselHtml = `
+                    <div class="relative h-48 w-full overflow-hidden bg-slate-900 group/nav" id="native-slider-${index}">
+                        <div class="w-full h-full">
+                            ${slidesHtml}
+                        </div>
+                        
+                        <!-- Indicador Flotante Numérico -->
+                        <span id="slide-badge-${index}" class="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-slate-950/70 text-white font-bold text-[10px] px-2 py-0.5 rounded-full tracking-wider z-10 backdrop-blur-sm">
+                            1 / ${photos.length}
+                        </span>
+
+                        <!-- Controles de Flechas Nativos basados en Tailwind -->
+                        <button type="button" onclick="window.switchNativeSlide(${index}, -1)" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-slate-950/40 hover:bg-slate-950/80 text-white p-1.5 rounded-full opacity-0 group-hover/nav:opacity-100 transition-opacity z-20 backdrop-blur-sm">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button type="button" onclick="window.switchNativeSlide(${index}, 1)" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-slate-950/40 hover:bg-slate-950/80 text-white p-1.5 rounded-full opacity-0 group-hover/nav:opacity-100 transition-opacity z-20 backdrop-blur-sm">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>`;
+            }
+
+            // Asignador predictivo de etiquetas comerciales según el precio
+            let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
+            const price = Number(item.asking_price || 0);
+            if (price < 8000) {
+                dealBadge = '<span class="bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Best Value Deal</span>';
+            } else if (price > 16000) {
+                dealBadge = '<span class="bg-amber-50 text-amber-700 border border-amber-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">High Demand Asset</span>';
+            }
             // Definimos el color de la etiqueta según el tipo de oferta comercial
             const isSale = item.listing_type === 'SALE';
             const badgeBg = isSale ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-cyan-50 text-cyan-800 border-cyan-200';
@@ -74,3 +162,4 @@ window.switchNativeSlide = function(cardIndex, direction) {
 document.addEventListener("DOMContentLoaded", () => {
     fetchAndRenderProperties();
 });
+
