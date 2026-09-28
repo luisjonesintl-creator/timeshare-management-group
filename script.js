@@ -1,43 +1,21 @@
+// =========================================================================
+// TIMESHARE MANAGEMENT GROUP — SUPABASE NATIVE IMAGE ENGINE (V7.0)
+// =========================================================================
+
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES REALES ======
-const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2"; // URL real de tu proyecto
-const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f"; // Tu llave pública
+const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2"; 
+const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f"; 
 
 // ====== 2. INICIALIZACIÓN MÁSTER DEL CONECTOR ======
-// Forzamos al navegador a crear el cliente usando tus servidores reales
 const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-
-// ====== 3. FUNCIÓN AUXILIAR: BUSCADOR ASÍNCRONO EN LA API DE WIKIPEDIA ======
-async function getWikipediaImage(resortName) {
-    if (!resortName) return null;
-    try {
-        // Limpiamos el nombre quitando caracteres extraños para optimizar la búsqueda
-        const cleanQuery = encodeURIComponent(resortName.trim());
-        
-        // Consultamos la API oficial de Wikipedia (formato JSON, buscando la imagen principal)
-        const response = await fetch(`https://wikipedia.org{cleanQuery}&prop=pageimages&format=json&pithumbsize=800&origin=*`);
-        const data = await response.json();
-        
-        const pages = data.query.pages;
-        const pageId = Object.keys(pages)[0];
-        
-        // Si Wikipedia tiene una página válida con miniatura, devolvemos el enlace directo
-        if (pageId && pages[pageId].thumbnail) {
-            return pages[pageId].thumbnail.source;
-        }
-    } catch (err) {
-        console.warn("Wikipedia Image Lookup skipped for:", resortName);
-    }
-    return null; // Si no hay foto, retorna nulo para usar el respaldo
-}
-
-// ====== 4. FUNCIÓN MAESTRA DE CONSULTA Y RENDERIZADO ======
+// ====== 3. FUNCIÓN MAESTRA DE CONSULTA Y RENDERIZADO ======
 async function fetchAndRenderProperties() {
     const container = document.getElementById("active-properties");
     if (!container) return;
 
     try {
-        // Consulta directa masiva a la tabla de Supabase
+        // Consulta directa masiva a la tabla de Supabase sin filtros restrictivos
         const { data: properties, error } = await supabaseClientInstance
             .from('properties')
             .select('*');
@@ -51,27 +29,22 @@ async function fetchAndRenderProperties() {
 
         container.innerHTML = "";
 
-        // Procesamos los resorts uno por uno de forma secuencial para resolver las imágenes
-        for (const [index, item] of properties.entries()) {
+        // Procesamos los resorts uno por uno dibujando sus datos en pantalla
+        properties.forEach((item, index) => {
             
-            // Intenta buscar la foto en Wikipedia usando el nombre del resort
-            let wikiImg = await getWikipediaImage(item.resort_name);
-            
-            // Sistema de respaldos jerárquico impecable
+            // Evaluamos la URL de la imagen guardada en tu base de datos de Supabase
             let finalImageUrl = "";
-            if (wikiImg) {
-                finalImageUrl = wikiImg; // Prioridad 1: Foto real de Wikipedia
-            } else if (item.image_url && String(item.image_url).startsWith('http')) {
-                finalImageUrl = item.image_url; // Prioridad 2: Enlace manual de Supabase si existe
+            if (item.image_url && String(item.image_url).trim().startsWith('http')) {
+                finalImageUrl = String(item.image_url).trim(); // Usa tu foto real de Supabase
             } else {
-                // Prioridad 3: Fondo corporativo elegante de respaldo si no hay fotos disponibles
+                // Foto premium de respaldo si la columna en la base de datos está vacía
                 finalImageUrl = "https://unsplash.com";
             }
 
             const isSale = item.listing_type === 'SALE';
             const badgeBg = isSale ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-cyan-50 text-cyan-800 border-cyan-200';
 
-            // Marcador comercial predictivo según el valor económico
+            // Marcador comercial predictivo según el precio
             let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
             const price = Number(item.asking_price || 0);
             if (price < 8000) {
@@ -84,8 +57,8 @@ async function fetchAndRenderProperties() {
                 <div class="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
                     <div>
                         <div class="relative h-48 w-full overflow-hidden bg-slate-900">
-                            <!-- Imagen inteligente jalada desde la API -->
-                            <img src="${finalImageUrl}" alt="${item.resort_name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <!-- Inyección directa de la imagen de Supabase -->
+                            <img src="${finalImageUrl}" alt="${item.resort_name || 'Resort'}" class="w-full h-full object-cover">
                             <span class="absolute top-4 left-4 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border backdrop-blur-md z-10 ${badgeBg}">
                                 For ${item.listing_type || 'SALE'}
                             </span>
@@ -119,14 +92,14 @@ async function fetchAndRenderProperties() {
                 </div>
             `;
             container.innerHTML += cardHtml;
-        }
+        });
 
     } catch (err) {
         console.error("Error sincronizando catálogo:", err);
     }
 }
 
-// Inicialización automática del DOM
+// Inicialización automática cuando el DOM está listo
 document.addEventListener("DOMContentLoaded", () => {
     fetchAndRenderProperties();
 });
