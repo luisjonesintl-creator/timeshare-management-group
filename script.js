@@ -2,8 +2,10 @@
 const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
-// ====== INITIALIZATION ROUTINE ======
-const supabaseClientInstance = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ====== INITIALIZATION ROUTINE (REPARADA PARA NAVEGADOR) ======
+// Forzamos la lectura del objeto global de la ventana para evitar peticiones deformadas
+const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
 // Función de control nativa para cambiar las imágenes del carrusel por tarjeta
 window.switchNativeSlide = function(cardIndex, direction) {
