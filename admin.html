@@ -224,10 +224,9 @@
     </footer>
 
     <!-- INYECCIÓN DEL SDK DE SUPABASE Y LOGICA DE CONTROL DE PESTAÑAS INTEGRADA -->
-    <script src="https://jsdelivr.net"></script>
-    <script>
+
         // Credenciales estables de comunicación con el ecosistema de Supabase
-        const SUPABASE_URL = "https://supabase.co";
+        const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
         const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
         const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
