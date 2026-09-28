@@ -229,8 +229,11 @@
     
     <script>
         // Credenciales estables de comunicación con el ecosistema de Supabase
-        const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
+              // Credenciales estables de comunicación con el ecosistema de Supabase
+        const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
+        
+        // FORZAMOS AL NAVEGADOR A CONECTAR DIRECTO USANDO EL CLIENTE GLOBAL WINDOW
         const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ... El resto de tus funciones como switchAdminTab y runGlobalTableSynchronizer ...
