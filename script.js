@@ -86,3 +86,60 @@ function renderPropertiesGrid(propertiesList) {
         container.innerHTML += cardHtml;
     });
 }
+
+
+// ====== 4. FUNCIÓN MAESTRA DE CONSULTA E INICIALIZACIÓN DE CACHÉ ======
+async function fetchAndRenderProperties() {
+    try {
+        // Consulta directa masiva a la tabla de Supabase sin filtros restrictivos
+        const { data: properties, error } = await supabaseClientInstance
+            .from('properties')
+            .select('*');
+
+        if (error) throw error;
+
+        // Guardamos los datos originales en nuestra memoria caché local
+        localPropertiesCache = properties || [];
+
+        // Renderizamos la grilla inicial completa con todos los resorts
+        renderPropertiesGrid(localPropertiesCache);
+
+    } catch (err) {
+        console.error("Error sincronizando catálogo principal:", err);
+        const container = document.getElementById("active-properties");
+        if (container) {
+            container.innerHTML = `<div class="col-span-full text-center py-12 text-rose-500 font-bold uppercase tracking-wider">Database Connection Error. Please Refresh.</div>`;
+        }
+    }
+}
+
+// ====== 5. ESCUCHADOR ACTIVO (EVENT LISTENER) DEL BUSCADOR PREDICTIVO ======
+document.addEventListener("DOMContentLoaded", async () => {
+    // Primero, disparamos la carga inicial masiva desde Supabase
+    await fetchAndRenderProperties();
+
+    // Localizamos la barra de búsqueda en el HTML por su ID vinculado
+    const searchInput = document.getElementById("search-input");
+    
+    if (searchInput) {
+        // Escuchamos en tiempo real cada tecla presionada por el usuario (evento input)
+        searchInput.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+
+            // Si la barra está vacía, volvemos a mostrar todo el catálogo guardado en caché
+            if (searchTerm === "") {
+                renderPropertiesGrid(localPropertiesCache);
+                return;
+            }
+
+            // Filtramos en caliente de forma instantánea sobre los datos en memoria
+            const filteredResults = localPropertiesCache.filter(item => {
+                const resortName = item.resort_name ? item.resort_name.toLowerCase() : "";
+                return resortName.includes(searchTerm);
+            });
+
+            // Dibujamos los resultados coincidentes de forma fluida y sin refrescar
+            renderPropertiesGrid(filteredResults);
+        });
+    }
+});
