@@ -1,5 +1,5 @@
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES REALES ======
-const SUPABASE_URL = "https://supabase.co"; // URL real de tu proyecto
+const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2"; // URL real de tu proyecto
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f"; // Tu llave pública
 
 // ====== 2. INICIALIZACIÓN MÁSTER DEL CONECTOR ======
