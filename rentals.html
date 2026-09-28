@@ -79,10 +79,22 @@
         <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-md border border-slate-200">
             <h3 class="text-xl font-black text-slate-900 mb-2">Book a Rental Week</h3>
             <p class="text-slate-500 text-xs mb-6">Lock in wholesale resort pricing. Our licensed escrow team ensures safe check-in credentials verification.</p>
+                       <!-- Formulario de Ofertas de Venta Estructurado -->
             <form id="general-lead-form" class="space-y-4">
-                <input type="text" placeholder="Full Name" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none">
-                <button type="submit" class="bg-cyan-700 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:bg-cyan-800 transition-all">Request Rental Booking</button>
+                <div>
+                    <input type="text" id="lead-name" placeholder="Full Name" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:border-blue-900 transition-all">
+                </div>
+                <div>
+                    <input type="email" id="lead-email" placeholder="Email Address" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:border-blue-900 transition-all">
+                </div>
+                <div>
+                    <textarea id="lead-message" placeholder="Type your purchase offer or questions here..." required rows="3" class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:border-blue-900 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="bg-blue-900 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:bg-blue-950 transition-all w-full sm:w-auto">
+                    Submit Purchase Offer
+                </button>
             </form>
+
         </div>
     </div>
 
