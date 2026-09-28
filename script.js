@@ -1,5 +1,5 @@
 // =========================================================================
-// TIMESHARE MANAGEMENT GROUP — MASTER ENGINE WITH SWIPER.JS (V4.5)
+// TIMESHARE MANAGEMENT GROUP — STORAGE CORE ENGINE (V5.0 - AUTOMATED)
 // =========================================================================
 
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
@@ -15,7 +15,7 @@ async function fetchAndRenderProperties() {
     if (!container) return;
 
     try {
-        // Consulta limpia a la tabla sin forzar ordenamiento de columnas faltantes
+        // Consultamos la tabla 'properties' filtrando únicamente los registros activos
         const { data: properties, error } = await supabaseClientInstance
             .from('properties')
             .select('*')
@@ -23,7 +23,6 @@ async function fetchAndRenderProperties() {
 
         if (error) throw error;
 
-        // Si no existen resorts disponibles en el servidor, desplegamos un aviso limpio
         if (!properties || properties.length === 0) {
             container.innerHTML = `
                 <div class="col-span-full text-center py-12 text-slate-400 font-medium">
@@ -32,17 +31,40 @@ async function fetchAndRenderProperties() {
             return;
         }
 
+        // Removemos de la interfaz el mensaje animado de sincronización
         container.innerHTML = "";
 
         // Procesamos uno a uno los resorts devueltos por la base de datos
         properties.forEach((item, index) => {
+            
+            // =================================================================
+            // 💡 MÉTODO AUTOMATIZADO DE STORAGE DE SUPABASE PARA IMÁGENES
+            // =================================================================
             const photos = [];
-            if (item.image_url) photos.push(String(item.image_url).trim());
-            for (let i = 1; i <= 10; i++) {
-                if (item['image_url' + i]) photos.push(String(item['image_url' + i]).trim());
+
+            // Si el registro ya contiene una URL completa en internet, la usamos directamente
+            if (item.image_url && String(item.image_url).startsWith('http')) {
+                photos.push(String(item.image_url).trim());
+            } 
+            // Si solo guardaste el nombre del archivo (ej: 'resort1.jpg'), el script construye la URL pública del Storage de Supabase automáticamente
+            else if (item.image_url) {
+                const cleanFolder = String(item.image_url).trim();
+                photos.push(`${SUPABASE_URL}/storage/v1/object/public/resorts/${cleanFolder}`);
             }
 
-            // Construcción del contenedor de fotos (Carrusel dinámico vs Imagen única)
+            // Repetimos el proceso automático para las fotos secundarias del carrusel (1 a 5) sin saturar la tabla
+            for (let i = 1; i <= 5; i++) {
+                if (item['image_url' + i]) {
+                    const extraPhoto = String(item['image_url' + i]).trim();
+                    if (extraPhoto.startsWith('http')) {
+                        photos.push(extraPhoto);
+                    } else {
+                        photos.push(`${SUPABASE_URL}/storage/v1/object/public/resorts/${extraPhoto}`);
+                    }
+                }
+            }
+
+            // Construcción estructural de las diapositivas con el motor Swiper
             let imageHeaderHtml = "";
             if (photos.length === 0) {
                 imageHeaderHtml = `
@@ -52,7 +74,7 @@ async function fetchAndRenderProperties() {
             } else {
                 const slidesHtml = photos.map(url => `
                     <div class="swiper-slide bg-slate-950 flex items-center justify-center h-full">
-                        <img src="${url}" alt="${item.resort_name}" class="max-h-full max-w-full object-contain">
+                        <img src="${url}" alt="${item.resort_name || 'Resort'}" class="max-h-full max-w-full object-contain">
                     </div>
                 `).join('');
 
@@ -66,8 +88,11 @@ async function fetchAndRenderProperties() {
                         <div class="swiper-button-prev swiper-button-prev-${index} !text-white !scale-50 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
                     </div>`;
             }
+            // Evaluamos el tipo de oferta comercial para asignar las clases de color de Tailwind
+            const isSale = item.listing_type === 'SALE';
+            const badgeBg = isSale ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-cyan-50 text-cyan-800 border-cyan-200';
 
-            // Asignador predictivo de etiquetas comerciales según el precio real de mercado
+            // Asignador automático de etiquetas según el precio real de mercado
             let dealBadge = '<span class="bg-blue-50 text-blue-700 border border-blue-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">Verified Ownership</span>';
             const price = Number(item.asking_price || 0);
             if (price < 8000) {
@@ -75,11 +100,8 @@ async function fetchAndRenderProperties() {
             } else if (price > 16000) {
                 dealBadge = '<span class="bg-amber-50 text-amber-700 border border-amber-200/50 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-3 inline-block">High Demand Asset</span>';
             }
-            // Definimos el color de la etiqueta según el tipo de oferta
-            const isSale = item.listing_type === 'SALE';
-            const badgeBg = isSale ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-cyan-50 text-cyan-800 border-cyan-200';
 
-            // Estructura HTML de la tarjeta con inyección de datos limpia
+            // Estructura de tarjeta con inyección automatizada blindada
             const cardHtml = `
                 <div class="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col group">
                     <!-- Contenedor del Carrusel Moderno -->
@@ -109,7 +131,7 @@ async function fetchAndRenderProperties() {
                             </div>
                         </div>
 
-                        <!-- Precio y botón de oferta -->
+                        <!-- Precio y botón de oferta con scroll suave -->
                         <div class="pt-5 mt-4 border-t border-slate-100 flex items-center justify-between">
                             <div>
                                 <span class="block text-[9px] uppercase tracking-widest font-bold text-slate-400">Asking Price</span>
@@ -123,10 +145,10 @@ async function fetchAndRenderProperties() {
                 </div>
             `;
             
-            // Adjuntamos la nueva tarjeta dentro de la grilla contenedora
+            // Adjuntamos de forma interactiva la tarjeta dentro de la grilla principal
             container.innerHTML += cardHtml;
 
-            // Despertamos el motor Swiper de forma instantánea y aislada para esta propiedad específica
+            // Despertamos los controles táctiles de Swiper en caliente para este listado
             if (photos.length > 0 && typeof Swiper !== 'undefined') {
                 setTimeout(() => {
                     new Swiper(`.cardSwiper-${index}`, {
@@ -147,7 +169,7 @@ async function fetchAndRenderProperties() {
     }
 }
 
-// Ejecutamos la sincronización de Supabase inmediatamente al cargar la página
+// Inicialización global de la grilla de Supabase al cargar la ventana
 document.addEventListener("DOMContentLoaded", () => {
     fetchAndRenderProperties();
 });
