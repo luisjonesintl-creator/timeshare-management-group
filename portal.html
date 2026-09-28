@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Portal Login | Timeshare Management Group</title>
+    <title>Owner Portal Secure Login | Timeshare Management Group</title>
     
     <!-- Icono oficial de la pestaña del navegador (Favicon) -->
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -19,7 +19,7 @@
     <!-- BARRA DE INFORMACIÓN CORPORATIVA -->
     <div class="bg-slate-950 text-slate-400 text-[11px] font-bold py-2 px-6 border-b border-slate-800/60">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <span class="flex items-center"><span class="h-1.5 w-1.5 bg-cyan-400 rounded-full mr-1.5 animate-pulse"></span> SECURE AES-256 ENCRYPTED PORTAL</span>
+            <span class="flex items-center"><span class="h-1.5 w-1.5 bg-cyan-400 rounded-full mr-1.5 animate-pulse"></span> SECURE LIVE SUPABASE AUTHENTICATION SYSTEM</span>
             <a href="index.html" class="hover:text-white transition-colors text-[10px] uppercase tracking-wider">&larr; Back to Marketplace</a>
         </div>
     </div>
@@ -29,7 +29,6 @@
         <!-- Luces ambientales de fondo -->
         <div class="absolute top-1/4 left-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
         <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-700"></div>
-
         <div class="relative w-full max-w-md bg-slate-950/40 border border-slate-800/80 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
             
             <!-- Identidad Corporativa -->
@@ -64,7 +63,7 @@
                 </button>
             </form>
 
-            <!-- Mensaje Informativo o de Alerta Simulada -->
+            <!-- Mensaje Informativo o de Alerta de Validación Real -->
             <div id="portal-alert" class="hidden text-center text-xs font-semibold p-3.5 rounded-xl border"></div>
 
             <!-- Bloque de Seguridad Corporativa -->
@@ -75,28 +74,62 @@
             </div>
         </div>
     </main>
-
     <!-- PIE DE PÁGINA SIMPLIFICADO -->
     <footer class="bg-slate-950 text-slate-600 text-[10px] font-bold py-6 text-center border-t border-slate-900/60">
-        &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. | AES-256 Verified
+        &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. | AES-256 Verified Auth System
     </footer>
 
-    <!-- INTERACCIÓN DEL PORTAL SIMULADO -->
+    <!-- CONECTOR DE AUTENTICACIÓN REAL DE SUPABASE -->
+    <script src="https://jsdelivr.net"></script>
     <script>
-        document.getElementById('portal-login-form').addEventListener('submit', function(e) {
+        // Configuración y credenciales del ecosistema
+        const SUPABASE_URL = "https://supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
+        const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Interceptamos el envío del formulario para validar accesos reales
+        document.getElementById('portal-login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('owner-email').value;
+            const email = document.getElementById('owner-email').value.trim();
+            const password = document.getElementById('owner-password').value;
             const alertBox = document.getElementById('portal-alert');
+            const submitBtn = this.querySelector("button[type='submit']");
             
-            alertBox.classList.remove('hidden', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/20', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
+            // Limpiamos estilos de alertas previos
+            alertBox.classList.remove('hidden', 'block', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/20', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
             
-            if (email.includes('test')) {
-                alertBox.innerText = "❌ Security Demo Account Active. Access Granted.";
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "VERIFYING CREDENTIALS...";
+            }
+
+            try {
+                // Consultamos el motor de autenticación nativo de tu Supabase
+                const { data, error } = await supabaseClientInstance.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+
+                // ACCESO EXITOSO
+                alertBox.innerText = "✔️ Access Granted. Redirecting to your Owner Dashboard...";
                 alertBox.classList.add('block', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
-            } else {
-                alertBox.innerText = "⚠️ Demo Portal Notice: Verification link sent to " + email;
-                alertBox.classList.add('block', 'bg-blue-500/10', 'text-cyan-400', 'border-blue-500/20');
+                
+                // Aquí puedes redirigir al usuario si creas un panel de dueños interno
+                // setTimeout(() => { window.location.href = 'owner-dashboard.html'; }, 2000);
+
+            } catch (err) {
+                // ERROR DE ACCESO (Usuario no existe o contraseña incorrecta)
+                console.error("Auth error:", err.message);
+                alertBox.innerText = "❌ Login Failed: " + err.message;
+                alertBox.classList.add('block', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/20');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Secure Account Login";
+                }
             }
         });
     </script>
