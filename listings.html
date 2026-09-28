@@ -174,6 +174,54 @@
         document.addEventListener("DOMContentLoaded", () => {
             fetchAndRenderSales();
         });
+        // ====== INTERCEPCIÓN ASÍNCRONA DE LEADS DIRECTO A SUPABASE ======
+        document.addEventListener("DOMContentLoaded", () => {
+            const leadForm = document.getElementById("general-lead-form");
+            if (!leadForm) return;
+
+            leadForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const nameInput = document.getElementById("lead-name");
+                const emailInput = document.getElementById("lead-email");
+                const messageInput = document.getElementById("lead-message");
+
+                const leadData = {
+                    name: nameInput ? nameInput.value.trim() : "Anonymous Catalog Lead",
+                    email: emailInput ? emailInput.value.trim() : "no-email@tmgresales.com",
+                    message: messageInput ? messageInput.value.trim() : "Internal Catalog Request"
+                };
+
+                const submitBtn = leadForm.querySelector("button[type='submit']");
+                const originalBtnText = submitBtn ? submitBtn.innerText : "Submit Request";
+                
+                if (submitBtn) {
+                    submitBtn.innerText = "Transmitting Secured Lead...";
+                    submitBtn.disabled = true;
+                }
+
+                try {
+                    // Inserción directa en la tabla de prospectos unificada
+                    const { error } = await supabaseClientInstance
+                        .from('leads')
+                        .insert([leadData]);
+
+                    if (error) throw error;
+
+                    alert("✉️ Offer Transmitted! A TMG closing coordinator will contact you shortly.");
+                    leadForm.reset();
+
+                } catch (err) {
+                    console.error("Error transmitiendo prospecto:", err);
+                    alert("⚠️ Lead transmission stalled. Please check your network connection.");
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.innerText = originalBtnText;
+                        submitBtn.disabled = false;
+                    }
+                }
+            });
+        });
 
     </script>
 </body>
