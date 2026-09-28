@@ -1,8 +1,6 @@
 // =========================================================================
 // TIMESHARE MANAGEMENT GROUP — WIKIPEDIA AUTO-IMAGE ENGINE (V6.0)
 // =========================================================================
-
-// ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
 const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
