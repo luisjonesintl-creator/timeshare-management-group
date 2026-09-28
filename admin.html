@@ -372,70 +372,118 @@
             }
         }
 
-        // ====== 3. EVENTOS Y FUNCIONES LÓGICAS CRUD TOTALES ======
+              // ====== 3. EVENTOS Y FUNCIONES LÓGICAS CRUD TOTALES (REPARADO) ======
 
-        // --- PROPERTIES MECHANICS ---
+        // --- PROPERTIES: ACTUALIZAR RESORT EN CALIENTE ---
         window.savePropertyCRUD = async function(id) {
+            const nameInput = document.getElementById(`prop-name-${id}`);
+            const typeSelect = document.getElementById(`prop-type-${id}`);
+            const weekInput = document.getElementById(`prop-week-${id}`);
+            const priceInput = document.getElementById(`prop-price-${id}`);
+
+            if (!nameInput || !typeSelect || !weekInput || !priceInput) return;
+
             const payload = {
-                resort_name: document.getElementById(`prop-name-${id}`).value.trim(),
-                listing_type: document.getElementById(`prop-type-${id}`).value,
-                week_number: parseInt(document.getElementById(`prop-week-${id}`).value),
-                asking_price: parseFloat(document.getElementById(`prop-price-${id}`).value)
+                resort_name: nameInput.value.trim(),
+                listing_type: typeSelect.value,
+                week_number: parseInt(weekInput.value),
+                asking_price: parseFloat(priceInput.value)
             };
+
             const { error } = await supabaseClientInstance.from('properties').update(payload).eq('id', id);
-            if (!error) { alert("🏢 Property updated!"); runGlobalTableSynchronizer(); }
-        };
-        window.deletePropertyCRUD = async function(id) {
-            if (confirm("Delete property permanently?")) {
-                await supabaseClientInstance.from('properties').delete().eq('id', id);
-                document.getElementById(`prop-row-${id}`).remove();
-                runGlobalTableSynchronizer();
+            if (!error) { 
+                alert("🏢 Property updated successfully in Supabase!"); 
+                runGlobalTableSynchronizer(); 
+            } else {
+                console.error("Error properties:", error);
+                alert("⚠️ Update failed. Check database constraints.");
             }
         };
 
-        // --- LEADS MECHANICS ---
-        window.deleteLeadCRUD = async function(id) {
-            if (confirm("Archive lead inquiry?")) {
-                await supabaseClientInstance.from('leads').delete().eq('id', id);
-                document.getElementById(`lead-row-${id}`).remove();
-                runGlobalTableSynchronizer();
-            }
-        };
-
-        // --- OWNERS MECHANICS ---
+        // --- OWNERS: ACTUALIZAR PROPIETARIO EN CALIENTE ---
         window.saveOwnerCRUD = async function(id) {
+            const nameInput = document.getElementById(`owner-name-${id}`);
+            const emailInput = document.getElementById(`owner-email-${id}`);
+
+            if (!nameInput || !emailInput) return;
+
             const payload = {
-                name: document.getElementById(`owner-name-${id}`).value.trim(),
-                email: document.getElementById(`owner-email-${id}`).value.trim()
+                name: nameInput.value.trim(),
+                email: emailInput.value.trim()
             };
+
             const { error } = await supabaseClientInstance.from('Owners').update(payload).eq('id', id);
-            if (!error) { alert("👥 Owner updated!"); runGlobalTableSynchronizer(); }
+            if (!error) { 
+                alert("👥 Owner record updated successfully!"); 
+                runGlobalTableSynchronizer(); 
+            } else {
+                console.error("Error owners:", error);
+                alert("⚠️ Update failed. Verify email format constraints.");
+            }
         };
+
+              // --- BORRADO PERMANENTE DE PROPIEDADES ---
+        window.deletePropertyCRUD = async function(id) {
+            if (confirm(`⚠️ WARNING: Are you sure you want to permanently delete Property #${id}?`)) {
+                const { error } = await supabaseClientInstance.from('properties').delete().eq('id', id);
+                if (!error) {
+                    alert("🗑️ Property completely purged from database servers.");
+                    const row = document.getElementById(`prop-row-${id}`);
+                    if (row) row.remove();
+                    runGlobalTableSynchronizer();
+                } else {
+                    alert("⚠️ Purge blocked by database constraint rules.");
+                }
+            }
+        };
+
+        // --- BORRADO PERMANENTE DE LEADS ---
+        window.deleteLeadCRUD = async function(id) {
+            if (confirm(`⚠️ Archive or permanently delete Lead inquiry #${id}?`)) {
+                const { error } = await supabaseClientInstance.from('leads').delete().eq('id', id);
+                if (!error) {
+                    alert("🗑️ Lead inquiry removed successfully.");
+                    const row = document.getElementById(`lead-row-${id}`);
+                    if (row) row.remove();
+                    runGlobalTableSynchronizer();
+                }
+            }
+        };
+
+        // --- BORRADO PERMANENTE DE OWNERS ---
         window.deleteOwnerCRUD = async function(id) {
-            if (confirm("Delete owner?")) {
-                await supabaseClientInstance.from('Owners').delete().eq('id', id);
-                document.getElementById(`owner-row-${id}`).remove();
-                runGlobalTableSynchronizer();
+            if (confirm(`⚠️ WARNING: Are you sure you want to completely erase Owner record #${id}?`)) {
+                const { error } = await supabaseClientInstance.from('Owners').delete().eq('id', id);
+                if (!error) {
+                    alert("🗑️ Owner record destroyed successfully.");
+                    const row = document.getElementById(`owner-row-${id}`);
+                    if (row) row.remove();
+                    runGlobalTableSynchronizer();
+                }
             }
         };
 
-        // --- OFFERS MECHANICS ---
-        window.updateOfferStatusCRUD = async function(id) {
-            const status = document.getElementById(`offer-status-${id}`).value;
-            const { error } = await supabaseClientInstance.from('offers').update({ status: status }).eq('id', id);
-            if (!error) alert("💰 Status synchronized!");
-        };
+        // --- BORRADO PERMANENTE DE OFERTAS ---
         window.deleteOfferCRUD = async function(id) {
-            if (confirm("Delete offer transaction?")) {
-                await supabaseClientInstance.from('offers').delete().eq('id', id);
-                document.getElementById(`offer-row-${id}`).remove();
-                runGlobalTableSynchronizer();
+            if (confirm(`⚠️ WARNING: Are you sure you want to delete Offer transaction #${id}?`)) {
+                const { error } = await supabaseClientInstance.from('offers').delete().eq('id', id);
+                if (!error) {
+                    alert("🗑️ Offer record permanently wiped out.");
+                    const row = document.getElementById(`offer-row-${id}`);
+                    if (row) row.remove();
+                    runGlobalTableSynchronizer();
+                }
             }
         };
 
-        // --- FORM INSERTS MECHANICS ---
+        // ====== 4. MECANISMOS DE FORMULARIOS DE INSERCIÓN ======
+        
+        // Formulario: Crear Propiedad
         document.getElementById("admin-add-property-form").addEventListener("submit", async function(e) {
             e.preventDefault();
+            const submitBtn = this.querySelector("button[type='submit']");
+            if (submitBtn) submitBtn.disabled = true;
+
             const record = {
                 resort_name: document.getElementById("new-resort-name").value.trim(),
                 listing_type: document.getElementById("new-listing-type").value,
@@ -444,18 +492,38 @@
                 image_url: document.getElementById("new-image-url").value.trim(),
                 status: 'AVAILABLE'
             };
+
             const { error } = await supabaseClientInstance.from('properties').insert([record]);
-            if (!error) { alert("🚀 Property injected!"); this.reset(); runGlobalTableSynchronizer(); }
+            if (!error) { 
+                alert("🚀 Public property successfully injected into clusters!"); 
+                this.reset(); 
+                runGlobalTableSynchronizer(); 
+            } else {
+                alert("⚠️ Insertion stalled. Validate inputs formatting layout.");
+            }
+            if (submitBtn) submitBtn.disabled = false;
         });
 
+        // Formulario: Crear Propietario
         document.getElementById("admin-add-owner-form").addEventListener("submit", async function(e) {
             e.preventDefault();
+            const submitBtn = this.querySelector("button[type='submit']");
+            if (submitBtn) submitBtn.disabled = true;
+
             const record = {
                 name: document.getElementById("new-owner-name").value.trim(),
                 email: document.getElementById("new-owner-email").value.trim()
             };
+
             const { error } = await supabaseClientInstance.from('Owners').insert([record]);
-            if (!error) { alert("👥 New Owner Record injected!"); this.reset(); runGlobalTableSynchronizer(); }
+            if (!error) { 
+                alert("👥 New verified TMG Owner recorded inside table structure!"); 
+                this.reset(); 
+                runGlobalTableSynchronizer(); 
+            } else {
+                alert("⚠️ Owner record insertion failed.");
+            }
+            if (submitBtn) submitBtn.disabled = false;
         });
 
         // Lanzamos la descarga inicial masiva de datos relacionales
