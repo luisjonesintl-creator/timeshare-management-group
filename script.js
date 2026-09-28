@@ -4,7 +4,7 @@
 
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
 // ====== 1. CONFIGURACIÓN Y CREDENCIALES GLOBALES ======
-const SUPABASE_URL = "https://supabase.co";
+const SUPABASE_URL = "https://unpkg.com/@supabase/supabase-js@2";
 const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
 
 // ====== 2. INICIALIZACIÓN CON CONECTOR GLOBAL DEL NAVEGADOR ======
