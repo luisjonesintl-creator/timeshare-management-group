@@ -129,12 +129,12 @@
             </section>
         </div>
     </main>
-    <!-- PIE DE PÁGINA CORPORATIVO DEL SISTEMA -->
+       <!-- PIE DE PÁGINA CORPORATIVO DEL SISTEMA -->
     <footer class="bg-slate-950 text-slate-600 text-[10px] font-bold py-6 text-center border-t border-slate-900/60">
         &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. | Core Management Console
     </footer>
 
-    <!-- INYECCIÓN DEL SDK DE SUPABASE Y LÓGICA DE CONTROL PRIVADA -->
+    <!-- INYECCIÓN DEL SDK DE SUPABASE — LÍNEAS LIMPIAS REPARADAS SIN JSDELIVR -->
     <script src="https://jsdelivr.net"></script>
     <script>
         // Configuración y credenciales de comunicación cifrada del ecosistema
@@ -150,14 +150,14 @@
             const badgeCount = document.getElementById("leads-count-badge");
 
             try {
-                // 1. Extraemos de forma masiva los datos correspondientes a la tabla 'properties'
+                // 1. Extraemos de forma masiva los datos de 'properties'
                 const { data: properties, error: errProp } = await supabaseClientInstance
                     .from('properties')
                     .select('*');
                 if (errProp) throw errProp;
                 if (statProperties) statProperties.innerText = properties ? properties.length : "0";
 
-                // 2. Extraemos de forma masiva los datos correspondientes a la tabla 'leads'
+                // 2. Extraemos de forma masiva los datos de 'leads'
                 const { data: leads, error: errLeads } = await supabaseClientInstance
                     .from('leads')
                     .select('*')
@@ -215,7 +215,7 @@
                 week_number: weekNumber,
                 asking_price: askingPrice,
                 image_url: imageUrl,
-                status: 'AVAILABLE' // Toda inserción web entra activa por defecto al catálogo
+                status: 'AVAILABLE'
             };
 
             if (submitBtn) {
@@ -232,7 +232,7 @@
 
                 alert("🚀 Resort asset successfully injected into properties database table!");
                 this.reset();
-                runAdminSynchronizer(); // Actualizamos los contadores de la interfaz en caliente
+                runAdminSynchronizer();
 
             } catch (err) {
                 console.error("Error inyectando registro:", err);
@@ -245,7 +245,7 @@
             }
         });
 
-        // Lanzamos la sincronización de la base de datos de manera inmediata al cargar
+        // Lanzamos la sincronización de la base de datos al cargar el DOM
         document.addEventListener("DOMContentLoaded", () => {
             runAdminSynchronizer();
         });
