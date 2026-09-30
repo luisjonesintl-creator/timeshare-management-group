@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     
     <!-- Motor nativo oficial de Tailwind CSS -->
-    <script src="https://tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; }
     </style>
@@ -224,10 +224,10 @@
     </footer>
 
     <!-- INYECCIÓN DEL SDK DE SUPABASE Y LOGICA DE CONTROL DE PESTAÑAS INTEGRADA -->
-    <script src="https://jsdelivr.net"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script>
         // Credenciales estables de comunicación con el ecosistema de Supabase
-        const SUPABASE_URL = "https://supabase.co";
+        const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
         const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
