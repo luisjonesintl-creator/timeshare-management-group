@@ -116,11 +116,11 @@
 
     <!-- LÓGICA DE JAVASCRIPT CORREGIDA -->
     <script>
-        // ====== 1. CONFIGURACIÓN Y CREDENCIALES COMPROBADAS REALES ======
-        const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
+        <!-- INYECCIÓN ASÍNCRONA — MOTOR DE INTEGRACIÓN DE SUPABASE Y WIKIPEDIA -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+             const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
-
-        // ====== 2. CONEXIÓN DIRECTA USANDO EL OBJETO WINDOW GLOBAL ======
         const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // ====== 3. FUNCIÓN ASÍNCRONA DE FILTRADO Y RENDERIZADO VISUAL ======
         async function fetchAndRenderSales() {
