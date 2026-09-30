@@ -3,15 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMG Core System Console | Full Database CRUD</title>
+    <title>TMG Universal Core Console | Dynamic Multi-Table CRUD</title>
     
     <!-- Icono oficial de la pestaña del navegador (Favicon) -->
     <link rel="icon" type="image/png" href="favicon.png" />
     
     <!-- Motor nativo oficial de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SDK de Supabase unificado (Versión estable) -->
+    <script src="https://ztojbyfbyidzzrqicjvn.supabase.co"></script>
+    
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; }
+        /* Ocultar flechas en inputs numéricos dentro de tablas */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col justify-between selection:bg-blue-500/20">
@@ -19,7 +29,7 @@
     <!-- BARRA SUPERIOR DE SESIÓN -->
     <div class="bg-slate-950 text-slate-400 text-[11px] font-bold py-3.5 px-6 border-b border-slate-800 flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <span class="flex items-center"><span class="h-1.5 w-1.5 bg-cyan-400 rounded-full mr-1.5 animate-pulse"></span> SYSTEM CRUD CENTRAL CONSOLE</span>
+            <span class="flex items-center"><span class="h-1.5 w-1.5 bg-cyan-400 rounded-full mr-1.5 animate-pulse"></span> UNIVERSAL ENGINE CONSOLE</span>
             <span class="text-slate-700">|</span>
             <a href="index.html" class="hover:text-white transition-colors">&larr; Public Marketplace</a>
         </div>
@@ -27,438 +37,319 @@
             ROLE: <span class="text-cyan-400 font-bold">MASTER_ADMIN</span>
         </div>
     </div>
-
     <!-- PANEL GENERAL -->
     <main class="max-w-7xl mx-auto w-full px-6 py-10 space-y-8 flex-grow">
         
         <!-- ENCABEZADO PRINCIPAL -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6">
             <div>
-                <h1 class="text-2xl font-black text-white tracking-tight">System Master Dashboard</h1>
-                <p class="text-slate-400 text-xs font-medium mt-0.5">Real-time database read, write, update, and overwrite mechanics for corporate timeshare intervals.</p>
+                <h1 class="text-2xl font-black text-white tracking-tight">Universal Database Manager</h1>
+                <p class="text-slate-400 text-xs font-medium mt-0.5">Real-time dynamic CRUD engine. Read, filter, modify, and overwrite any Supabase table cell on the fly.</p>
             </div>
             <div class="flex space-x-2">
-                <button onclick="window.location.reload()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center">
-                    🔄 Force Refresh Feed
+                <button onclick="window.refreshActiveTable()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center shadow-md">
+                    🔄 Refresh Dataset
                 </button>
             </div>
         </div>
 
-        <!-- REJILLA DE MÉTRICAS RÁPIDAS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Live Inventory Listings</span>
-                <span id="stat-properties" class="text-3xl font-black text-white mt-2">...</span>
-                <span class="text-[9px] text-cyan-400 font-semibold mt-1">Active items inside properties table</span>
-            </div>
-            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Form Prospects</span>
-                <span id="stat-leads" class="text-3xl font-black text-emerald-400 mt-2">...</span>
-                <span class="text-[9px] text-slate-500 font-semibold mt-1">Synchronized client records captured</span>
-            </div>
-            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-r from-blue-950/20 to-slate-950/40 border-blue-900/30">
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Database Connection</span>
-                <span class="text-lg font-black text-white mt-3 flex items-center">
-                    <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2"></span> ONLINE 200 OK
-                </span>
-                <span class="text-[9px] text-slate-500 font-semibold mt-1">Supabase production client handshake</span>
-            </div>
-        </div>
-        <!-- ==================== CONTROL DE PESTAÑAS (TAB BAR) ==================== -->
-        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-px">
-            <button onclick="window.switchAdminTab('properties-tab')" id="btn-properties-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all border-b-2 border-cyan-500 bg-slate-800 text-white">
-                🏢 public.properties
-            </button>
-            <button onclick="window.switchAdminTab('leads-tab')" id="btn-leads-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all text-slate-400 hover:text-slate-200">
-                ✉️ public.leads
-            </button>
-            <button onclick="window.switchAdminTab('owners-tab')" id="btn-owners-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all text-slate-400 hover:text-slate-200">
-                👥 public.Owners
-            </button>
-            <button onclick="window.switchAdminTab('offers-tab')" id="btn-offers-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all text-slate-400 hover:text-slate-200">
-                💰 public.offers
-            </button>
-        </div>
-
-        <!-- ==================== CONTENIDO DE LAS PESTAÑAS (TAB CONTENT) ==================== -->
-        <div id="admin-tabs-container" class="space-y-8">
+        <!-- REJILLA DE CONTROL MAESTRO Y FILTROS -->
+        <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
             
-            <!-- 🏢 PESTAÑA CONTAINER: PROPERTIES -->
-            <div id="properties-tab" class="tab-content space-y-6">
-                <section class="bg-slate-950/50 border border-slate-800 rounded-3xl p-6 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-cyan-500"></div>
-                    <div class="border-b border-slate-800 pb-3 mb-6">
-                        <h3 class="text-base font-black text-white tracking-tight">Add New Resort Listing</h3>
-                        <p class="text-[11px] text-slate-500 font-medium">Direct database injection mechanism for certified ownership records.</p>
-                    </div>
-                    <form id="admin-add-property-form" class="space-y-4">
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Resort Full Name</label>
-                            <input type="text" id="new-resort-name" required placeholder="e.g. Disney's Saratoga Springs Resort" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 transition-all font-medium placeholder-slate-700">
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Listing Type</label>
-                                <select id="new-listing-type" required class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-bold">
-                                    <option value="SALE">FOR SALE</option>
-                                    <option value="RENT">FOR RENT</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Week #</label>
-                                <input type="number" id="new-week-number" required placeholder="e.g. 26" min="1" max="52" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Asking Price ($)</label>
-                                <input type="number" id="new-asking-price" required placeholder="e.g. 6400" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Photo URL</label>
-                            <input type="url" id="new-image-url" required placeholder="https://..." class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 text-cyan-400 font-mono">
-                        </div>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">Inject to public.properties</button>
-                    </form>
-                </section>
-
-                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
-                                <th class="p-4 w-12">ID</th>
-                                <th class="p-4">Modify Resort Name</th>
-                                <th class="p-4 w-32">Type</th>
-                                <th class="p-4 w-24">Week</th>
-                                <th class="p-4 w-36">Price ($)</th>
-                                <th class="p-4 text-center w-32">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-inventory-table" class="divide-y divide-slate-800/60 font-medium">
-                            <tr><td colspan="6" class="text-center py-6 text-slate-500">Connecting inventory cluster...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- ✉️ PESTAÑA CONTAINER: LEADS -->
-            <div id="leads-tab" class="tab-content hidden space-y-4">
-                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
-                                <th class="p-4 w-12">ID</th>
-                                <th class="p-4">Client Name</th>
-                                <th class="p-4">Email</th>
-                                <th class="p-4">Message Inquiry</th>
-                                <th class="p-4 text-center w-24">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-leads-table" class="divide-y divide-slate-800/60 font-medium">
-                            <tr><td colspan="5" class="text-center py-6 text-slate-500">Connecting leads cluster...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- CONTROLLER 1: SELECTOR UNIVERSAL DE TABLAS -->
+            <div class="md:col-span-4">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Select Target Table</label>
+                <select id="universal-table-selector" onchange="window.loadTargetTable(this.value)" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs font-black border border-slate-800 focus:outline-none focus:border-cyan-500 transition-all cursor-pointer">
+                    <option value="properties">🏢 public.properties (Inventory)</option>
+                    <option value="leads">✉️ public.leads (Form Inquiries)</option>
+                    <option value="Owners">👥 public.Owners (Deed Holders)</option>
+                    <option value="offers">💰 public.offers (Transactions)</option>
+                </select>
             </div>
 
-            <!-- 👥 PESTAÑA CONTAINER: OWNERS -->
-            <div id="owners-tab" class="tab-content hidden space-y-6">
-                <section class="bg-slate-950/40 border border-slate-800 rounded-3xl p-6">
-                    <div class="border-b border-slate-800 pb-3 mb-4">
-                        <h3 class="text-sm font-black text-white">Insert New Owner Record</h3>
-                    </div>
-                    <form id="admin-add-owner-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Owner Full Name</label>
-                            <input type="text" id="new-owner-name" required placeholder="John Doe" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Contact Email</label>
-                            <input type="email" id="new-owner-email" required placeholder="john@example.com" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
-                        </div>
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">Add to public.Owners</button>
-                    </form>
-                </section>
-                
-                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
-                                <th class="p-4 w-12">ID</th>
-                                <th class="p-4">Owner Name</th>
-                                <th class="p-4">Email Address</th>
-                                <th class="p-4 text-center w-32">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-owners-table" class="divide-y divide-slate-800/60 font-medium">
-                            <tr><td colspan="4" class="text-center py-6 text-slate-500">Connecting owner cluster...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- 💰 PESTAÑA CONTAINER: OFFERS -->
-            <div id="offers-tab" class="tab-content hidden space-y-6">
-                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
-                                <th class="p-4 w-12">ID</th>
-                                <th class="p-4">Property ID</th>
-                                <th class="p-4">Offer Type</th>
-                                <th class="p-4">Amount (\$)</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4 text-center w-32">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-offers-table" class="divide-y divide-slate-800/60 font-medium">
-                            <tr><td colspan="6" class="text-center py-6 text-slate-500">Connecting transaction cluster...</td></tr>
-                        </tbody>
-                    </table>
+            <!-- CONTROLLER 2: BUSCADOR UNIVERSAL INTELIGENTE -->
+            <div class="md:col-span-8">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Live Filter Query (ID, Name, Email, Values...)</label>
+                <div class="relative flex items-center">
+                    <input type="text" id="universal-search-input" oninput="window.filterTableRows()" placeholder="Type to filter synchronized rows instantly..." class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-cyan-500 transition-all font-medium placeholder-slate-700">
+                    <span id="row-counter-badge" class="absolute right-3 bg-slate-800 text-slate-400 text-[10px] font-mono px-2 py-0.5 rounded border border-slate-700 font-bold">0 rows</span>
                 </div>
             </div>
 
         </div>
+
+        <!-- CONTENEDOR DE VISUALIZACIÓN DINÁMICA -->
+        <div class="space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <div>
+                    <h2 class="text-sm font-black uppercase tracking-wider text-slate-300">
+                        Active Database View: <span id="active-table-title" class="text-cyan-400 font-mono">properties</span>
+                    </h2>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="window.addNewRowUniversal()" class="bg-cyan-600 hover:bg-cyan-700 text-slate-950 px-3.5 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all shadow-md">
+                        ➕ Insert Empty Row
+                    </button>
+                </div>
+            </div>
+
+            <!-- GRILLA DE DATOS MÁSTER UNIVERSAL -->
+            <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/40 shadow-xl">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead id="universal-table-head" class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
+                        <!-- Las columnas se generarán dinámicamente aquí -->
+                    </thead>
+                    <tbody id="universal-table-body" class="divide-y divide-slate-800/50 font-medium">
+                        <tr>
+                            <td class="text-center py-12 text-slate-500">
+                                <div class="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                                Booting universal database schema cluster...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </main>
 
     <!-- PIE DE PÁGINA CORPORATIVO DEL SISTEMA -->
     <footer class="bg-slate-950 text-slate-600 text-[10px] font-bold py-6 text-center border-t border-slate-900/60">
-        &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. | Core Multi-Table Manager
+        &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. | Universal Table Reflection Engine v2.0
     </footer>
-
-    <!-- INYECCIÓN DEL SDK DE SUPABASE Y LOGICA DE CONTROL DE PESTAÑAS INTEGRADA -->
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <!-- MOTOR DE REFLEXIÓN DINÁMICA (JAVASCRIPT AUTOMÁTICO) -->
     <script>
-        // Credenciales estables de comunicación con el ecosistema de Supabase
-        const SUPABASE_URL = "https://supabase.co";
+        // ====== 1. CONFIGURACIÓN DEL ENLACE DE PRODUCCIÓN ======
+        const SUPABASE_URL = "https://ztojbyfbyidzzrqicjvn.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
         const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ====== 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS (TABS INTERACTIVOS) ======
-        window.switchAdminTab = function(tabId) {
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
+        // Variables de estado del motor universal
+        let currentTableName = "properties";
+        let localTableCache = [];
+        let detectedColumns = [];
 
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-slate-800', 'text-white', 'border-b-2', 'border-cyan-500');
-                btn.classList.add('text-slate-400', 'hover:text-slate-200');
-            });
+        // ====== 2. CARGADOR EN FRÍO Y MAPEO DE SCHEMAS EN TIEMPO REAL ======
+        window.loadTargetTable = async function(tableName) {
+            currentTableName = tableName;
+            document.getElementById("active-table-title").innerText = tableName;
+            
+            const tableBody = document.getElementById("universal-table-body");
+            const tableHead = document.getElementById("universal-table-head");
+            
+            tableBody.innerHTML = `<tr><td class="text-center py-12 text-slate-500"><div class="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Fetching table datasets...</td></tr>`;
 
-            const activeBtn = document.getElementById(`btn-${tabId}`);
-            if (activeBtn) {
-                activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200');
-                activeBtn.classList.add('bg-slate-800', 'text-white', 'border-b-2', 'border-cyan-500');
-            }
-        };
-
-        // ====== 2. RECOLECTOR Y RENDERIZADOR GENERAL DE LAS 4 TABLAS ======
-        async function runGlobalTableSynchronizer() {
             try {
-                // Descarga paralela asíncrona de las 4 tablas de Supabase
-                const [resProps, resLeads, resOwners, resOffers] = await Promise.all([
-                    supabaseClientInstance.from('properties').select('*').order('id', { ascending: true }),
-                    supabaseClientInstance.from('leads').select('*').order('id', { ascending: false }),
-                    supabaseClientInstance.from('Owners').select('*').order('id', { ascending: true }),
-                    supabaseClientInstance.from('offers').select('*').order('id', { ascending: false })
-                ]);
+                // Descarga masiva del estado actual de la tabla
+                const { data, error } = await supabaseClientInstance
+                    .from(tableName)
+                    .select('*')
+                    .order('id', { ascending: false });
 
-                // Actualizamos contadores superiores en la interfaz
-                document.getElementById("stat-properties").innerText = resProps.data ? resProps.data.length : "0";
-                document.getElementById("stat-leads").innerText = resLeads.data ? resLeads.data.length : "0";
+                if (error) throw error;
 
-                // --- RENDERING public.properties ---
-                const tableProps = document.getElementById("admin-inventory-table");
-                if (tableProps && resProps.data) {
-                    if (resProps.data.length === 0) {
-                        tableProps.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
-                    } else {
-                        tableProps.innerHTML = resProps.data.map(item => `
-                            <tr class="hover:bg-slate-950/20 transition-colors border-b border-slate-800/50" id="prop-row-${item.id}">
-                                <td class="p-4 font-mono font-bold text-slate-500">#${item.id}</td>
-                                <td class="p-4"><input type="text" id="prop-name-${item.id}" value="${item.resort_name || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold focus:outline-none focus:border-blue-500 transition-all"></td>
-                                <td class="p-4">
-                                    <select id="prop-type-${item.id}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-black focus:outline-none focus:border-blue-500 transition-all">
-                                        <option value="SALE" ${item.listing_type === 'SALE' ? 'selected' : ''}>SALE</option>
-                                        <option value="RENT" ${item.listing_type === 'RENT' ? 'selected' : ''}>RENT</option>
-                                    </select>
-                                </td>
-                                <td class="p-4"><input type="number" id="prop-week-${item.id}" value="${item.week_number || 0}" min="1" max="52" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs text-center focus:outline-none focus:border-blue-500 transition-all"></td>
-                                <td class="p-4"><input type="number" id="prop-price-${item.id}" value="${item.asking_price || 0}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs focus:outline-none focus:border-blue-500 transition-all"></td>
-                                <td class="p-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button onclick="window.savePropertyCRUD(${item.id})" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800/50 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Update</button>
-                                        <button onclick="window.deletePropertyCRUD(${item.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Delete</button>
-                                    </div>
-                                </td>
-                            </tr>`).join('');
-                    }
+                localTableCache = data || [];
+                
+                if (localTableCache.length > 0) {
+                    // Mapeamos de forma dinámica el listado de columnas disponibles en base al primer registro
+                    detectedColumns = Object.keys(localTableCache[0]);
+                } else {
+                    // Fallback estructural si la tabla está completamente vacía
+                    if (tableName === "properties") detectedColumns = ["id", "resort_name", "listing_type", "week_number", "asking_price", "image_url"];
+                    else if (tableName === "leads") detectedColumns = ["id", "name", "email", "message"];
+                    else if (tableName === "Owners") detectedColumns = ["id", "owner_name", "email"];
+                    else if (tableName === "offers") detectedColumns = ["id", "property_id", "offer_type", "amount", "status"];
+                    else detectedColumns = ["id"];
                 }
 
-                // --- RENDERING public.leads ---
-                const tableLeads = document.getElementById("admin-leads-table");
-                if (tableLeads && resLeads.data) {
-                    if (resLeads.data.length === 0) {
-                        tableLeads.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
-                    } else {
-                        tableLeads.innerHTML = resLeads.data.map(lead => `
-                            <tr class="hover:bg-slate-950/20 border-b border-slate-800/50" id="lead-row-${lead.id}">
-                                <td class="p-4 font-mono font-bold text-slate-500">#${lead.id}</td>
-                                <td class="p-4 text-white font-bold">${lead.name || 'Anonymous'}</td>
-                                <td class="p-4 text-cyan-400 font-mono font-bold select-all">${lead.email || 'N/A'}</td>
-                                <td class="p-4 text-slate-300 max-w-xs truncate">${lead.message || ''}</td>
-                                <td class="p-4 text-center">
-                                    <button onclick="window.deleteLeadCRUD(${lead.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Archive</button>
-                                </td>
-                            </tr>`).join('');
-                    }
-                }
-                // --- RENDERING public.Owners (REPARADO) ---
-                const tableOwners = document.getElementById("admin-owners-table");
-                if (tableOwners && resOwners.data) {
-                    if (resOwners.data.length === 0) {
-                        tableOwners.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
-                    } else {
-                        tableOwners.innerHTML = resOwners.data.map(owner => `
-                            <tr class="hover:bg-slate-950/20 border-b border-slate-800/50" id="owner-row-${owner.id}">
-                                <td class="p-4 font-mono font-bold text-slate-500">#${owner.id}</td>
-                                <td class="p-4"><input type="text" id="owner-name-${owner.id}" value="${owner.owner_name || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold focus:outline-none focus:border-blue-500 transition-all"></td>
-                                <td class="p-4"><input type="email" id="owner-email-${owner.id}" value="${owner.email || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-medium focus:outline-none focus:border-blue-500 transition-all"></td>
-                                <td class="p-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button onclick="window.saveOwnerCRUD(${owner.id})" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800/50 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Save</button>
-                                        <button onclick="window.deleteOwnerCRUD(${owner.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Delete</button>
-                                    </div>
-                                </td>
-                            </tr>`).join('');
-                    }
-                }
+                // Generamos dinámicamente las cabeceras de la tabla
+                tableHead.innerHTML = `
+                    <tr>
+                        ${detectedColumns.map(col => `<th class="p-4 uppercase tracking-wider">\${col}</th>`).join('')}
+                        <th class="p-4 text-center w-36">Actions</th>
+                    </tr>
+                `;
 
-                // --- RENDERING public.offers ---
-                const tableOffers = document.getElementById("admin-offers-table");
-                if (tableOffers && resOffers.data) {
-                    if (resOffers.data.length === 0) {
-                        tableOffers.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
-                    } else {
-                        tableOffers.innerHTML = resOffers.data.map(offer => `
-                            <tr class="hover:bg-slate-950/20 border-b border-slate-800/50" id="offer-row-${offer.id}">
-                                <td class="p-4 font-mono font-bold text-slate-500">#${offer.id}</td>
-                                <td class="p-4 font-mono text-slate-400">#TMG${offer.property_id || offer.listing_id || 'N/A'}</td>
-                                <td class="p-4 font-bold uppercase text-slate-300">${offer.offer_type || 'BUY'}</td>
-                                <td class="p-4 font-mono font-bold text-cyan-400">$${Number(offer.amount || offer.offer_amount || 0).toLocaleString()}</td>
-                                <td class="p-4">
-                                    <select id="offer-status-${offer.id}" onchange="window.updateOfferStatusCRUD(${offer.id})" class="p-1.5 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold">
-                                        <option value="PENDING" ${offer.status === 'PENDING' ? 'selected' : ''}>PENDING</option>
-                                        <option value="ACCEPTED" ${offer.status === 'ACCEPTED' ? 'selected' : ''}>ACCEPTED</option>
-                                        <option value="REJECTED" ${offer.status === 'REJECTED' ? 'selected' : ''}>REJECTED</option>
-                                    </select>
-                                </td>
-                                <td class="p-4 text-center">
-                                    <button onclick="window.deleteOfferCRUD(${offer.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Purge</button>
-                                </td>
-                            </tr>`).join('');
-                    }
-                }
+                // Renderizamos las filas físicas con inputs editables
+                window.renderCachedRows(localTableCache);
 
             } catch (err) {
-                console.error("CRUD Sync Failure:", err);
-            }
-        }
-
-        // ====== 3. EVENTOS Y FUNCIONES LÓGICAS CRUD TOTALES ======
-
-        window.savePropertyCRUD = async function(id) {
-            const payload = {
-                resort_name: document.getElementById(`prop-name-${id}`).value.trim(),
-                listing_type: document.getElementById(`prop-type-${id}`).value,
-                week_number: parseInt(document.getElementById(`prop-week-${id}`).value),
-                asking_price: parseFloat(document.getElementById(`prop-price-${id}`).value)
-            };
-            const { error } = await supabaseClientInstance.from('properties').update(payload).eq('id', id);
-            if (!error) { alert("🏢 Property updated!"); runGlobalTableSynchronizer(); }
-        };
-
-        window.deletePropertyCRUD = async function(id) {
-            if (confirm("Delete property permanently?")) {
-                await supabaseClientInstance.from('properties').delete().eq('id', id);
-                document.getElementById(`prop-row-${id}`).remove();
-                runGlobalTableSynchronizer();
+                console.error("Universal Engine Error:", err);
+                tableBody.innerHTML = `<tr><td class="text-center py-12 text-rose-500 font-bold">⚠️ Error accessing table "${tableName}". Check table names, policies or connection.</td></tr>`;
             }
         };
 
-        window.deleteLeadCRUD = async function(id) {
-            if (confirm("Archive lead inquiry?")) {
-                await supabaseClientInstance.from('leads').delete().eq('id', id);
-                document.getElementById(`lead-row-${id}`).remove();
-                runGlobalTableSynchronizer();
+        // ====== 3. RENDERIZADOR UNIVERSAL DE REGISTROS ======
+        window.renderCachedRows = function(rowsArray) {
+            const tableBody = document.getElementById("universal-table-body");
+            document.getElementById("row-counter-badge").innerText = `${rowsArray.length} rows`;
+
+            if (rowsArray.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="${detectedColumns.length + 1}" class="text-center py-12 text-slate-500">No matching records inside this viewport.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = rowsArray.map(row => {
+                return `
+                    <tr class="hover:bg-slate-950/20 transition-colors border-b border-slate-800/40" id="universal-row-${row.id}">
+                        ${detectedColumns.map(col => {
+                            const val = row[col] === null ? "" : row[col];
+                            // Si es la columna ID, la mantenemos estricta y deshabilitada para proteger la integridad
+                            if (col === "id") {
+                                return `<td class="p-4 font-mono font-bold text-slate-500">#\${val}</td>`;
+                            }
+                            
+                            // Determinamos de manera inteligente el tipo de entrada gráfica
+                            let inputType = "text";
+                            if (typeof val === "number" || col.includes("price") || col.includes("amount") || col.includes("week") || col.includes("id")) {
+                                inputType = "number";
+                            } else if (col.includes("email")) {
+                                inputType = "email";
+                            } else if (col.includes("url")) {
+                                inputType = "url";
+                            }
+
+                            return `
+                                <td class="p-2">
+                                    <input type="\${inputType}" 
+                                           data-col="\${col}" 
+                                           data-id="\${row.id}" 
+                                           value="\${val}" 
+                                           class="universal-cell-input w-full p-2 border border-slate-800/80 rounded-lg bg-slate-900 text-white text-xs focus:outline-none focus:border-cyan-500 transition-all font-medium">
+                                </td>
+                            `;
+                        }).join('')}
+                        <td class="p-2 text-center">
+                            <div class="flex items-center justify-center space-x-1.5">
+                                <button onclick="window.saveUniversalRow(${row.id})" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-400 border border-cyan-800/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Save</button>
+                                <button onclick="window.deleteUniversalRow(${row.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Drop</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        };
+        // ====== 4. FILTRO PREDICTIVO EN VIVO MULTI-COLUMNA ======
+        window.filterTableRows = function() {
+            const query = document.getElementById("universal-search-input").value.toLowerCase().trim();
+            if (!query) {
+                window.renderCachedRows(localTableCache);
+                return;
+            }
+
+            // Escaneamos recursivamente cada celda de la fila sin importar la columna para coincidir con la búsqueda
+            const filtered = localTableCache.filter(row => {
+                return detectedColumns.some(col => {
+                    const cellValue = String(row[col] || '').toLowerCase();
+                    return cellValue.includes(query);
+                });
+            });
+
+            window.renderCachedRows(filtered);
+        };
+
+        // ====== 5. OPERACIÓN GLOBAL: UPDATE AUTOMÁTICO DE FILAS ======
+        window.saveUniversalRow = async function(id) {
+            const rowInputs = document.querySelectorAll(`.universal-cell-input[data-id="${id}"]`);
+            const payload = {};
+
+            // Compilamos dinámicamente el objeto de actualización leyendo los inputs físicos en pantalla
+            rowInputs.forEach(input => {
+                const column = input.getAttribute("data-col");
+                let value = input.value.trim();
+
+                // Formateo correcto de tipos numéricos para evitar que Supabase los rechace
+                if (input.type === "number") {
+                    value = value === "" ? null : Number(value);
+                }
+
+                payload[column] = value;
+            });
+
+            try {
+                const { error } = await supabaseClientInstance
+                    .from(currentTableName)
+                    .update(payload)
+                    .eq('id', id);
+
+                if (error) throw error;
+                alert(`✨ Row #${id} in table "${currentTableName}" successfully synchronized.`);
+                window.refreshActiveTable();
+            } catch (err) {
+                console.error("Error updating record:", err);
+                alert(`⚠️ Database rollback: Unable to save changes. Verify columns constraints.`);
             }
         };
 
-        window.saveOwnerCRUD = async function(id) {
-            const payload = {
-                owner_name: document.getElementById(`owner-name-${id}`).value.trim(),
-                email: document.getElementById(`owner-email-${id}`).value.trim()
-            };
-            const { error } = await supabaseClientInstance.from('Owners').update(payload).eq('id', id);
-            if (!error) { alert("👥 Owner updated!"); runGlobalTableSynchronizer(); }
-        };
+        // ====== 6. OPERACIÓN GLOBAL: ELIMINACIÓN DE REGISTROS ======
+        window.deleteUniversalRow = async function(id) {
+            if (!confirm(`Crucial Alert: Are you sure you want to hard delete row #${id} from "public.${currentTableName}"? This action bypasses recovery.`)) return;
+            
+            try {
+                const { error } = await supabaseClientInstance
+                    .from(currentTableName)
+                    .delete()
+                    .eq('id', id);
 
-        window.deleteOwnerCRUD = async function(id) {
-            if (confirm("Delete owner?")) {
-                await supabaseClientInstance.from('Owners').delete().eq('id', id);
-                document.getElementById(`owner-row-${id}`).remove();
-                runGlobalTableSynchronizer();
+                if (error) throw error;
+                document.getElementById(`universal-row-${id}`)?.remove();
+                
+                // Actualizamos cache local
+                localTableCache = localTableCache.filter(r => r.id !== id);
+                document.getElementById("row-counter-badge").innerText = `${localTableCache.length} rows`;
+                alert(`🗑️ Record #${id} wiped cleanly.`);
+            } catch (err) {
+                console.error("Error deleting record:", err);
+                alert(`⚠️ Operation denied. Check Row-Level Security policies or foreign key dependencies.`);
             }
         };
 
-        window.updateOfferStatusCRUD = async function(id) {
-            const status = document.getElementById(`offer-status-${id}`).value;
-            const { error } = await supabaseClientInstance.from('offers').update({ status: status }).eq('id', id);
-            if (!error) alert("💰 Status synchronized!");
-        };
+        // ====== 7. OPERACIÓN GLOBAL: INSERCIÓN DIRECTA DE FILAS VACÍAS ======
+        window.addNewRowUniversal = async function() {
+            const emptyPayload = {};
+            
+            // Llenamos campos obligatorios mínimos detectados según la tabla activa para evitar bloqueos de esquema
+            detectedColumns.forEach(col => {
+                if (col !== "id") {
+                    emptyPayload[col] = null;
+                }
+            });
 
-        window.deleteOfferCRUD = async function(id) {
-            if (confirm("Delete offer transaction?")) {
-                await supabaseClientInstance.from('offers').delete().eq('id', id);
-                document.getElementById(`offer-row-${id}`).remove();
-                runGlobalTableSynchronizer();
+            // Fallbacks específicos para campos requeridos por convención en tu base de datos
+            if (currentTableName === "properties") {
+                emptyPayload["resort_name"] = "New Premium Resort Interval";
+                emptyPayload["listing_type"] = "SALE";
+            } else if (currentTableName === "leads") {
+                emptyPayload["name"] = "New Client Record";
+            } else if (currentTableName === "Owners") {
+                emptyPayload["owner_name"] = "New Owner";
+            } else if (currentTableName === "offers") {
+                emptyPayload["offer_type"] = "BUY";
+                emptyPayload["status"] = "PENDING";
+            }
+
+            try {
+                const { error } = await supabaseClientInstance
+                    .from(currentTableName)
+                    .insert([emptyPayload]);
+
+                if (error) throw error;
+                alert(`➕ New raw container injected into public.${currentTableName}.`);
+                window.refreshActiveTable();
+            } catch (err) {
+                console.error("Error inserting raw placeholder:", err);
+                alert(`⚠️ Insertion failed. If you added columns rules, make sure to adjust defaults in Supabase.`);
             }
         };
 
-        // ====== 4. MECANISMOS DE FORMULARIOS DE INSERCIÓN ======
+        // ====== 8. REFRESH DE VISTA EN CALIENTE ======
+        window.refreshActiveTable = function() {
+            window.loadTargetTable(currentTableName);
+        };
 
-        document.getElementById("admin-add-property-form").addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const submitBtn = this.querySelector("button[type='submit']");
-            if (submitBtn) submitBtn.disabled = true;
-
-            const record = {
-                resort_name: document.getElementById("new-resort-name").value.trim(),
-                listing_type: document.getElementById("new-listing-type").value,
-                week_number: parseInt(document.getElementById("new-week-number").value),
-                asking_price: parseFloat(document.getElementById("new-asking-price").value),
-                image_url: document.getElementById("new-image-url").value.trim(),
-                status: 'AVAILABLE'
-            };
-
-            const { error } = await supabaseClientInstance.from('properties').insert([record]);
-            if (!error) { alert("🚀 Property injected!"); this.reset(); runGlobalTableSynchronizer(); }
-            if (submitBtn) submitBtn.disabled = false;
-        });
-
-        document.getElementById("admin-add-owner-form").addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const submitBtn = this.querySelector("button[type='submit']");
-            if (submitBtn) submitBtn.disabled = true;
-
-            const record = {
-                owner_name: document.getElementById("new-owner-name").value.trim(),
-                email: document.getElementById("new-owner-email").value.trim()
-            };
-
-            const { error } = await supabaseClientInstance.from('Owners').insert([record]);
-            if (!error) { alert("👥 New Owner Record injected!"); this.reset(); runGlobalTableSynchronizer(); }
-            if (submitBtn) submitBtn.disabled = false;
-        });
-
+        // Inicialización automatizada al cargar el DOM del administrador
         document.addEventListener("DOMContentLoaded", () => {
-            runGlobalTableSynchronizer();
+            window.loadTargetTable("properties");
         });
     </script>
 </body>
