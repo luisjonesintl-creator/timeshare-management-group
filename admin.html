@@ -1,320 +1,460 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timeshare Management Group | Premier Resale & Rental Marketplace</title>
+    <title>TMG Core System Console | Full Database CRUD</title>
+    
+    <!-- Icono oficial de la pestaña del navegador (Favicon) -->
     <link rel="icon" type="image/png" href="favicon.png" />
+    
     <!-- Motor nativo oficial de Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- SDK de Supabase para conexiones asíncronas -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+    </style>
 </head>
+<body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col justify-between selection:bg-blue-500/20">
 
-
-<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-500/20">
-
-    <!-- BARRA DE INFORMACIÓN CORPORATIVA (Asistencia Telefónica) -->
-    <div class="bg-slate-900 text-slate-300 text-[11px] font-bold py-2.5 px-6 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-            <div class="flex items-center space-x-4">
-                <span><span class="text-cyan-400">Toll Free:</span> <a href="tel:18778154227" class="hover:text-white transition">1-877-815-4227</a></span>
-                <span class="text-slate-600">|</span>
-                <span><span class="text-slate-400">International:</span> <a href="tel:16035160200" class="hover:text-white transition">1-603-516-0200</a></span>
-            </div>
-            <div class="flex items-center space-x-4 text-[10px] uppercase tracking-wider text-slate-400">
-                <span class="flex items-center"><span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> BBB A+ ACCREDITED MARKETPLACE</span>
-            </div>
+    <!-- BARRA SUPERIOR DE SESIÓN -->
+    <div class="bg-slate-950 text-slate-400 text-[11px] font-bold py-3.5 px-6 border-b border-slate-800 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <span class="flex items-center"><span class="h-1.5 w-1.5 bg-cyan-400 rounded-full mr-1.5 animate-pulse"></span> SYSTEM CRUD CENTRAL CONSOLE</span>
+            <span class="text-slate-700">|</span>
+            <a href="index.html" class="hover:text-white transition-colors">&larr; Public Marketplace</a>
+        </div>
+        <div class="text-[10px] bg-slate-900 px-3 py-1 rounded-md border border-slate-800 text-slate-400 font-mono">
+            ROLE: <span class="text-cyan-400 font-bold">MASTER_ADMIN</span>
         </div>
     </div>
-    <!-- NAVEGACIÓN PRINCIPAL (Menú unificado y limpio estilo SMTN) -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            
-            <!-- Identidad Visual -->
-            <div class="flex items-center space-x-3 group cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-                <div class="bg-gradient-to-tr from-blue-900 via-blue-950 to-blue-800 text-white p-2.5 rounded-xl font-black tracking-wider text-xl shadow-md">TMG</div>
-                <div>
-                    <span class="block text-sm font-extrabold tracking-tight text-slate-900 uppercase">Timeshare</span>
-                    <span class="block text-[10px] text-blue-600 font-black uppercase tracking-widest -mt-0.5">Management Group</span>
-                </div>
-            </div>
-            
-            <!-- Menú de Enlaces Optimizado -->
-            <nav class="hidden lg:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider text-slate-600">
-                <a href="listings.html" class="hover:text-blue-950 transition-colors">Timeshares For Sale</a>
-                <a href="rentals.html" class="hover:text-blue-950 transition-colors">Last Minute Rentals</a>
-                <a href="#contact" class="hover:text-blue-950 transition-colors">Sell My Timeshare</a>
-                <a href="#metrics-section" class="hover:text-blue-950 transition-colors">Resources</a>
-            </nav>
 
-            <!-- Acceso Directo Privado -->
-            <div class="flex items-center space-x-4">
-                <a href="portal.html" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-all">
-                    Login
-                </a>
-                <a href="#contact" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-md">
-                    Get Started
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- HERO PRINCIPAL CON BUSCADOR DINÁMICO -->
-    <section class="relative bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900 py-24 px-6 text-center text-white overflow-hidden">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
-
-<!-- Input de Búsqueda Vinculado con el Motor Predictivo -->
-<input 
-    type="text" 
-    id="search-input" 
-    placeholder="Search by resort name or vacation club..." 
-    class="w-full p-4 pl-12 rounded-2xl bg-white border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-900 transition-all font-medium"
-/>
+    <!-- PANEL GENERAL -->
+    <main class="max-w-7xl mx-auto w-full px-6 py-10 space-y-8 flex-grow">
         
-        <div class="relative max-w-4xl mx-auto space-y-6">
-            <span class="inline-block bg-white/10 text-cyan-400 border border-white/10 text-[10px] font-extrabold tracking-widest uppercase px-3 py-1.5 rounded-full backdrop-blur-sm">
-                The Ultimate Secondary Timeshare Marketplace
-            </span>
-            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
-                Timeshares for <span class="text-cyan-400">Sale</span> and <span class="text-blue-400">Rent</span> <br>By Certified Owners
-            </h1>
-            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-                Search over 75,000 timeshare rentals and resales in our open marketplace. Secure incredible wholesale prices from premium brands like Disney, Hilton, and Marriott.
-            </p>
-            
-            <!-- Entrada del buscador predictivo -->
-            <div class="max-w-xl mx-auto bg-white p-2.5 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2 border border-white/10 backdrop-blur-md">
-                <div class="w-full flex items-center px-3">
-                    <svg class="h-5 w-5 text-slate-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" placeholder="Search resorts, locations, brands or destinations..." class="w-full bg-transparent py-2 text-slate-800 text-sm focus:outline-none placeholder-slate-400 font-medium" disabled>
-                </div>
-                <button onclick="document.getElementById('marketplace-section').scrollIntoView({behavior:'smooth'})" class="bg-blue-900 text-white font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-xl hover:bg-blue-950 transition-all shadow-md whitespace-nowrap">
-                    Search Marketplace
+        <!-- ENCABEZADO PRINCIPAL -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6">
+            <div>
+                <h1 class="text-2xl font-black text-white tracking-tight">System Master Dashboard</h1>
+                <p class="text-slate-400 text-xs font-medium mt-0.5">Real-time database read, write, update, and overwrite mechanics for corporate timeshare intervals.</p>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="window.location.reload()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center">
+                    🔄 Force Refresh Feed
                 </button>
             </div>
         </div>
-    </section>
-    <!-- BLOQUES DE MONETIZACIÓN DIRECTA PARA DUEÑOS -->
-    <section class="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
+
+        <!-- REJILLA DE MÉTRICAS RÁPIDAS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200/60 hover:shadow-2xl transition group cursor-pointer" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-                <div class="h-10 w-10 bg-blue-50 text-blue-900 rounded-xl flex items-center justify-center font-bold mb-4 group-hover:bg-blue-900 group-hover:text-white transition">01</div>
-                <h3 class="text-lg font-black text-slate-900">Sell My Timeshare</h3>
-                <p class="text-slate-500 text-xs mt-1 leading-relaxed">Ready to exit? List your interval safely and ask our licensed agents about our corporate guarantee structure.</p>
-                <span class="inline-block text-blue-900 font-bold text-xs mt-3 uppercase tracking-wider group-hover:underline">Learn More &rarr;</span>
+            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Live Inventory Listings</span>
+                <span id="stat-properties" class="text-3xl font-black text-white mt-2">...</span>
+                <span class="text-[9px] text-cyan-400 font-semibold mt-1">Active items inside properties table</span>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200/60 hover:shadow-2xl transition group cursor-pointer" onclick="window.location.href='rentals.html'">
-                <div class="h-10 w-10 bg-cyan-50 text-cyan-900 rounded-xl flex items-center justify-center font-bold mb-4 group-hover:bg-cyan-900 group-hover:text-white transition">02</div>
-                <h3 class="text-lg font-black text-slate-900">Rent My Timeshare</h3>
-                <p class="text-slate-500 text-xs mt-1 leading-relaxed">Can't use your week this year? Turn unused intervals or points packages into immediate cash to cover maintenance fees.</p>
-                <span class="inline-block text-cyan-700 font-bold text-xs mt-3 uppercase tracking-wider group-hover:underline">Learn More &rarr;</span>
+            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Form Prospects</span>
+                <span id="stat-leads" class="text-3xl font-black text-emerald-400 mt-2">...</span>
+                <span class="text-[9px] text-slate-500 font-semibold mt-1">Synchronized client records captured</span>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200/60 hover:shadow-2xl transition group cursor-pointer" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-                <div class="h-10 w-10 bg-slate-50 text-slate-900 rounded-xl flex items-center justify-center font-bold mb-4 group-hover:bg-slate-900 group-hover:text-white transition">03</div>
-                <h3 class="text-lg font-black text-slate-900">What's My Timeshare Worth?</h3>
-                <p class="text-slate-500 text-xs mt-1 leading-relaxed">Don't guess your market value. Get a 100% free, automated and data-driven evaluation of your vacation club asset.</p>
-                <span class="inline-block text-slate-700 font-bold text-xs mt-3 uppercase tracking-wider group-hover:underline">Evaluate Now &rarr;</span>
+            <div class="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-r from-blue-950/20 to-slate-950/40 border-blue-900/30">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Database Connection</span>
+                <span class="text-lg font-black text-white mt-3 flex items-center">
+                    <span class="h-2 w-2 bg-emerald-500 rounded-full mr-2"></span> ONLINE 200 OK
+                </span>
+                <span class="text-[9px] text-slate-500 font-semibold mt-1">Supabase production client handshake</span>
             </div>
         </div>
-    </section>
+        <!-- ==================== CONTROL DE PESTAÑAS (TAB BAR) ==================== -->
+        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-px">
+            <button onclick="window.switchAdminTab('properties-tab')" id="btn-properties-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all border-b-2 border-cyan-500 bg-slate-800 text-white">
+                🏢 public.properties
+            </button>
+            <button onclick="window.switchAdminTab('leads-tab')" id="btn-leads-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all text-slate-400 hover:text-slate-200">
+                ✉️ public.leads
+            </button>
+            <button onclick="window.switchAdminTab('owners-tab')" id="btn-owners-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all text-slate-400 hover:text-slate-200">
+                👥 public.Owners
+            </button>
+            <button onclick="window.switchAdminTab('offers-tab')" id="btn-offers-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all text-slate-400 hover:text-slate-200">
+                💰 public.offers
+            </button>
+        </div>
 
-    <!-- SECCIÓN DE MÉTRICAS CORPORATIVAS DE CREDIBILIDAD -->
-    <section id="metrics-section" class="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div class="lg:col-span-5 space-y-4">
-            <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 block">Trusted Industry Leadership</span>
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight leading-tight">Why Sell & Rent With TMG Marketplace?</h2>
-            <p class="text-slate-500 text-sm leading-relaxed">
-                Since 2003, our corporate marketing platform has been the most active and trusted resale company in the industry. We drive real cash results, making life easier for timeshare deed holders just like you.
-            </p>
-        </div>
-        <div class="lg:col-span-7 bg-slate-900 rounded-3xl p-8 text-white grid grid-cols-1 sm:grid-cols-2 gap-6 relative overflow-hidden shadow-2xl">
-            <div class="absolute -right-10 -bottom-10 h-40 w-40 bg-blue-500/10 rounded-full blur-2xl"></div>
-            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40">
-                <span class="block text-3xl font-black tracking-tight text-cyan-400">10,000+</span>
-                <span class="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mt-1">Unique Daily Visitors</span>
-            </div>
-            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40">
-                <span class="block text-3xl font-black tracking-tight text-white">3.2 Million</span>
-                <span class="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mt-1">Annual Marketplace Visits</span>
-            </div>
-            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40">
-                <span class="block text-3xl font-black tracking-tight text-cyan-400">$254M</span>
-                <span class="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mt-1">Offers Driven Last Year</span>
-            </div>
-            <div class="p-4 border border-slate-800 rounded-2xl bg-slate-950/40 sm:col-span-2 bg-gradient-to-r from-blue-950 to-slate-900 border-blue-500/20">
-                <span class="block text-4xl font-black tracking-tight text-white">$5 BILLION+</span>
-                <span class="block text-[10px] uppercase tracking-widest font-black text-cyan-400 mt-1">Total Resale & Rental Offers Processed To Date</span>
-            </div>
-        </div>
-    </section>
-         <!-- ==================== POPULAR BRANDS SECTION (BLINDADA SIN ENLACES ROTOS) ==================== -->
-    <section class="bg-gradient-to-b from-white to-slate-100 border-t border-b border-slate-200 py-20 px-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div class="lg:col-span-4 space-y-4">
-                <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 block">Industry Leaders</span>
-                <h2 class="text-3xl font-black text-slate-900 tracking-tight leading-tight">
-                    Popular Brands <br><span class="text-blue-900">for Timeshare Buyers</span>
-                </h2>
-                <p class="text-slate-500 text-xs leading-relaxed font-medium">
-                    The following brands are among the most well-known timeshare companies and vacation clubs worldwide, making them a great choice for anyone purchasing on a timeshare resale.
-                </p>
-                <div class="pt-2">
-                    <a href="listings.html" class="inline-flex items-center text-xs font-bold text-blue-900 hover:text-blue-950 transition uppercase tracking-wider group">
-                        Browse All Brands Listings <span class="ml-1.5 transform group-hover:translate-x-1 transition-transform">&rarr;</span>
-                    </a>
-                </div>
-            </div>
+        <!-- ==================== CONTENIDO DE LAS PESTAÑAS (TAB CONTENT) ==================== -->
+        <div id="admin-tabs-container" class="space-y-8">
             
-            <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Disney (Estilo Corporativo Tipográfico Premium) -->
-                <div class="bg-white p-6 h-28 border border-slate-200 rounded-2xl hover:border-blue-900 hover:shadow-md transition duration-300 flex flex-col justify-center items-center text-center group cursor-pointer" onclick="window.location.href='listings.html'">
-                    <span class="block font-serif text-2xl font-black tracking-tight text-slate-800 group-hover:text-blue-950 transition-colors">Disney</span>
-                    <span class="block text-[9px] uppercase tracking-widest font-black text-slate-400 mt-1">Vacation Club</span>
-                </div>
-                
-                <!-- Marriott (Estilo Elegante con el Logo M Clásico en SVG Nativo) -->
-                <div class="bg-white p-6 h-28 border border-slate-200 rounded-2xl hover:border-blue-900 hover:shadow-md transition duration-300 flex flex-col justify-center items-center text-center group cursor-pointer" onclick="window.location.href='listings.html'">
-                    <div class="flex items-center space-x-2">
-                        <svg class="h-6 w-6 text-red-700 group-hover:text-blue-900 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M2 3h4l4 12 4-12h4l4 18h-4l-2-10-4 10H10L6 9l-2 10H2Z"/>
-                        </svg>
-                        <span class="font-serif text-xl font-bold text-slate-800 tracking-tight">Marriott</span>
+            <!-- 🏢 PESTAÑA CONTAINER: PROPERTIES -->
+            <div id="properties-tab" class="tab-content space-y-6">
+                <section class="bg-slate-950/50 border border-slate-800 rounded-3xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-cyan-500"></div>
+                    <div class="border-b border-slate-800 pb-3 mb-6">
+                        <h3 class="text-base font-black text-white tracking-tight">Add New Resort Listing</h3>
+                        <p class="text-[11px] text-slate-500 font-medium">Direct database injection mechanism for certified ownership records.</p>
                     </div>
-                    <span class="block text-[9px] uppercase tracking-widest font-black text-slate-400 mt-1">Vacation Club</span>
-                </div>
-                
-                <!-- Hilton (Estilo Ejecutivo Moderno con H en Escudo SVG Nativo) -->
-                <div class="bg-white p-6 h-28 border border-slate-200 rounded-2xl hover:border-blue-900 hover:shadow-md transition duration-300 flex flex-col justify-center items-center text-center group cursor-pointer" onclick="window.location.href='listings.html'">
-                    <div class="flex items-center space-x-2">
-                        <svg class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1"/>
-                        </svg>
-                        <span class="font-sans text-xl font-extrabold tracking-tight text-slate-800">Hilton</span>
-                    </div>
-                    <span class="block text-[9px] uppercase tracking-widest font-black text-slate-400 mt-1">Grand Vacations</span>
-                </div>
-                
-                <!-- RCI -->
-                <div class="bg-white p-6 h-28 border border-slate-200 rounded-2xl hover:border-blue-900 hover:shadow-md transition duration-300 flex flex-col justify-center items-center text-center group cursor-pointer" onclick="window.location.href='listings.html'">
-                    <span class="block font-sans text-2xl font-black tracking-wider text-slate-800 group-hover:text-blue-900 transition-colors">RCI<sup>&reg;</sup></span>
-                    <span class="block text-[9px] uppercase tracking-widest font-black text-slate-400 mt-1">Exchange Network</span>
-                </div>
-                
-                <!-- Westgate -->
-                <div class="bg-white p-6 h-28 border border-slate-200 rounded-2xl hover:border-blue-900 hover:shadow-md transition duration-300 flex flex-col justify-center items-center text-center group cursor-pointer" onclick="window.location.href='listings.html'">
-                    <span class="block font-serif text-xl font-black italic tracking-tight text-slate-800 group-hover:text-blue-900 transition-colors">Westgate</span>
-                    <span class="block text-[9px] uppercase tracking-widest font-black text-slate-400 mt-1">Resorts & Clubs</span>
-                </div>
-                
-                <!-- Hyatt (Estilo Luxury Limpio con H Crest) -->
-                <div class="bg-white p-6 h-28 border border-slate-200 rounded-2xl hover:border-blue-900 hover:shadow-md transition duration-300 flex flex-col justify-center items-center text-center group cursor-pointer" onclick="window.location.href='listings.html'">
-                    <span class="block font-sans text-xl font-light tracking-widest text-slate-900 uppercase group-hover:text-blue-900 transition-colors">Hyatt</span>
-                    <span class="block text-[9px] uppercase tracking-widest font-black text-slate-400 mt-1">Residence Club</span>
-                </div>
-            </div>
-        </div>
-    </section>
+                    <form id="admin-add-property-form" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Resort Full Name</label>
+                            <input type="text" id="new-resort-name" required placeholder="e.g. Disney's Saratoga Springs Resort" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 transition-all font-medium placeholder-slate-700">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Listing Type</label>
+                                <select id="new-listing-type" required class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-bold">
+                                    <option value="SALE">FOR SALE</option>
+                                    <option value="RENT">FOR RENT</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Week #</label>
+                                <input type="number" id="new-week-number" required placeholder="e.g. 26" min="1" max="52" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Asking Price ($)</label>
+                                <input type="number" id="new-asking-price" required placeholder="e.g. 6400" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Photo URL</label>
+                            <input type="url" id="new-image-url" required placeholder="https://..." class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 text-cyan-400 font-mono">
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">Inject to public.properties</button>
+                    </form>
+                </section>
 
-    <!-- CONTENEDOR DEL CATÁLOGO DE PROPIEDADES ACTIVAS -->
-    <main class="max-w-7xl mx-auto px-6 py-16" id="marketplace-section">
-        <div class="border-b border-slate-200 pb-4 mb-8 flex justify-between items-end">
-            <div>
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Active Resale Portfolio</h2>
-                <p class="text-slate-500 text-xs font-medium mt-0.5">Verified intervals and points packages open for purchase offers.</p>
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
+                                <th class="p-4 w-12">ID</th>
+                                <th class="p-4">Modify Resort Name</th>
+                                <th class="p-4 w-32">Type</th>
+                                <th class="p-4 w-24">Week</th>
+                                <th class="p-4 w-36">Price ($)</th>
+                                <th class="p-4 text-center w-32">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-inventory-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="6" class="text-center py-6 text-slate-500">Connecting inventory cluster...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <span class="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-emerald-200 flex items-center">
-                <span class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1.5 animate-ping"></span> Live Catalog
-            </span>
-        </div>
-        <div id="active-properties" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <div class="col-span-full text-center py-12">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900 mx-auto mb-3"></div>
-                <p class="text-slate-400 text-xs uppercase tracking-widest font-bold animate-pulse">Synchronizing live resale feed...</p>
+            <!-- ✉️ PESTAÑA CONTAINER: LEADS -->
+            <div id="leads-tab" class="tab-content hidden space-y-4">
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
+                                <th class="p-4 w-12">ID</th>
+                                <th class="p-4">Client Name</th>
+                                <th class="p-4">Email</th>
+                                <th class="p-4">Message Inquiry</th>
+                                <th class="p-4 text-center w-24">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-leads-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="5" class="text-center py-6 text-slate-500">Connecting leads cluster...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <!-- 👥 PESTAÑA CONTAINER: OWNERS -->
+            <div id="owners-tab" class="tab-content hidden space-y-6">
+                <section class="bg-slate-950/40 border border-slate-800 rounded-3xl p-6">
+                    <div class="border-b border-slate-800 pb-3 mb-4">
+                        <h3 class="text-sm font-black text-white">Insert New Owner Record</h3>
+                    </div>
+                    <form id="admin-add-owner-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Owner Full Name</label>
+                            <input type="text" id="new-owner-name" required placeholder="John Doe" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Contact Email</label>
+                            <input type="email" id="new-owner-email" required placeholder="john@example.com" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700">
+                        </div>
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">Add to public.Owners</button>
+                    </form>
+                </section>
+                
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
+                                <th class="p-4 w-12">ID</th>
+                                <th class="p-4">Owner Name</th>
+                                <th class="p-4">Email Address</th>
+                                <th class="p-4 text-center w-32">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-owners-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="4" class="text-center py-6 text-slate-500">Connecting owner cluster...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 💰 PESTAÑA CONTAINER: OFFERS -->
+            <div id="offers-tab" class="tab-content hidden space-y-6">
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 font-black uppercase tracking-wider border-b border-slate-800 text-[10px]">
+                                <th class="p-4 w-12">ID</th>
+                                <th class="p-4">Property ID</th>
+                                <th class="p-4">Offer Type</th>
+                                <th class="p-4">Amount (\$)</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-center w-32">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-offers-table" class="divide-y divide-slate-800/60 font-medium">
+                            <tr><td colspan="6" class="text-center py-6 text-slate-500">Connecting transaction cluster...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <!-- OPINIONES DE GOOGLE Y CAPTACIÓN DE LEADS -->
-    <div class="bg-gradient-to-b from-slate-100 to-slate-200/40 border-t border-slate-200/60 py-24 px-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            <section class="lg:col-span-5 space-y-4">
-                <div class="flex items-center space-x-2">
-                    <span class="text-xl font-bold text-slate-900">4.6 / 5</span>
-                    <div class="flex text-amber-400">
-                        <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                        <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                        <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                        <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                        <svg class="h-4 w-4 fill-current text-slate-300" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                    </div>
-                    <span class="text-xs text-slate-400 font-semibold">(613 reviews)</span>
-                </div>
-                <h3 class="text-lg font-black text-slate-900 tracking-tight">Verified Google Reviews</h3>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-                    <p class="text-xs text-slate-600 leading-relaxed font-medium">"My timeshare was sold exactly as explained. It took a while but was sold legitimately. I highly recommend them."</p>
-                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">— Mark Kay (June 29, 2026)</span>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-                    <p class="text-xs text-slate-600 leading-relaxed font-medium">"SMTN was very professional and friendly. They sold my timeshare and we are very happy to no longer be paying the maintenance fee."</p>
-                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">— AEZ Medical Services (Nov 5, 2025)</span>
-                </div>
-            </section>
-
-            <section id="contact" class="lg:col-span-7 bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/80 border border-slate-200/60 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-900 to-cyan-500"></div>
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Speak to a Licensed Broker</h2>
-                <p class="text-slate-400 text-xs font-medium mt-1 mb-6">Have questions regarding timeshare title transfer deed services? Our agents are standing by.</p>
-                <form id="general-lead-form" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label for="lead-name" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Full Name</label>
-                            <input type="text" id="lead-name" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
-                        </div>
-                        <div>
-                            <label for="lead-email" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Email Address</label>
-                            <input type="email" id="lead-email" required class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="lead-message" class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Inquiry Details</label>
-                        <textarea id="lead-message" rows="3" required placeholder="Specify your desired brand, complex location or questions..." class="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all placeholder-slate-400 font-medium"></textarea>
-                    </div>
-                    <p class="text-[9px] text-slate-400 leading-normal font-semibold">We will protect your personal information as stated in our Privacy Policy. By submitting this form, you consent to receive emails, calls and marketing text messages from TMG.</p>
-                    <button type="submit" class="bg-gradient-to-r from-blue-900 to-blue-950 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-md">
-                        Submit Broker Request
-                    </button>
-                </form>
-            </section>
-        </div>
-    </div>
-
-    <!-- PIE DE PÁGINA CORPORATIVO -->
-    <footer class="bg-slate-900 text-slate-400 text-xs py-16 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-10">
-            <div class="space-y-4">
-                <span class="block text-white font-black tracking-wider text-sm uppercase">Timeshare Management Group</span>
-                <p class="text-slate-500 leading-relaxed font-medium">TMG is an independent secondary marketplace specializing in for-sale-by-owner interval resales. Prices are designated explicitly by individual deed holders.</p>
-            </div>
-            <div class="space-y-3 font-medium">
-                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Resale Security</span>
-                <p class="text-slate-400">• Official Escrow title transfer deed security processed</p>
-                <p class="text-slate-400">• BBB A+ Accredited secondary market platform standards</p>
-            </div>
-            <div class="space-y-3 font-medium">
-                <span class="block text-white font-bold uppercase tracking-wider text-[10px] tracking-widest text-cyan-400 mb-1">Corporate Correspondence</span>
-                <p class="text-slate-400">8545 Commodity Circle, Orlando, FL 32819</p>
-                <p class="text-slate-400">Support: <a href="mailto:support@tmgresales.com" class="text-cyan-400 hover:underline">support@tmgresales.com</a></p>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-800 text-center text-slate-500 font-semibold">
-            &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved.
-        </div>
+    <!-- PIE DE PÁGINA CORPORATIVO DEL SISTEMA -->
+    <footer class="bg-slate-950 text-slate-600 text-[10px] font-bold py-6 text-center border-t border-slate-900/60">
+        &copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved. | Core Multi-Table Manager
     </footer>
-        <!-- Conector oficial de Supabase — Ruta real completa sin bloqueos -->
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    
-    <!-- Tu archivo de lógica local central -->
-    <script src="script.js"></script>
+
+    <!-- INYECCIÓN DEL SDK DE SUPABASE Y LOGICA DE CONTROL DE PESTAÑAS INTEGRADA -->
+    <script src="https://jsdelivr.net"></script>
+    <script>
+        // Credenciales estables de comunicación con el ecosistema de Supabase
+        const SUPABASE_URL = "https://supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_cYSA9_lak5EnHx-b9Q4SQg_6Z-o0h7f";
+        const supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ====== 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS (TABS INTERACTIVOS) ======
+        window.switchAdminTab = function(tabId) {
+            // Ocultamos todos los contenedores de pestañas
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            // Mostramos el contenedor seleccionado
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Restablecemos los estilos de todos los botones de pestañas
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-white', 'border-b-2', 'border-cyan-500');
+                btn.classList.add('text-slate-400', 'hover:text-slate-200');
+            });
+
+            // Aplicamos estilos activos al botón presionado
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200');
+                activeBtn.classList.add('bg-slate-800', 'text-white', 'border-b-2', 'border-cyan-500');
+            }
+        };
+
+        // ====== 2. RECOLECTOR Y RENDERIZADOR GENERAL DE LAS 4 TABLAS ======
+        async function runGlobalTableSynchronizer() {
+            try {
+                // Descarga paralela asíncrona de las 4 tablas de Supabase
+                const [resProps, resLeads, resOwners, resOffers] = await Promise.all([
+                    supabaseClientInstance.from('properties').select('*').order('id', { ascending: true }),
+                    supabaseClientInstance.from('leads').select('*').order('id', { ascending: false }),
+                    supabaseClientInstance.from('Owners').select('*').order('id', { ascending: true }),
+                    supabaseClientInstance.from('offers').select('*').order('id', { ascending: false })
+                ]);
+
+                // Actualizamos contadores superiores en la interfaz
+                document.getElementById("stat-properties").innerText = resProps.data ? resProps.data.length : "0";
+                document.getElementById("stat-leads").innerText = resLeads.data ? resLeads.data.length : "0";
+
+                // --- RENDERING public.properties ---
+                const tableProps = document.getElementById("admin-inventory-table");
+                if (tableProps && resProps.data) {
+                    if (resProps.data.length === 0) {
+                        tableProps.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
+                    } else {
+                        tableProps.innerHTML = resProps.data.map(item => `
+                            <tr class="hover:bg-slate-950/20 transition-colors border-b border-slate-800/50" id="prop-row-${item.id}">
+                                <td class="p-4 font-mono font-bold text-slate-500">#${item.id}</td>
+                                <td class="p-4"><input type="text" id="prop-name-${item.id}" value="${item.resort_name || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold focus:outline-none focus:border-blue-500 transition-all"></td>
+                                <td class="p-4">
+                                    <select id="prop-type-${item.id}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-black focus:outline-none focus:border-blue-500 transition-all">
+                                        <option value="SALE" ${item.listing_type === 'SALE' ? 'selected' : ''}>SALE</option>
+                                        <option value="RENT" ${item.listing_type === 'RENT' ? 'selected' : ''}>RENT</option>
+                                    </select>
+                                </td>
+                                <td class="p-4"><input type="number" id="prop-week-${item.id}" value="${item.week_number || 0}" min="1" max="52" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs text-center focus:outline-none focus:border-blue-500 transition-all"></td>
+                                <td class="p-4"><input type="number" id="prop-price-${item.id}" value="${item.asking_price || 0}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs focus:outline-none focus:border-blue-500 transition-all"></td>
+                                <td class="p-4 text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button onclick="window.savePropertyCRUD(${item.id})" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800/50 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Update</button>
+                                        <button onclick="window.deletePropertyCRUD(${item.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>`).join('');
+                    }
+                }
+
+                // --- RENDERING public.leads ---
+                const tableLeads = document.getElementById("admin-leads-table");
+                if (tableLeads && resLeads.data) {
+                    if (resLeads.data.length === 0) {
+                        tableLeads.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
+                    } else {
+                        tableLeads.innerHTML = resLeads.data.map(lead => `
+                            <tr class="hover:bg-slate-950/20 border-b border-slate-800/50" id="lead-row-${lead.id}">
+                                <td class="p-4 font-mono font-bold text-slate-500">#${lead.id}</td>
+                                <td class="p-4 text-white font-bold">${lead.name || 'Anonymous'}</td>
+                                <td class="p-4 text-cyan-400 font-mono font-bold select-all">${lead.email || 'N/A'}</td>
+                                <td class="p-4 text-slate-300 max-w-xs truncate">${lead.message || ''}</td>
+                                <td class="p-4 text-center">
+                                    <button onclick="window.deleteLeadCRUD(${lead.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Archive</button>
+                                </td>
+                            </tr>`).join('');
+                    }
+                }
+                // --- RENDERING public.Owners ---
+                const tableOwners = document.getElementById("admin-owners-table");
+                if (tableOwners && resOwners.data) {
+                    if (resOwners.data.length === 0) {
+                        tableOwners.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
+                    } else {
+                        tableOwners.innerHTML = resOwners.data.map(owner => `
+                            <tr class="hover:bg-slate-950/20 border-b border-slate-800/50" id="owner-row-${owner.id}">
+                                <td class="p-4 font-mono font-bold text-slate-500">#${owner.id}</td>
+                                <td class="p-4"><input type="text" id="owner-name-${owner.id}" value="${owner.name || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold focus:outline-none focus:border-blue-500 transition-all"></td>
+                                <td class="p-4"><input type="email" id="owner-email-${owner.id}" value="${owner.email || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-medium focus:outline-none focus:border-blue-500 transition-all"></td>
+                                <td class="p-4 text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button onclick="window.saveOwnerCRUD(${owner.id})" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800/50 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Save</button>
+                                        <button onclick="window.deleteOwnerCRUD(${owner.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>`).join('');
+                    }
+                }
+
+                // --- RENDERING public.offers ---
+                const tableOffers = document.getElementById("admin-offers-table");
+                if (tableOffers && resOffers.data) {
+                    if (resOffers.data.length === 0) {
+                        tableOffers.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500">No records found.</td></tr>`;
+                    } else {
+                        tableOffers.innerHTML = resOffers.data.map(offer => `
+                            <tr class="hover:bg-slate-950/20 border-b border-slate-800/50" id="offer-row-${offer.id}">
+                                <td class="p-4 font-mono font-bold text-slate-500">#${offer.id}</td>
+                                <td class="p-4 font-mono text-slate-400">#TMG${offer.property_id || offer.listing_id || 'N/A'}</td>
+                                <td class="p-4 font-bold uppercase text-slate-300">${offer.offer_type || 'BUY'}</td>
+                                <td class="p-4 font-mono font-bold text-cyan-400">$${Number(offer.amount || offer.offer_amount || 0).toLocaleString()}</td>
+                                <td class="p-4">
+                                    <select id="offer-status-${offer.id}" onchange="window.updateOfferStatusCRUD(${offer.id})" class="p-1.5 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold">
+                                        <option value="PENDING" ${offer.status === 'PENDING' ? 'selected' : ''}>PENDING</option>
+                                        <option value="ACCEPTED" ${offer.status === 'ACCEPTED' ? 'selected' : ''}>ACCEPTED</option>
+                                        <option value="REJECTED" ${offer.status === 'REJECTED' ? 'selected' : ''}>REJECTED</option>
+                                    </select>
+                                </td>
+                                <td class="p-4 text-center">
+                                    <button onclick="window.deleteOfferCRUD(${offer.id})" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 border border-rose-900/40 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all">Purge</button>
+                                </td>
+                            </tr>`).join('');
+                    }
+                }
+
+            } catch (err) {
+                console.error("CRUD Sync Failure:", err);
+            }
+        }
+
+        // ====== 3. EVENTOS Y FUNCIONES LÓGICAS CRUD TOTALES ======
+
+        // --- PROPERTIES MECHANICS ---
+        window.savePropertyCRUD = async function(id) {
+            const payload = {
+                resort_name: document.getElementById(`prop-name-${id}`).value.trim(),
+                listing_type: document.getElementById(`prop-type-${id}`).value,
+                week_number: parseInt(document.getElementById(`prop-week-${id}`).value),
+                asking_price: parseFloat(document.getElementById(`prop-price-${id}`).value)
+            };
+            const { error } = await supabaseClientInstance.from('properties').update(payload).eq('id', id);
+            if (!error) { alert("🏢 Property updated!"); runGlobalTableSynchronizer(); }
+        };
+        window.deletePropertyCRUD = async function(id) {
+            if (confirm("Delete property permanently?")) {
+                await supabaseClientInstance.from('properties').delete().eq('id', id);
+                document.getElementById(`prop-row-${id}`).remove();
+                runGlobalTableSynchronizer();
+            }
+        };
+
+        // --- LEADS MECHANICS ---
+        window.deleteLeadCRUD = async function(id) {
+            if (confirm("Archive lead inquiry?")) {
+                await supabaseClientInstance.from('leads').delete().eq('id', id);
+                document.getElementById(`lead-row-${id}`).remove();
+                runGlobalTableSynchronizer();
+            }
+        };
+
+        // --- OWNERS MECHANICS ---
+        window.saveOwnerCRUD = async function(id) {
+            const payload = {
+                name: document.getElementById(`owner-name-${id}`).value.trim(),
+                email: document.getElementById(`owner-email-${id}`).value.trim()
+            };
+            const { error } = await supabaseClientInstance.from('Owners').update(payload).eq('id', id);
+            if (!error) { alert("👥 Owner updated!"); runGlobalTableSynchronizer(); }
+        };
+        window.deleteOwnerCRUD = async function(id) {
+            if (confirm("Delete owner?")) {
+                await supabaseClientInstance.from('Owners').delete().eq('id', id);
+                document.getElementById(`owner-row-${id}`).remove();
+                runGlobalTableSynchronizer();
+            }
+        };
+
+        // --- OFFERS MECHANICS ---
+        window.updateOfferStatusCRUD = async function(id) {
+            const status = document.getElementById(`offer-status-${id}`).value;
+            const { error } = await supabaseClientInstance.from('offers').update({ status: status }).eq('id', id);
+            if (!error) alert("💰 Status synchronized!");
+        };
+        window.deleteOfferCRUD = async function(id) {
+            if (confirm("Delete offer transaction?")) {
+                await supabaseClientInstance.from('offers').delete().eq('id', id);
+                document.getElementById(`offer-row-${id}`).remove();
+                runGlobalTableSynchronizer();
+            }
+        };
+
+        // --- FORM INSERTS MECHANICS ---
+        document.getElementById("admin-add-property-form").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const record = {
+                resort_name: document.getElementById("new-resort-name").value.trim(),
+                listing_type: document.getElementById("new-listing-type").value,
+                week_number: parseInt(document.getElementById("new-week-number").value),
+                asking_price: parseFloat(document.getElementById("new-asking-price").value),
+                image_url: document.getElementById("new-image-url").value.trim(),
+                status: 'AVAILABLE'
+            };
+            const { error } = await supabaseClientInstance.from('properties').insert([record]);
+            if (!error) { alert("🚀 Property injected!"); this.reset(); runGlobalTableSynchronizer(); }
+        });
+
+        document.getElementById("admin-add-owner-form").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const record = {
+                name: document.getElementById("new-owner-name").value.trim(),
+                email: document.getElementById("new-owner-email").value.trim()
+            };
+            const { error } = await supabaseClientInstance.from('Owners').insert([record]);
+            if (!error) { alert("👥 New Owner Record injected!"); this.reset(); runGlobalTableSynchronizer(); }
+        });
+
+        // Lanzamos la descarga inicial masiva de datos relacionales
+        document.addEventListener("DOMContentLoaded", () => {
+            runGlobalTableSynchronizer();
+        });
+    </script>
 </body>
 </html>
