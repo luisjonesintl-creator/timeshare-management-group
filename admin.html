@@ -64,6 +64,7 @@
                 <span class="text-[9px] text-slate-500 font-semibold mt-1">Supabase production client handshake</span>
             </div>
         </div>
+
         <!-- ==================== CONTROL DE PESTAÑAS (TAB BAR) ==================== -->
         <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-px">
             <button onclick="window.switchAdminTab('properties-tab')" id="btn-properties-tab" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider rounded-t-xl transition-all border-b-2 border-cyan-500 bg-slate-800 text-white">
@@ -120,7 +121,7 @@
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all">Inject to public.properties</button>
                     </form>
                 </section>
-
+                <!-- TABLA DE EDICIÓN DE PROPIEDADES -->
                 <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
@@ -139,6 +140,7 @@
                     </table>
                 </div>
             </div>
+
             <!-- ✉️ PESTAÑA CONTAINER: LEADS -->
             <div id="leads-tab" class="tab-content hidden space-y-4">
                 <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
@@ -158,7 +160,6 @@
                     </table>
                 </div>
             </div>
-
             <!-- 👥 PESTAÑA CONTAINER: OWNERS -->
             <div id="owners-tab" class="tab-content hidden space-y-6">
                 <section class="bg-slate-950/40 border border-slate-800 rounded-3xl p-6">
@@ -233,18 +234,14 @@
 
         // ====== 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS (TABS INTERACTIVOS) ======
         window.switchAdminTab = function(tabId) {
-            // Ocultamos todos los contenedores de pestañas
             document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-            // Mostramos el contenedor seleccionado
             document.getElementById(tabId).classList.remove('hidden');
 
-            // Restablecemos los estilos de todos los botones de pestañas
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-slate-800', 'text-white', 'border-b-2', 'border-cyan-500');
                 btn.classList.add('text-slate-400', 'hover:text-slate-200');
             });
 
-            // Aplicamos estilos activos al botón presionado
             const activeBtn = document.getElementById(`btn-${tabId}`);
             if (activeBtn) {
                 activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200');
@@ -313,7 +310,7 @@
                             </tr>`).join('');
                     }
                 }
-                // --- RENDERING public.Owners ---
+                // --- RENDERING public.Owners (CORREGIDO A OWNER_NAME) ---
                 const tableOwners = document.getElementById("admin-owners-table");
                 if (tableOwners && resOwners.data) {
                     if (resOwners.data.length === 0) {
@@ -322,7 +319,7 @@
                         tableOwners.innerHTML = resOwners.data.map(owner => `
                             <tr class="hover:bg-slate-950/20 border-b border-slate-800/50" id="owner-row-${owner.id}">
                                 <td class="p-4 font-mono font-bold text-slate-500">#${owner.id}</td>
-                                <td class="p-4"><input type="text" id="owner-name-${owner.id}" value="${owner.name || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold focus:outline-none focus:border-blue-500 transition-all"></td>
+                                <td class="p-4"><input type="text" id="owner-name-${owner.id}" value="${owner.owner_name || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-bold focus:outline-none focus:border-blue-500 transition-all"></td>
                                 <td class="p-4"><input type="email" id="owner-email-${owner.id}" value="${owner.email || ''}" class="w-full p-2 border border-slate-800 rounded-lg bg-slate-900 text-white text-xs font-medium focus:outline-none focus:border-blue-500 transition-all"></td>
                                 <td class="p-4 text-center">
                                     <div class="flex items-center justify-center space-x-2">
@@ -378,6 +375,7 @@
             const { error } = await supabaseClientInstance.from('properties').update(payload).eq('id', id);
             if (!error) { alert("🏢 Property updated!"); runGlobalTableSynchronizer(); }
         };
+
         window.deletePropertyCRUD = async function(id) {
             if (confirm("Delete property permanently?")) {
                 await supabaseClientInstance.from('properties').delete().eq('id', id);
@@ -398,12 +396,13 @@
         // --- OWNERS MECHANICS ---
         window.saveOwnerCRUD = async function(id) {
             const payload = {
-                name: document.getElementById(`owner-name-${id}`).value.trim(),
+                owner_name: document.getElementById(`owner-name-${id}`).value.trim(),
                 email: document.getElementById(`owner-email-${id}`).value.trim()
             };
             const { error } = await supabaseClientInstance.from('Owners').update(payload).eq('id', id);
             if (!error) { alert("👥 Owner updated!"); runGlobalTableSynchronizer(); }
         };
+
         window.deleteOwnerCRUD = async function(id) {
             if (confirm("Delete owner?")) {
                 await supabaseClientInstance.from('Owners').delete().eq('id', id);
@@ -418,6 +417,7 @@
             const { error } = await supabaseClientInstance.from('offers').update({ status: status }).eq('id', id);
             if (!error) alert("💰 Status synchronized!");
         };
+
         window.deleteOfferCRUD = async function(id) {
             if (confirm("Delete offer transaction?")) {
                 await supabaseClientInstance.from('offers').delete().eq('id', id);
@@ -426,7 +426,8 @@
             }
         };
 
-        // --- FORM INSERTS MECHANICS ---
+        // ====== 4. MECANISMOS DE FORMULARIOS DE INSERCIÓN ======
+
         document.getElementById("admin-add-property-form").addEventListener("submit", async function(e) {
             e.preventDefault();
             const record = {
@@ -444,7 +445,7 @@
         document.getElementById("admin-add-owner-form").addEventListener("submit", async function(e) {
             e.preventDefault();
             const record = {
-                name: document.getElementById("new-owner-name").value.trim(),
+                owner_name: document.getElementById("new-owner-name").value.trim(),
                 email: document.getElementById("new-owner-email").value.trim()
             };
             const { error } = await supabaseClientInstance.from('Owners').insert([record]);
