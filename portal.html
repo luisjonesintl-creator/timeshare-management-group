@@ -56,11 +56,32 @@
     <main class="max-w-7xl mx-auto w-full px-6 py-12 flex-grow space-y-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- COLUMNA IZQUIERDA: INFORMACIÓN Y REQUISITOS DE TITULACIÓN -->
+            <!-- COLUMNA IZQUIERDA: BUSCADOR DE ESTATUS DE PROPIEDAD PARA DUEÑOS -->
             <div class="lg:col-span-5 space-y-6">
+                
+                <!-- MÓDULO INTERACTIVO: CONSULTA DE PROPIEDAD -->
+                <div class="bg-slate-950/60 border border-slate-800 rounded-3xl p-6 space-y-4">
+                    <div class="border-b border-slate-800 pb-2">
+                        <span class="text-blue-400 font-black text-[10px] uppercase tracking-wider block">Real-Time Tracking</span>
+                        <h3 class="text-base font-black text-white tracking-tight">Check Your Listing Status</h3>
+                        <p class="text-[11px] text-slate-500 font-medium">Enter your unique Property ID to track market activity.</p>
+                    </div>
+                    
+                    <!-- INPUT DE BÚSQUEDA RAPIDA -->
+                    <div class="flex gap-2">
+                        <input type="number" id="owner-search-id" placeholder="Enter Property ID (e.g. 1)" class="w-full p-3 rounded-xl bg-slate-900 text-white text-xs border border-slate-800 focus:outline-none focus:border-blue-500 font-mono font-bold placeholder-slate-600">
+                        <button onclick="window.trackOwnerProperty()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Track</button>
+                    </div>
+
+                    <!-- CONTENEDOR DINÁMICO DE RESPUESTA (CONTROLADO POR JAVASCRIPT) -->
+                    <div id="owner-tracking-result" class="hidden p-4 rounded-2xl border bg-slate-900/60 border-slate-800 space-y-3">
+                        <!-- Los datos de la propiedad se inyectarán aquí dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- GUÍA CORPORATIVA ORIGINAL -->
                 <div class="bg-slate-950/40 border border-slate-800 rounded-3xl p-6 space-y-4">
-                    <span class="text-blue-400 font-black text-xs uppercase tracking-wider block">Brokerage Escrow</span>
-                    <h3 class="text-lg font-black text-white tracking-tight">Timeshare Deed Requirements</h3>
+                    <h4 class="text-sm font-black text-white tracking-tight">Timeshare Deed Requirements</h4>
                     <p class="text-slate-400 text-xs font-medium leading-relaxed">
                         To process a secondary market transfer or update an official resale certificate, the original estoppel verification must be presented to our closing agents.
                     </p>
@@ -71,13 +92,7 @@
                         <p>• Current year maintenance fee receipt confirmation</p>
                     </div>
                 </div>
-
-                <div class="p-5 bg-gradient-to-r from-blue-950/20 to-slate-950/40 border border-blue-900/30 rounded-2xl text-xs space-y-1">
-                    <p class="text-blue-400 font-bold">🔒 Secure Encrow Escrow Protected</p>
-                    <p class="text-slate-400 text-[11px]">All ownership operations are audited under corporate title verification clusters.</p>
-                </div>
             </div>
-
             <!-- COLUMNA DERECHA: FORMULARIO DE ASISTENCIA Y REGISTRO -->
             <div class="lg:col-span-7 bg-slate-950/40 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm">
                 <div class="border-b border-slate-800 pb-4 mb-6">
@@ -106,14 +121,14 @@
 
         </div>
     </main>
+
     <!-- PIE DE PÁGINA CORPORATIVO DEL PORTAL -->
-    <footer class="bg-slate-950 text-slate-500 text-[10px] font-bold py-8 text-center border-t border-slate-950">
+    <footer class="bg-slate-950 text-slate-500 text-[10px] font-bold py-8 text-center border-t border-slate-950/40">
         <div class="max-w-7xl mx-auto px-6 space-y-2">
             <p>&copy; 2003-2026 Timeshare Management Group, LLC. All rights reserved.</p>
             <p class="text-slate-700 text-[9px] font-medium font-mono">Owners Authorized Portal | Licensed Escrow Transfer Network</p>
         </div>
     </footer>
-
     <!-- INYECCIÓN OFICIAL DEL SDK DE SUPABASE — RUTA FIJA REAL SIN BLOQUEOS CORS -->
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script>
@@ -151,7 +166,6 @@
                 }
 
                 try {
-                    // Inserción limpia dentro de tu tabla 'leads' de Supabase
                     const { error } = await supabaseClientInstance
                         .from('leads')
                         .insert([leadData]);
@@ -172,6 +186,84 @@
                 }
             });
         });
+
+        // ====== 4. CONSULTA DINÁMICA DE PROPIEDAD Y OFERTAS PARA EL PROPIETARIO ======
+        window.trackOwnerProperty = async function() {
+            const inputId = document.getElementById("owner-search-id").value.trim();
+            const resultBox = document.getElementById("owner-tracking-result");
+            
+            if (!inputId) {
+                alert("Please enter a valid Property ID.");
+                return;
+            }
+
+            resultBox.classList.remove("hidden");
+            resultBox.innerHTML = `
+                <div class="text-center py-4 space-y-2">
+                    <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Fetching Deeded Contract Metrics...</p>
+                </div>`;
+
+            try {
+                // 1. Buscamos el resort por su ID numérico
+                const { data: property, error: propError } = await supabaseClientInstance
+                    .from('properties')
+                    .select('*')
+                    .eq('id', parseInt(inputId))
+                    .single();
+
+                if (propError || !property) {
+                    resultBox.innerHTML = `
+                        <div class="text-xs text-rose-400 font-bold p-2 text-center">
+                            ❌ Property ID #TMG${inputId} not found in verified registry.
+                        </div>`;
+                    return;
+                }
+
+                // 2. Buscamos si existen ofertas activas ligadas a este ID en la tabla 'offers'
+                const { data: offers } = await supabaseClientInstance
+                    .from('offers')
+                    .select('*')
+                    .eq('property_id', property.id);
+
+                const offerCount = offers ? offers.length : 0;
+                
+                let statusBadgeColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                if (property.status === 'PENDING_SALE') statusBadgeColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                if (property.status === 'RENTED') statusBadgeColor = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+
+                // 3. Pintamos las estadísticas de la propiedad al dueño
+                resultBox.innerHTML = `
+                    <div class="text-[10px] font-mono text-slate-500 font-bold border-b border-slate-800 pb-2 flex justify-between items-center">
+                        <span>RECORD #TMG${property.id}</span>
+                        <span class="px-2 py-0.5 rounded-full border ${statusBadgeColor}">${property.status || 'AVAILABLE'}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">Resort Name</span>
+                        <p class="text-xs font-black text-white leading-tight">${property.resort_name}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
+                            <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">Asking Price</span>
+                            <span class="text-sm font-black text-white">\$${Number(property.asking_price || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
+                            <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">Market Offers</span>
+                            <span class="text-sm font-black text-cyan-400 flex items-center">
+                                <span class="h-1.5 w-1.5 rounded-full ${offerCount > 0 ? 'bg-cyan-400 animate-pulse' : 'bg-slate-600'} mr-1.5"></span>
+                                ${offerCount} Received
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-[9px] font-bold text-slate-500 pt-1 text-center font-mono">
+                        Interval Type: ${property.listing_type} | Week: ${property.week_number || 'N/A'}
+                    </div>`;
+
+            } catch (err) {
+                console.error("Owner tracking error:", err);
+                resultBox.innerHTML = `<div class="text-xs text-rose-500 text-center font-bold">Failed to connect to transfer nodes.</div>`;
+            }
+        };
     </script>
 </body>
 </html>
